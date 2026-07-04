@@ -1,5 +1,5 @@
 /**
- * Utility functions for formatting common values in property management.
+ * Utility functions for formatting common values in Omamie.
  */
 
 /**

@@ -39,7 +39,7 @@ Property owners and agents looking to increase occupancy rates, reduce vacancy p
 
 ## Value Proposition
 
-A centralized property-management platform that connects the right tenants with the right properties. By collecting structured requirements from tenants and detailed property data from owners, the platform automates intelligent matching, saving time and reducing friction for everyone involved.
+A centralized Omamie property management platform that connects the right tenants with the right properties. By collecting structured requirements from tenants and detailed property data from owners, the platform automates intelligent matching, saving time and reducing friction for everyone involved.
 
 ## Validation Strategy (MVP Initial)
 

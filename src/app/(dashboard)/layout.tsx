@@ -20,7 +20,7 @@ export default async function DashboardLayout({
       <header className="border-b">
         <div className="mx-auto flex h-14 max-w-5xl items-center px-4">
           <Link href="/dashboard" className="text-lg font-semibold">
-            PropManager
+            Omamie
           </Link>
           <nav className="ml-auto flex items-center gap-2">
             <span className="text-muted-foreground text-sm">{user.email}</span>

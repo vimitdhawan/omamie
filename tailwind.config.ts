@@ -1,4 +1,4 @@
-// Tailwind configuration – aligns property-management design tokens with Tailwind utilities.
+// Tailwind configuration – aligns omamie design tokens with Tailwind utilities.
 // NOTE: Tailwind CSS v4 reads theme tokens from the CSS file (globals.css) via @theme.
 // This file is kept as a human-readable reference of the design system mapping.
 import type { Config } from "tailwindcss";

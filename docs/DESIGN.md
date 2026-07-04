@@ -1,7 +1,7 @@
 ---
 version: alpha
-name: property-management-design
-description: A clean, photography-driven property-management marketplace built on a white canvas with a primary accent color (#ff385c). The design emphasizes generous whitespace, soft rounded corners, and clear hierarchy for property listings, search, and booking flows. All typography uses the Inter fallback stack.
+name: omamie-design
+description: A clean, photography-driven Omamie property management marketplace built on a white canvas with a primary accent color (#ff385c). The design emphasizes generous whitespace, soft rounded corners, and clear hierarchy for property listings, search, and booking flows. All typography uses the Inter fallback stack.
 # Design system notes – colors map to Tailwind semantic tokens; light mode only, dark mode can be added later
 
 colors:
@@ -348,7 +348,7 @@ components:
 
 ## Overview
 
-The platform is the canonical example of a generous, photography-led property-management marketplace. The base canvas is **pure white** (`{colors.canvas}` — #ffffff) with deep near-black ink (`{colors.ink}` — #222222) for headlines and body, and a single voltage of **primary accent** (`{colors.primary}` — #ff385c) carrying every primary CTA, the search-button orb, and inline brand links. There is no secondary brand color in mainline marketing — the **Premium purple** (`{colors.premium}` — #460479) and **Featured magenta** (`{colors.featured}` — #92174d) tokens are sub-brand accents that only appear inside premium / featured property contexts.
+The platform is the canonical example of a generous, photography-led Omamie property management marketplace. The base canvas is **pure white** (`{colors.canvas}` — #ffffff) with deep near-black ink (`{colors.ink}` — #222222) for headlines and body, and a single voltage of **primary accent** (`{colors.primary}` — #ff385c) carrying every primary CTA, the search-button orb, and inline brand links. There is no secondary brand color in mainline marketing — the **Premium purple** (`{colors.premium}` — #460479) and **Featured magenta** (`{colors.featured}` — #92174d) tokens are sub-brand accents that only appear inside premium / featured property contexts.
 
 Type runs **Inter** (a variable font), with a system stack underneath (`system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif`).
 
@@ -502,7 +502,7 @@ There are no progressive elevation tiers — the system either has the one shado
 
 ### Top Navigation
 
-**`top-nav`** — White surface, 80px height, 1px bottom hairline. The property-management wordmark sits flush left, the three product tabs (Properties / Rentals / Services) sit in the dead center, and account utilities (agent link, language globe, account menu) sit flush right.
+**`top-nav`** — White surface, 80px height, 1px bottom hairline. The Omamie wordmark sits flush left, the three product tabs (Properties / Rentals / Services) sit in the dead center, and account utilities (agent link, language globe, account menu) sit flush right.
 
 **`product-tab-active`** — Ink label in `{typography.nav-link}`, 32px hand-illustrated icon, 2px ink underline rule beneath the icon-label pair.
 
