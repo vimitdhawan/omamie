@@ -105,7 +105,7 @@ Connect tenants with property owners and agents.
 
 ---
 
-## Vertical 2: Property Management (Future)
+## Vertical 2: Owner / Agent Operations (Future)
 
 Help owners manage their properties without hassle.
 
@@ -421,7 +421,7 @@ When a match is found:
 
 # Future Opportunities
 
-- Property management tools
+- Property operations tools
 - Service marketplace
 - Contract management
 - Rent payments

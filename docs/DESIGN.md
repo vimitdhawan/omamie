@@ -1,7 +1,7 @@
 ---
 version: alpha
 name: omamie-design
-description: A clean, photography-driven Omamie property management marketplace built on a white canvas with a primary accent color (#ff385c). The design emphasizes generous whitespace, soft rounded corners, and clear hierarchy for property listings, search, and booking flows. All typography uses the Inter fallback stack.
+description: A clean, photography-driven Omamie — a property management marketplace built on a white canvas with a primary accent color (#ff385c). The design emphasizes generous whitespace, soft rounded corners, and clear hierarchy for property listings, search, and booking flows. All typography uses the Inter fallback stack.
 # Design system notes – colors map to Tailwind semantic tokens; light mode only, dark mode can be added later
 
 colors:

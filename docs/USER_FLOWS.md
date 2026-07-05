@@ -448,7 +448,7 @@ Property viewing is scheduled.
 
 These workflows are outside MVP scope.
 
-## Omamie
+## Owner / Agent Operations
 
 - Tenant management
 - Rental contracts

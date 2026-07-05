@@ -491,7 +491,7 @@ Platform analytics.
 
 ---
 
-# Future Vertical: Omamie
+# Future Vertical: Owner / Agent Operations
 
 Placeholder routes.
 
@@ -585,6 +585,6 @@ Excluded
 - Messaging
 - Contracts
 - Service marketplace
-- Property management
+- Property operations
 - Reviews and ratings
 - Mobile application
