@@ -1,10 +1,10 @@
-# Property Management Platform
+# Omamie
 
-A clean, production-ready foundation for a property management platform built with Next.js, Tailwind CSS, TypeScript, and Supabase SSR.
+A clean, production-ready foundation for Omamie — a property management platform — built with Next.js, Tailwind CSS, TypeScript, and Supabase SSR.
 
 ## Goal & Architecture
 
-This application acts as the backend and frontend skeleton for a property management system. It supports:
+This application acts as the backend and frontend skeleton for Omamie — a property management system. It supports:
 
 - **Tenants** searching for properties based on size, room count, pet-friendliness, and location.
 - **Owners and Agents** onboarding and managing properties.

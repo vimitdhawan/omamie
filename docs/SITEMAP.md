@@ -491,17 +491,17 @@ Platform analytics.
 
 ---
 
-# Future Vertical: Property Management
+# Future Vertical: Owner / Agent Operations
 
 Placeholder routes.
 
 ```txt
-/property-management/dashboard
-/property-management/properties
-/property-management/tenants
-/property-management/contracts
-/property-management/payments
-/property-management/maintenance
+/omamie/dashboard
+/omamie/properties
+/omamie/tenants
+/omamie/contracts
+/omamie/payments
+/omamie/maintenance
 ```
 
 ---
@@ -585,6 +585,6 @@ Excluded
 - Messaging
 - Contracts
 - Service marketplace
-- Property management
+- Property operations
 - Reviews and ratings
 - Mobile application

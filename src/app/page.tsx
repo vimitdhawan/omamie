@@ -7,7 +7,7 @@ export default function HomePage() {
       <header className="border-b">
         <div className="mx-auto flex h-14 max-w-5xl items-center px-4">
           <Link href="/" className="text-lg font-semibold">
-            PropManager
+            Omamie
           </Link>
           <nav className="ml-auto flex items-center gap-2">
             <Link
@@ -28,7 +28,7 @@ export default function HomePage() {
 
       <main className="flex flex-1 flex-col items-center justify-center gap-6 px-4 text-center">
         <h1 className="text-4xl font-bold tracking-tight">
-          Property Management,
+          Omamie,
           <br />
           Simplified.
         </h1>
@@ -53,7 +53,7 @@ export default function HomePage() {
       </main>
 
       <footer className="text-muted-foreground border-t py-6 text-center text-sm">
-        &copy; {new Date().getFullYear()} PropManager. All rights reserved.
+        &copy; {new Date().getFullYear()} Omamie. All rights reserved.
       </footer>
     </div>
   );

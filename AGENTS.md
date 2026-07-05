@@ -6,7 +6,7 @@ Welcome! This file coordinates agent behavior across different AI tooling enviro
 
 ## 1. Project Goal & Features
 
-This application acts as the backend and frontend skeleton for a **Property Management Platform**. It supports:
+This application acts as the backend and frontend skeleton for **Omamie — a property management platform**. It supports:
 
 - **Tenants** searching for properties based on size (sqm), room count, pet-friendliness, and location.
 - **Owners and Agents** onboarding and managing properties.

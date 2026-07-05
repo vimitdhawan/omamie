@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Property Management",
-  description: "Property management platform for tenants, owners, and agents",
+  title: "Omamie",
+  description: "Omamie — property management for tenants, owners, and agents",
 };
 
 export default function RootLayout({

@@ -34,9 +34,7 @@ export function SignupForm() {
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle>Create an account</CardTitle>
-        <CardDescription>
-          Get started with your property management account
-        </CardDescription>
+        <CardDescription>Get started with your Omamie account</CardDescription>
       </CardHeader>
       <form action={formAction}>
         <CardContent className="flex flex-col gap-4">
