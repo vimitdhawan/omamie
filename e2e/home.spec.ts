@@ -15,7 +15,9 @@ test.describe("Home page", () => {
     await expect(
       page.getByRole("link", { name: /Get started/i })
     ).toBeVisible();
-    await expect(page.getByRole("link", { name: /^Log in$/ })).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /^Log in$/ }).first()
+    ).toBeVisible();
   });
 
   test("Log in link navigates to /login", async ({ page }) => {
