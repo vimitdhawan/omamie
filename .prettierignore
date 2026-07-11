@@ -21,3 +21,9 @@ skills-lock.json
 
 # Public assets
 public/
+
+# Test artifacts
+coverage/
+test-results/
+playwright-report/
+playwright/.cache/
