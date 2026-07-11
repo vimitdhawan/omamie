@@ -105,6 +105,77 @@ To prevent linting conflicts, compilation errors, and Git merge issues, all agen
    NEXT_PUBLIC_SUPABASE_URL=https://dummy.supabase.co NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy npm run build
    ```
 3. **Pre-commit Integrity**: Commit hooks are set up via Husky and lint-staged. When modifying files, make sure to format with Prettier to avoid hook failures.
+4. **Test Verification**: New features or bug fixes MUST be accompanied by tests (see §7). Run the relevant tests before declaring a task complete:
+   ```bash
+   npm run test           # unit + component (Vitest)
+   npm run test:e2e       # end-to-end (Playwright, needs local Supabase stack)
+   ```
+
+---
+
+## 7. Testing Strategy
+
+The project uses a two-layer testing stack aligned with the Next.js 16 / React 19 architecture:
+
+| Layer        | Tool                                       | Purpose                                                                |
+| :----------- | :----------------------------------------- | :--------------------------------------------------------------------- |
+| Unit / Comp. | **Vitest** + React Testing Library + JSDOM | Pure logic (`schema.ts`, `service.ts`, `utils.ts`) + client components |
+| End-to-End   | **Playwright** + **local Supabase stack**  | User flows against a real `next build` + real DB / auth                |
+
+### 7.1 Directory Layout
+
+```
+src/features/<name>/__tests__/         # co-located unit/component tests
+  *.test.ts                              # logic (schema, service, utils)
+  *.test.tsx                             # component tests (RTL)
+
+e2e/                                     # Playwright specs
+  *.spec.ts
+  supabase/seed.sql                      # test seed applied via explicit `psql -f` step
+
+src/lib/test/supabase-mock.ts           # shared Supabase client mock builder
+vitest.config.ts                         # Vitest configuration
+vitest.setup.ts                          # RTL jest-dom + next/* mocks
+playwright.config.ts                     # Playwright configuration
+```
+
+### 7.2 NPM Scripts
+
+```bash
+npm run test                # vitest run (one-shot)
+npm run test:watch          # vitest in watch mode
+npm run test:coverage       # vitest run + v8 coverage report (no thresholds enforced)
+npm run test:e2e            # playwright test (requires `next build` + Supabase stack)
+npm run test:e2e:ui         # playwright interactive UI mode for local debugging
+```
+
+### 7.3 Unit Test Conventions
+
+- **Layer to test**: `service.ts`, `utils.ts`, `schema.ts`, and any pure helper. Avoid unit-testing `actions.ts` (Server Actions) — those are covered by E2E.
+- **Repository tests**: `repository.ts` tests mock `@/lib/supabase/server`'s `createClient` factory, **never** the repository module itself. The repository code still runs against the mock client.
+- **Mock pattern**: use `vi.hoisted()` to build the client inline and wire `vi.mock("@/lib/supabase/server", () => ({ createClient }))`. See `src/features/auth/__tests__/service.test.ts` for the canonical pattern. Do not import `@/lib/test/supabase-mock` from inside the `vi.hoisted` factory — Node's CJS `require` cannot resolve `.ts` paths so the helper must be imported at the top of the test instead.
+- **Co-locate tests** under `src/features/<name>/__tests__/`. Filename suffix: `*.test.ts(x)`.
+- **Async Server Components** are not unit-tested. Cover them with Playwright instead (per Next.js docs guidance).
+
+### 7.4 E2E Test Conventions
+
+- **Local Supabase**: E2E tests target the local Supabase stack started via the Supabase CLI. The `webServer` block runs `npm run start` against the production build; CI is responsible for running `supabase start` + `supabase db reset` before the tests execute.
+- **Seed**: deterministic credentials live in `e2e/supabase/seed.sql`. `supabase db reset` only loads `supabase/seed.sql` (dev-time placeholder), so the E2E seed is applied via an explicit `psql -f e2e/supabase/seed.sql` step in CI. When running E2E locally, execute the same `psql` command manually after `db reset`. Never commit real Supabase project credentials.
+- **Smoke vs flow**: pure smoke tests (home page, login form rendering) live in `home.spec.ts` and `auth.spec.ts` and don't depend on Supabase being seeded. Full authenticated flows belong in their own specs and assume the seed is applied.
+- **Environment for build**: when running E2E locally, build with the local API URL inlined:
+  ```bash
+  NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 \
+  NEXT_PUBLIC_SUPABASE_ANON_KEY=<local-anon-key> \
+  npm run build
+  npm run test:e2e
+  ```
+
+### 7.5 CI
+
+- **`quality-and-build`** → lint + type-check + `next build`.
+- **`unit-tests`** → `npm run test:coverage` and uploads the coverage report artifact.
+- **`e2e-tests`** → installs Supabase CLI, starts the local stack, resets the DB (loads migrations + dev placeholder seed), applies the E2E seed via `psql -f e2e/supabase/seed.sql`, builds Next.js with the local API URL, runs `npm run test:e2e`, uploads the Playwright report artifact, then tears down the stack.
+- All three jobs run on every PR and every push to `main`/`master`. Branch protection should require all three to pass before merge.
 
 <!-- OPENSPEC:START -->
 
