@@ -413,26 +413,26 @@ The system runs **Inter** for everything — display, body, navigation, captions
 
 ### Hierarchy
 
-| Token                         | Size | Weight | Line Height | Letter Spacing     | Use                                                           |
-| ----------------------------- | ---- | ------ | ----------- | ------------------ | ------------------------------------------------------------- |
-| `{typography.rating-display}` | 64px | 700    | 1.1         | -1px               | Listing detail rating display ("4.81")                        |
-| `{typography.display-xl}`     | 28px | 700    | 1.43        | 0                  | Homepage hero heading                                         |
-| `{typography.display-lg}`     | 22px | 500    | 1.18        | -0.44px            | Listing detail hero h1                                        |
-| `{typography.display-md}`     | 21px | 700    | 1.43        | 0                  | Section heads inside listing detail                           |
-| `{typography.display-sm}`     | 20px | 600    | 1.20        | -0.18px            | Sub-section titles ("Amenities", "Reviews")                   |
-| `{typography.title-md}`       | 16px | 600    | 1.25        | 0                  | City link block titles                                        |
-| `{typography.title-sm}`       | 16px | 500    | 1.25        | 0                  | Footer column heads                                           |
-| `{typography.body-md}`        | 16px | 400    | 1.5         | 0                  | Default running-text                                          |
-| `{typography.body-sm}`        | 14px | 400    | 1.43        | 0                  | Card meta lines, dates, prices                                |
-| `{typography.caption}`        | 14px | 500    | 1.29        | 0                  | Search field segment labels                                   |
-| `{typography.caption-sm}`     | 13px | 400    | 1.23        | 0                  | Footer legal line                                             |
-| `{typography.badge}`          | 11px | 600    | 1.18        | 0                  | "Guest favorite" floating badge text                          |
-| `{typography.micro-label}`    | 12px | 700    | 1.33        | 0                  | Property amenity micro-labels                                 |
-| `{typography.uppercase-tag}`  | 8px  | 700    | 1.25        | 0.32px (uppercase) | "NEW" badge on product-nav tabs                               |
-| `{typography.button-md}`      | 16px | 500    | 1.25        | 0                  | Primary CTA button labels                                     |
-| `{typography.button-sm}`      | 14px | 500    | 1.29        | 0                  | Pill button labels (category strip)                           |
-| `{typography.link}`           | 14px | 400    | 1.43        | 0                  | Inline body links                                             |
-| `{typography.nav-link}`       | 16px | 600    | 1.25        | 0                  | Top product-nav labels (Properties, Rentals, Services)        |
+| Token                         | Size | Weight | Line Height | Letter Spacing     | Use                                                    |
+| ----------------------------- | ---- | ------ | ----------- | ------------------ | ------------------------------------------------------ |
+| `{typography.rating-display}` | 64px | 700    | 1.1         | -1px               | Listing detail rating display ("4.81")                 |
+| `{typography.display-xl}`     | 28px | 700    | 1.43        | 0                  | Homepage hero heading                                  |
+| `{typography.display-lg}`     | 22px | 500    | 1.18        | -0.44px            | Listing detail hero h1                                 |
+| `{typography.display-md}`     | 21px | 700    | 1.43        | 0                  | Section heads inside listing detail                    |
+| `{typography.display-sm}`     | 20px | 600    | 1.20        | -0.18px            | Sub-section titles ("Amenities", "Reviews")            |
+| `{typography.title-md}`       | 16px | 600    | 1.25        | 0                  | City link block titles                                 |
+| `{typography.title-sm}`       | 16px | 500    | 1.25        | 0                  | Footer column heads                                    |
+| `{typography.body-md}`        | 16px | 400    | 1.5         | 0                  | Default running-text                                   |
+| `{typography.body-sm}`        | 14px | 400    | 1.43        | 0                  | Card meta lines, dates, prices                         |
+| `{typography.caption}`        | 14px | 500    | 1.29        | 0                  | Search field segment labels                            |
+| `{typography.caption-sm}`     | 13px | 400    | 1.23        | 0                  | Footer legal line                                      |
+| `{typography.badge}`          | 11px | 600    | 1.18        | 0                  | "Guest favorite" floating badge text                   |
+| `{typography.micro-label}`    | 12px | 700    | 1.33        | 0                  | Property amenity micro-labels                          |
+| `{typography.uppercase-tag}`  | 8px  | 700    | 1.25        | 0.32px (uppercase) | "NEW" badge on product-nav tabs                        |
+| `{typography.button-md}`      | 16px | 500    | 1.25        | 0                  | Primary CTA button labels                              |
+| `{typography.button-sm}`      | 14px | 500    | 1.29        | 0                  | Pill button labels (category strip)                    |
+| `{typography.link}`           | 14px | 400    | 1.43        | 0                  | Inline body links                                      |
+| `{typography.nav-link}`       | 16px | 600    | 1.25        | 0                  | Top product-nav labels (Properties, Rentals, Services) |
 
 ### Principles
 
