@@ -1,0 +1,57 @@
+# PR-Agent configuration for Omamie
+# Tailored to the AGENTS.md architecture conventions
+
+[config]
+model = "nvidia_nim/nvidia/nemotron-3-ultra"
+fallback_models = ["nvidia_nim/meta/llama-3.1-70b-instruct"]
+# NVIDIA NIM base URL (defaults to https://integrate.api.nvidia.com/v1/)
+# api_base = "https://integrate.api.nvidia.com/v1/"
+
+[pr_reviewer]
+# Review focus areas for Omamie (Next.js 16 + React 19 + Supabase SSR)
+extra_instructions = """
+Review focus areas for Omamie (Next.js 16 + React 19 + Supabase SSR):
+
+1. **Architecture Layer Boundaries** (from AGENTS.md §4):
+   - repository.ts: ONLY direct DB queries via `@/lib/supabase/server`
+   - service.ts: Business logic ONLY, calls repository.ts + schema.ts
+   - actions.ts: Server Actions ONLY, calls service.ts + schema.ts
+   - NO direct repository.ts imports in actions.ts
+   - NO DB queries in Server Components or client components
+
+2. **Next.js 16 Async APIs** (AGENTS.md §5):
+   - Must use `await cookies()`, `await headers()`, `await params`, `await searchParams`
+   - NO synchronous `cookies()` / `headers()` calls
+
+3. **Proxy / Middleware** (AGENTS.md §5):
+   - Intercept logic in `src/proxy.ts` ONLY
+   - NO `middleware.ts` (deprecated in Next.js 16)
+
+4. **Supabase Usage** (AGENTS.md §4):
+   - NO browser-side Supabase clients
+   - All auth/data access on server via `@/lib/supabase/server`
+   - NO direct `supabase.from()` calls in Server Actions
+
+5. **Testing** (AGENTS.md §7):
+   - Unit tests for service.ts, schema.ts, utils.ts (Vitest)
+   - E2E tests for Server Actions + auth flows (Playwright)
+   - Mock Supabase via `vi.hoisted()` + `vi.mock("@/lib/supabase/server")`
+
+6. **General Code Quality**:
+   - TypeScript strict mode — no `any` unless justified
+   - Zod schemas for all Server Action inputs
+   - Proper error handling with user-friendly messages
+   - No console.log in production code
+"""
+# Enable comprehensive reviews
+require_tests_review = false
+max_comments = 20
+
+[pr_code_suggestions]
+num_code_suggestions = 8
+suggestions_score_threshold = 7
+apply_automatically = false
+
+[pr_description]
+# Auto-generate PR descriptions
+enabled = true
