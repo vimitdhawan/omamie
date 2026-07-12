@@ -1,33 +1,33 @@
 ---
 version: alpha
 name: omamie-design
-description: A clean, photography-driven Omamie — a property management marketplace built on a white canvas with a primary accent color (#ff385c). The design emphasizes generous whitespace, soft rounded corners, and clear hierarchy for property listings, search, and booking flows. All typography uses the Inter fallback stack.
+description: A clean, photography-driven Omamie — a property management marketplace built on a pure white canvas with a primary blue accent (#336cfb). The design emphasizes generous whitespace, soft rounded corners, and clear hierarchy for property listings, search, and booking flows. All typography uses the Inter fallback stack.
 # Design system notes – colors map to Tailwind semantic tokens; light mode only, dark mode can be added later
 
 colors:
   # Tailwind semantic token (light mode) → Purpose
-  primary: "#ff385c" # Primary CTA / accent (maps to bg-primary / text-primary-foreground)
-  primary-active: "#e00b41" # Active state for primary CTA
-  primary-disabled: "#ffd1da" # Disabled primary CTA
-  primary-error-text: "#c13515" # Error text for forms
-  primary-error-text-hover: "#b32505" # Error text hover state
-  premium: "#460479" # Premium badge / accent (e.g., featured property)
-  featured: "#92174d" # Featured badge / accent
-  ink: "#222222" # Default text on light surfaces
-  body: "#3f3f3f" # Secondary text / long-form copy
-  muted: "#6a6a6a"
-  muted-soft: "#929292"
-  hairline: "#dddddd"
-  hairline-soft: "#ebebeb"
-  border-strong: "#c1c1c1"
+  primary: "#336cfb" # Primary CTA / accent (maps to bg-primary / text-primary-foreground)
+  primary-active: "#1e52d9" # Active state for primary CTA
+  primary-disabled: "#adc6ff" # Disabled primary CTA
+  primary-error-text: "#ba1a1a" # Error text for forms
+  primary-error-text-hover: "#9a1515" # Error text hover state
+  premium: "#6174b3" # Premium badge / accent (e.g., featured property)
+  featured: "#ca5100" # Featured badge / accent
+  ink: "#757681" # Default text on light surfaces
+  body: "#757681" # Secondary text / long-form copy
+  muted: "#9da0aa"
+  muted-soft: "#b8bac3"
+  hairline: "#c4c6cf"
+  hairline-soft: "#e1e6f1"
+  border-strong: "#74777f"
   canvas: "#ffffff"
-  surface-soft: "#f7f7f7"
+  surface-soft: "#f1f3f9"
   surface-card: "#ffffff"
-  surface-strong: "#f2f2f2"
+  surface-strong: "#e6ebf4"
   on-primary: "#ffffff"
   on-dark: "#ffffff"
-  legal-link: "#428bff"
-  star-rating: "#222222"
+  legal-link: "#336cfb"
+  star-rating: "#757681"
   scrim: "#000000"
 
 typography:
@@ -348,59 +348,58 @@ components:
 
 ## Overview
 
-The platform is the canonical example of a generous, photography-led Omamie property management marketplace. The base canvas is **pure white** (`{colors.canvas}` — #ffffff) with deep near-black ink (`{colors.ink}` — #222222) for headlines and body, and a single voltage of **primary accent** (`{colors.primary}` — #ff385c) carrying every primary CTA, the search-button orb, and inline brand links. There is no secondary brand color in mainline marketing — the **Premium purple** (`{colors.premium}` — #460479) and **Featured magenta** (`{colors.featured}` — #92174d) tokens are sub-brand accents that only appear inside premium / featured property contexts.
+The platform is the canonical example of a generous, photography-led Omamie property management marketplace. The base canvas is **pure white** (`{colors.canvas}` — #ffffff) with a modern, medium-dark neutral (`{colors.ink}` — #757681) for headlines and body, and a single voltage of **primary blue** (`{colors.primary}` — #336cfb) carrying every primary CTA, the search-button orb, and inline brand links. The **Muted Navy** (`{colors.premium}` — #6174b3) and **Burnt Orange** (`{colors.featured}` — #ca5100) tokens are sub-brand accents that only appear inside premium / featured property contexts to provide visual distinction without breaking the professional tone.
 
 Type runs **Inter** (a variable font), with a system stack underneath (`system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif`).
 
-The shape language is **soft**. Buttons are 8px radius (`{rounded.sm}`), property cards are ~14px (`{rounded.md}`), the search bar is fully pill-shaped (`{rounded.full}`), and icon buttons and orbs are circles (`{rounded.full}`). There is essentially no hard corner anywhere except the body grid itself — every interactive element is rounded.
+The shape language is **rounded**. Buttons are 8px radius (`{rounded.sm}`), property cards are 16px (`{rounded.md}`), the search bar is fully pill-shaped (`{rounded.full}`), and icon buttons and orbs are circles (`{rounded.full}`). There is essentially no hard corner anywhere except the body grid itself — every interactive element is rounded.
 
 **Key Characteristics:**
 
-- Single accent color: `{colors.primary}` (#ff385c) carries every primary CTA, the search orb, and inline links. Used scarcely — most pages are 90% white + ink with one or two accent moments.
+- Single accent color: `{colors.primary}` (#336cfb) carries every primary CTA, the search orb, and inline links. Used scarcely — most pages are 90% white + ink with one or two accent moments.
 - Custom variable type: **Inter** font. Display weights sit at 500–700, body at 400. Modest weight is intentional — the system trusts photography for visual heft.
-- Three-product top nav: Properties, Rentals, Services — each with a hand-illustrated 32px icon and "NEW" badges (`{component.new-tag}`) on the newer products. Active tab uses an underline rule (`{component.product-tab-active}`).
+- Three-product top nav: Properties, Rentals, Services — each with a hand-illustrated 32px icon and "NEW" badges (`{component.new-tag}`) on the newer products.
 - Pill-shaped global search bar: white surface, fully rounded (`{rounded.full}`), divided by 1px hairlines into Where / When / Who segments, terminated by a circular primary search orb (`{component.search-orb}`).
-- Property cards are photo-first: aspect-ratio rectangles with `{rounded.md}` corner clipping, swipeable image carousel, "Guest favorite" floating badge top-left, heart icon top-right, then 4–5 lines of meta beneath.
-- Editorial dropdowns (footer, language picker) are clean text columns unmanaged columns over the white canvas — no card surface, no shadow.
-- The design system caps elevation at one shadow tier (`box-shadow: rgba(0,0,0,0.02) 0 0 0 1px, rgba(0,0,0,0.04) 0 2px 6px, rgba(0,0,0,0.1) 0 4px 8px`) — used on hover-floated cards and search/account dropdowns. This is the single shadow definition in the entire system.
-- 8px base spacing system, with major sections at `{spacing.section}` (64px) — generous but not airy enough to feel editorial-magazine; the marketplace density wants more cards per scroll.
+- Property cards are photo-first: aspect-ratio rectangles with `{rounded.md}` corner clipping, swipeable image carousel, "Guest favorite" floating badge top-left, heart icon top-right.
+- The design system caps elevation at one shadow tier — used on hover-floated cards and search/account dropdowns.
+- 8px base spacing system, with major sections at `{spacing.section}` (64px) — generous but efficient.
 
 ## Colors
 
 ### Brand & Accent
 
-- **Primary** (`{colors.primary}` — #ff385c): The single brand color. Used for primary CTA backgrounds (Reserve, Continue, Search), the search orb, and inline brand links.
-- **Primary Active** (`{colors.primary-active}` — #e00b41): The press / pointer-down variant — slightly more saturated. Used on `{component.button-primary-active}`.
-- **Primary Disabled** (`{colors.primary-disabled}` — #ffd1da): A pale tint used on disabled CTAs.
-- **Premium** (`{colors.premium}` — #460479): Sub-brand accent for premium/first property tier. Only appears inside premium-branded surfaces — never in mainline marketing.
-- **Featured** (`{colors.featured}` — #92174d): Sub-brand accent for featured property. Same scoping as Premium — sub-product only.
+- **Primary** (`{colors.primary}` — #336cfb): The single brand color. Used for primary CTA backgrounds (Reserve, Continue, Search), the search orb, and inline brand links.
+- **Primary Active** (`{colors.primary-active}` — #1e52d9): The press / pointer-down variant — slightly deeper blue.
+- **Primary Disabled** (`{colors.primary-disabled}` — #adc6ff): A pale blue tint used on disabled CTAs.
+- **Premium** (`{colors.premium}` — #6174b3): Sub-brand accent for premium/first property tier.
+- **Featured** (`{colors.featured}` — #ca5100): Sub-brand accent for featured property. High-contrast orange used for visibility.
 
 ### Surface
 
-- **Canvas** (`{colors.canvas}` — #ffffff): The default page floor for every public page. The platform does not have a dark mode on the public web as of now.
-- **Surface Soft** (`{colors.surface-soft}` — #f7f7f7): The lightest fill — used on disabled fields, sub-nav hover backgrounds, and the inline search filter band.
-- **Surface Strong** (`{colors.surface-strong}` — #f2f2f2): Slightly heavier fill — circular icon-button surface (e.g., the breadcrumb back-arrow and listing toolbar buttons).
+- **Canvas** (`{colors.canvas}` — #ffffff): The default page floor for every public page.
+- **Surface Soft** (`{colors.surface-soft}` — #f1f3f9): The lightest fill — used on disabled fields and sub-nav hover backgrounds.
+- **Surface Strong** (`{colors.surface-strong}` — #e6ebf4): Slightly heavier fill — circular icon-button surface.
 
 ### Hairlines & Borders
 
-- **Hairline** (`{colors.hairline}` — #dddddd): The default 1px border tone — search bar dividers, table separators, footer column splitters, card 1px borders.
-- **Hairline Soft** (`{colors.hairline-soft}` — #ebebeb): A lighter divider used on long-scrolling editorial body separators.
-- **Border Strong** (`{colors.border-strong}` — #c1c1c1): A heavier stroke used on disabled outline buttons and form input outlines after focus.
+- **Hairline** (`{colors.hairline}` — #c4c6cf): The default 1px border tone.
+- **Hairline Soft** (`{colors.hairline-soft}` — #e1e6f1): A lighter divider used on long-scrolling editorial body separators.
+- **Border Strong** (`{colors.border-strong}` — #74777f): A heavier stroke used on disabled outline buttons and form focus states.
 
 ### Text
 
-- **Ink** (`{colors.ink}` — #222222): The dominant text color on light surfaces. Display headlines, body paragraphs, primary nav links, and most inline link text. Never pure black.
-- **Body** (`{colors.body}` — #3f3f3f): A secondary running-text color used inside long-form review and amenity copy where ink would feel too heavy.
-- **Muted** (`{colors.muted}` — #6a6a6a): Sub-titles inside city link blocks, inactive product-tab labels, footer category sub-labels, "View all" links.
-- **Muted Soft** (`{colors.muted-soft}` — #929292): Disabled link text. Used very sparingly.
-- **Star Rating** (`{colors.star-rating}` — #222222): The same ink token — star icons and rating numbers all render in ink rather than a yellow/gold color.
-- **On Primary** (`{colors.on-primary}` — #ffffff): White text on primary accent CTAs.
+- **Ink** (`{colors.ink}` — #757681): The dominant text color on light surfaces. Provides a professional, softer contrast than pure black.
+- **Body** (`{colors.body}` — #757681): Main running-text color.
+- **Muted** (`{colors.muted}` — #9da0aa): Sub-titles and inactive UI labels.
+- **Muted Soft** (`{colors.muted-soft}` — #b8bac3): Disabled link text.
+- **Star Rating** (`{colors.star-rating}` — #757681): Star icons and rating numbers render in the neutral ink token.
+- **On Primary** (`{colors.on-primary}` — #ffffff): White text on primary blue CTAs.
 
 ### Semantic
 
-- **Error** (`{colors.primary-error-text}` — #c13515): Inline error text for form validation. Distinct from primary — slightly darker, more saturated red.
-- **Error Hover** (`{colors.primary-error-text-hover}` — #b32505): Darkens on link hover.
-- **Legal Link Blue** (`{colors.legal-link}` — #428bff): Inline links inside legal copy (Privacy, Terms). Only used inside the legal sub-band.
+- **Error** (`{colors.primary-error-text}` — #ba1a1a): Inline error text for form validation.
+- **Error Hover** (`{colors.primary-error-text-hover}` — #9a1515): Darkens on link hover.
+- **Legal Link Blue** (`{colors.legal-link}` — #336cfb): Inline links inside legal copy.
 
 ### Scrim
 
@@ -410,32 +409,30 @@ The shape language is **soft**. Buttons are 8px radius (`{rounded.sm}`), propert
 
 ### Font Family
 
-The system runs **Inter** for everything — display, body, navigation, captions, microcopy. Fallbacks walk the system stack (`system-ui, -apple-system, sans-serif`).
-
-There is no separate display family. The variable font carries the entire scale.
+The system runs **Inter** for everything — display, body, navigation, captions, microcopy.
 
 ### Hierarchy
 
-| Token                         | Size | Weight | Line Height | Letter Spacing     | Use                                                           |
-| ----------------------------- | ---- | ------ | ----------- | ------------------ | ------------------------------------------------------------- |
-| `{typography.rating-display}` | 64px | 700    | 1.1         | -1px               | Listing detail rating display ("4.81")                        |
-| `{typography.display-xl}`     | 28px | 700    | 1.43        | 0                  | Homepage hero heading                                         |
-| `{typography.display-lg}`     | 22px | 500    | 1.18        | -0.44px            | Listing detail hero h1 ("3-bedroom Rental, Premium Location") |
-| `{typography.display-md}`     | 21px | 700    | 1.43        | 0                  | Section heads inside listing detail                           |
-| `{typography.display-sm}`     | 20px | 600    | 1.20        | -0.18px            | Sub-section titles ("Amenities", "Reviews")                   |
-| `{typography.title-md}`       | 16px | 600    | 1.25        | 0                  | City link block titles                                        |
-| `{typography.title-sm}`       | 16px | 500    | 1.25        | 0                  | Footer column heads                                           |
-| `{typography.body-md}`        | 16px | 400    | 1.5         | 0                  | Default running-text inside listing copy                      |
-| `{typography.body-sm}`        | 14px | 400    | 1.43        | 0                  | Card meta lines, dates, prices, distance text                 |
-| `{typography.caption}`        | 14px | 500    | 1.29        | 0                  | Search field segment labels ("Where", "When", "Who")          |
-| `{typography.caption-sm}`     | 13px | 400    | 1.23        | 0                  | Footer legal line                                             |
-| `{typography.badge}`          | 11px | 600    | 1.18        | 0                  | "Guest favorite" floating badge text                          |
-| `{typography.micro-label}`    | 12px | 700    | 1.33        | 0                  | Property amenity micro-labels                                 |
-| `{typography.uppercase-tag}`  | 8px  | 700    | 1.25        | 0.32px (uppercase) | "NEW" badge on product-nav tabs                               |
-| `{typography.button-md}`      | 16px | 500    | 1.25        | 0                  | Primary CTA button labels                                     |
-| `{typography.button-sm}`      | 14px | 500    | 1.29        | 0                  | Pill button labels (category strip)                           |
-| `{typography.link}`           | 14px | 400    | 1.43        | 0                  | Inline body links                                             |
-| `{typography.nav-link}`       | 16px | 600    | 1.25        | 0                  | Top product-nav labels (Properties, Rentals, Services)        |
+| Token                         | Size | Weight | Line Height | Letter Spacing     | Use                                                    |
+| ----------------------------- | ---- | ------ | ----------- | ------------------ | ------------------------------------------------------ |
+| `{typography.rating-display}` | 64px | 700    | 1.1         | -1px               | Listing detail rating display ("4.81")                 |
+| `{typography.display-xl}`     | 28px | 700    | 1.43        | 0                  | Homepage hero heading                                  |
+| `{typography.display-lg}`     | 22px | 500    | 1.18        | -0.44px            | Listing detail hero h1                                 |
+| `{typography.display-md}`     | 21px | 700    | 1.43        | 0                  | Section heads inside listing detail                    |
+| `{typography.display-sm}`     | 20px | 600    | 1.20        | -0.18px            | Sub-section titles ("Amenities", "Reviews")            |
+| `{typography.title-md}`       | 16px | 600    | 1.25        | 0                  | City link block titles                                 |
+| `{typography.title-sm}`       | 16px | 500    | 1.25        | 0                  | Footer column heads                                    |
+| `{typography.body-md}`        | 16px | 400    | 1.5         | 0                  | Default running-text                                   |
+| `{typography.body-sm}`        | 14px | 400    | 1.43        | 0                  | Card meta lines, dates, prices                         |
+| `{typography.caption}`        | 14px | 500    | 1.29        | 0                  | Search field segment labels                            |
+| `{typography.caption-sm}`     | 13px | 400    | 1.23        | 0                  | Footer legal line                                      |
+| `{typography.badge}`          | 11px | 600    | 1.18        | 0                  | "Guest favorite" floating badge text                   |
+| `{typography.micro-label}`    | 12px | 700    | 1.33        | 0                  | Property amenity micro-labels                          |
+| `{typography.uppercase-tag}`  | 8px  | 700    | 1.25        | 0.32px (uppercase) | "NEW" badge on product-nav tabs                        |
+| `{typography.button-md}`      | 16px | 500    | 1.25        | 0                  | Primary CTA button labels                              |
+| `{typography.button-sm}`      | 14px | 500    | 1.29        | 0                  | Pill button labels (category strip)                    |
+| `{typography.link}`           | 14px | 400    | 1.43        | 0                  | Inline body links                                      |
+| `{typography.nav-link}`       | 16px | 600    | 1.25        | 0                  | Top product-nav labels (Properties, Rentals, Services) |
 
 ### Principles
 
@@ -473,7 +470,7 @@ The system gives editorial bands 64px of vertical breathing room but compresses 
 The system has essentially **one shadow tier** plus the flat baseline.
 
 - **Flat (no shadow):** Body, hero, footer, all editorial bands — 95% of surfaces.
-- **Card hover float:** `box-shadow: rgba(0, 0, 0, 0.02) 0 0 0 1px, rgba(0, 0, 0, 0.04) 0 2px 6px 0, rgba(0, 0, 0, 0.1) 0 4px 8px 0` — applied to property cards on pointer hover, the search bar at rest, and the dropdown menus (account menu, language picker, date picker). This is the single shadow definition in the entire system.
+- **Card hover float:** `box-shadow: rgba(0, 0, 0, 0.02) 0 0 0 1px, rgba(0, 0, 0, 0.04) 0 2px 6px 0, rgba(0, 0, 0, 0.1) 0 4px 8px 0` — applied to property cards on pointer hover, the search bar at rest, and dropdown menus.
 - **Modal scrim:** `{colors.scrim}` rendered at 50% opacity — the global modal backdrop. Used on date pickers, login dialogs, language picker.
 
 There are no progressive elevation tiers — the system either has the one shadow or none. Depth comes from photography, the white-on-white surface separation, and rounded-corner clipping rather than from layered shadows.
@@ -482,71 +479,51 @@ There are no progressive elevation tiers — the system either has the one shado
 
 ### Buttons
 
-**`button-primary`** — Primary accent fill, white text, 8px radius, 14×24px padding, 48px height, weight 500. The most common CTA across the system: "Reserve", "Continue", "Search", account-flow primaries.
+**`button-primary`** — Primary blue fill (#336cfb), white text, 8px radius, 14×24px padding, 48px height, weight 500. The most common CTA across the system: "Reserve", "Continue", "Search", account-flow primaries.
 
-**`button-primary-active`** — The press state. Background flips to `{colors.primary-active}`. No transform, no shadow change.
+**`button-primary-active`** — The press state. Background flips to `{colors.primary-active}` (#1e52d9).
 
-**`button-primary-disabled`** — Pale primary tint at #ffd1da with white text. Cursor not-allowed.
+**`button-primary-disabled`** — Pale blue tint at #adc6ff with white text. Cursor not-allowed.
 
 **`button-secondary`** — White fill with ink text and a 1px ink outline. 8px radius. Used for "Save", "Cancel", and inverse CTAs over primary surfaces.
 
 **`button-tertiary-text`** — Plain ink text, no surface, no border. Underlined on hover. Used for "Show more" type links and modal close labels.
 
-**`button-pill-primary`** — A pill-shaped primary accent CTA used on featured cells (e.g., "Become a host" sub-CTA) — 9999px radius, 10×20px padding, 14px label.
+**`button-pill-primary`** — A pill-shaped primary blue CTA — 9999px radius, 10×20px padding, 14px label.
 
 ### Search Surface
 
-**`search-bar-pill`** — The signature global search bar. White fill, 9999px radius, 64px height, 1px hairline 1px-shadow border. Internally divided by vertical hairline rules into `{component.search-field-segment}` cells (Where / When / Who). Each segment holds an uppercase caption label above a placeholder line in `{typography.caption}`.
+**`search-bar-pill`** — The signature global search bar. White fill, 9999px radius, 64px height, 1px hairline border. Internally divided by vertical hairline rules into `{component.search-field-segment}` cells (Where / When / Who).
 
-**`search-orb`** — The circular primary accent orb terminating the right edge of the search bar. 48×48px, fully rounded, white magnifying-glass icon centered. The hottest single color moment on the homepage.
+**`search-orb`** — The circular primary blue orb terminating the right edge of the search bar. 48×48px, fully rounded, white magnifying-glass icon centered. The hottest single color moment on the homepage.
 
 ### Top Navigation
 
-**`top-nav`** — White surface, 80px height, 1px bottom hairline. The Omamie wordmark sits flush left, the three product tabs (Properties / Rentals / Services) sit in the dead center, and account utilities (agent link, language globe, account menu) sit flush right.
+**`top-nav`** — White surface, 80px height, 1px bottom hairline. The Omamie wordmark sits flush left.
 
-**`product-tab-active`** — Ink label in `{typography.nav-link}`, 32px hand-illustrated icon, 2px ink underline rule beneath the icon-label pair.
-
-**`product-tab-inactive`** — Muted label, illustrated icon, no underline. Becomes active on click.
-
-**`new-tag`** — A tiny rounded-pill badge (`{rounded.full}`) anchored top-right of an icon, carrying the uppercase "NEW" label in `{typography.uppercase-tag}` (8px / 700 with 0.32px tracking, uppercase). Used on Rentals and Services to signal recency.
+**`new-tag`** — A tiny rounded-pill badge anchored top-right of an icon, carrying the uppercase "NEW" label.
 
 ### Listing Cards
 
-**`property-card`** — A photo-first card. 1:1 aspect-ratio image with `{rounded.md}` corner clipping, image carousel dots overlay, "Guest favorite" floating badge top-left (`{component.guest-favorite-badge}`), and a heart icon top-right (`{component.icon-button-circle}` in default outlined state, primary-filled when saved). Beneath the image: 4–5 lines of meta — title (`{typography.title-md}`), distance / dates (`{typography.body-sm}` muted), and price ("$X night") right-aligned.
+**`property-card`** — A photo-first card. Image with `{rounded.md}` corner clipping, image carousel dots overlay, "Guest favorite" floating badge top-left, and a heart icon top-right.
 
-**`property-card-photo`** — The photo plate itself, separated as a token because some surfaces (wishlist, search results) reuse just the photo without the meta block.
-
-**`experience-card`** — A taller-aspect card (4:5) for experience listings. Same `{rounded.md}` clipping, floating "NEW" badge top-left, heart top-right, and a single-line title beneath.
-
-**`guest-favorite-badge`** — White rounded pill (`{rounded.full}`) at 11px / 600 weight. Sits over the photo with the system's only shadow tier applied for elevation.
+**`guest-favorite-badge`** — White rounded pill at 11px / 600 weight. Sits over the photo with the system's only shadow tier applied for elevation.
 
 ### Listing Detail
 
-**`rating-display-card`** — The signature listing-detail moment. A 64px / 700 rating number ("4.81") flanked left and right by tiny laurel-wreath SVG ornaments. Beneath the rating: "Guest favorite" tagline and a row of ink stat columns. The largest typographic weight in the whole system.
+**`rating-display-card`** — The signature listing-detail moment. A 64px / 700 rating number flanked by tiny laurel-wreath SVG ornaments.
 
-**`amenity-row`** — A 1-column list of amenity icons + ink labels in `{typography.body-md}`. 12px row padding, no border between rows; section is closed by a 1px hairline divider above and below.
-
-**`reviews-card`** — A 2-column grid of review excerpts. Each column holds an author row (avatar, name, date) above a 3-line excerpt with "Show more" tertiary link.
-
-**`host-card`** — A white card with `{rounded.md}` rounding and 24px padding holding a host avatar, name, "Top Agent" badge, response-rate stat, and a "Contact host" `{component.button-secondary}`.
-
-**`reservation-card`** — The sticky right-rail card on listing detail pages. White surface, `{rounded.md}` rounding, 1px hairline border, 1px shadow tier elevation, 24px padding. Contains: nightly price (`{typography.display-md}` ink), date-range selector, guest-count stepper, "Reserve" primary CTA full-width, and a fee breakdown stack beneath in `{typography.body-sm}`.
-
-### Date Picker
-
-**`date-picker-day`** — A 40×40px circular cell carrying the day number in `{typography.body-sm}`. Default state is transparent fill, ink text.
-
-**`date-picker-day-selected`** — Ink fill, white text, full circle (`{rounded.full}`). Range states between two selected days carry a `{colors.surface-soft}` lozenge background that connects them.
+**`reservation-card`** — The sticky right-rail card on listing detail pages. White surface, `{rounded.md}` rounding, 1px hairline border, 1px shadow tier elevation, 24px padding. Contains nightly price, date-range selector, guest-count stepper, "Reserve" primary blue CTA full-width, and a fee breakdown stack beneath.
 
 ### Forms
 
-**`text-input`** — White surface, 1px hairline outline, `{rounded.sm}` 8px radius, 56px height, 14×12px padding. Stacked label above (in `{typography.caption}` muted), placeholder text in `{typography.body-md}` muted. On focus, the border thickens to 2px ink and the border color flips to `{colors.ink}` — no glow, no ring.
+**`text-input`** — White surface, 1px hairline outline, `{rounded.sm}` 8px radius, 56px height. On focus, the border thickens to 2px and the border color flips to `{colors.ink}` — no glow, no ring.
 
 ### Footer
 
-**`footer-light`** — White surface (matches the page canvas — the platform has no contrast footer), 48×80px padding. Three columns of link blocks (Support / Hosting / Legal), separated by generous 24px gutters. Each column heads with a `{typography.title-sm}` ink label and stacks `{component.footer-link}` rows in `{typography.body-sm}` ink.
+**`footer-light`** — White surface (matches the page canvas), 48×80px padding. Three columns of link blocks (Support / Hosting / Legal).
 
-**`legal-band`** — A bottom strip beneath the footer columns carrying the copyright line, language picker (globe icon + "English (US)" link), currency picker, and social icons (Facebook, X, Instagram). All text in muted `{colors.muted}` at `{typography.caption-sm}`.
+**`legal-band`** — A bottom strip beneath the footer columns carrying the copyright line, language picker, and social icons. All text in muted `{colors.muted}` at `{typography.caption-sm}`.
 
 ## Responsive Behavior
 
