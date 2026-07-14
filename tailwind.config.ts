@@ -1,45 +1,46 @@
-// Tailwind configuration – aligns omamie design tokens with Tailwind utilities.
+// Tailwind configuration – aligns Omamie design tokens with Tailwind utilities.
 // NOTE: Tailwind CSS v4 reads theme tokens from the CSS file (globals.css) via @theme.
 // This file is kept as a human-readable reference of the design system mapping.
+
 import type { Config } from "tailwindcss";
 
 export default {
   theme: {
     extend: {
       colors: {
-        // Primary brand accent and variants
-        primary: "#ff385c",
-        "primary-active": "#e00b41",
-        "primary-disabled": "#ffd1da",
+        // Primary brand accent and variants (Stitch Blue Palette)
+        primary: "#336cfb",
+        "primary-active": "#1e52d9",
+        "primary-disabled": "#adc6ff",
         // Semantic colors
-        error: "#c13515",
-        "error-hover": "#b32505",
+        error: "#ba1a1a",
+        "error-hover": "#9a1515",
         // Accent tokens
-        premium: "#460479",
-        featured: "#92174d",
+        premium: "#6174b3",
+        featured: "#ca5100",
         // Neutral palette
-        ink: "#222222",
-        body: "#3f3f3f",
-        muted: "#6a6a6a",
-        "muted-soft": "#929292",
-        hairline: "#dddddd",
-        "hairline-soft": "#ebebeb",
-        "border-strong": "#c1c1c1",
+        ink: "#757681",
+        body: "#757681",
+        muted: "#9da0aa",
+        "muted-soft": "#b8bac3",
+        hairline: "#c4c6cf",
+        "hairline-soft": "#e1e6f1",
+        "border-strong": "#74777f",
         canvas: "#ffffff",
-        "surface-soft": "#f7f7f7",
+        "surface-soft": "#f1f3f9",
         "surface-card": "#ffffff",
-        "surface-strong": "#f2f2f2",
+        "surface-strong": "#e6ebf4",
         "on-primary": "#ffffff",
         "on-dark": "#ffffff",
-        "legal-link": "#428bff",
-        "star-rating": "#222222",
+        "legal-link": "#336cfb",
+        "star-rating": "#757681",
         scrim: "#000000",
       },
       borderRadius: {
-        xxs: "4px",
+        xs: "4px",
         sm: "8px",
-        base: "16px",
-        mdCustom: "14px", // keep camelCase for this non-standard key
+        base: "14px",
+        mdCustom: "14px",
         lg: "20px",
         xl: "32px",
       },

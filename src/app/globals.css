@@ -47,34 +47,32 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
-  /* Design system custom colors */
-  --color-primary-active: #e00b41;
-  --color-primary-disabled: #ffd1da;
-  --color-error: #c13515;
-  --color-error-hover: #b32505;
-  --color-premium: #460479;
-  --color-featured: #92174d;
-  --color-ink: #222222;
-  --color-body: #3f3f3f;
-  --color-muted-soft: #929292;
-  --color-hairline: #dddddd;
-  --color-hairline-soft: #ebebeb;
-  --color-border-strong: #c1c1c1;
+  /* Design system custom colors - Stitch Omamie Blue Palette */
+  --color-primary: #336cfb;
+  --color-primary-active: #1e52d9;
+  --color-primary-disabled: #adc6ff;
+  --color-primary-error-text: #ba1a1a;
+  --color-primary-error-text-hover: #9a1515;
+  --color-premium: #6174b3;
+  --color-featured: #ca5100;
+  --color-ink: #757681;
+  --color-body: #757681;
+  --color-muted: #9da0aa;
+  --color-muted-soft: #b8bac3;
+  --color-hairline: #c4c6cf;
+  --color-hairline-soft: #e1e6f1;
+  --color-border-strong: #74777f;
   --color-canvas: #ffffff;
-  --color-surface-soft: #f7f7f7;
+  --color-surface-soft: #f1f3f9;
   --color-surface-card: #ffffff;
-  --color-surface-strong: #f2f2f2;
+  --color-surface-strong: #e6ebf4;
   --color-on-primary: #ffffff;
   --color-on-dark: #ffffff;
-  --color-legal-link: #428bff;
-  --color-star-rating: #222222;
+  --color-legal-link: #336cfb;
+  --color-star-rating: #757681;
   --color-scrim: #000000;
 
-  /* Design system custom spacing
-     NOTE: Use --sp-* prefix (not --spacing-*) for design system spacing tokens.
-     Tailwind v4 reserves --spacing-* for its internal scale used by utilities
-     like max-w-md, p-md, gap-md, etc. A naming collision causes those utilities
-     to resolve to the custom token value (e.g. max-w-md = 12px instead of 28rem). */
+  /* Design system custom spacing */
   --sp-xxs: 2px;
   --sp-xs: 4px;
   --sp-sm: 8px;
@@ -86,7 +84,12 @@
   --sp-section: 64px;
 
   /* Design system custom border-radius */
-  --radius-mdCustom: 14px;
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
 
   /* Design system custom font-sizes */
   --text-display-xl: 28px;
@@ -141,84 +144,148 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: #ff385c;
-  --primary-active: #e00b41;
-  --primary-disabled: #ffd1da;
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --background: var(--color-canvas);
+  --foreground: var(--color-ink);
+  --card: var(--color-surface-card);
+  --card-foreground: var(--color-ink);
+  --popover: var(--color-surface-card);
+  --popover-foreground: var(--color-ink);
+  --primary: var(--color-primary);
+  --primary-active: var(--color-primary-active);
+  --primary-disabled: var(--color-primary-disabled);
+  --primary-foreground: var(--color-on-primary);
+  --secondary: var(--color-surface-soft);
+  --secondary-foreground: var(--color-ink);
+  --muted: var(--color-surface-soft);
+  --muted-foreground: var(--color-muted);
+  --accent: var(--color-surface-soft);
+  --accent-foreground: var(--color-ink);
+  --destructive: var(--color-primary-error-text);
+  --destructive-foreground: var(--color-on-primary);
+  --border: var(--color-hairline);
+  --input: var(--color-hairline);
+  --ring: var(--color-primary);
+  --chart-1: var(--color-primary);
+  --chart-2: var(--color-premium);
+  --chart-3: var(--color-featured);
+  --chart-4: var(--color-muted);
+  --chart-5: var(--color-ink);
+  --radius: 8px;
+  --sidebar: var(--color-surface-card);
+  --sidebar-foreground: var(--color-ink);
+  --sidebar-primary: var(--color-primary);
+  --sidebar-primary-foreground: var(--color-on-primary);
+  --sidebar-accent: var(--color-surface-soft);
+  --sidebar-accent-foreground: var(--color-ink);
+  --sidebar-border: var(--color-hairline);
+  --sidebar-ring: var(--color-primary);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #191b24;
+  --foreground: #f0f0fc;
+  --card: #2e3039;
+  --card-foreground: #f0f0fc;
+  --popover: #2e3039;
+  --popover-foreground: #f0f0fc;
+  --primary: #b5c4ff;
+  --primary-active: #dbe1ff;
+  --primary-disabled: #4d6abc;
+  --primary-foreground: #00174d;
+  --secondary: #344884;
+  --secondary-foreground: #dbe1ff;
+  --muted: #344884;
+  --muted-foreground: #9da0aa;
+  --accent: #344884;
+  --accent-foreground: #dbe1ff;
+  --destructive: #ffb4ab;
+  --destructive-foreground: #690005;
+  --border: #344884;
+  --input: #344884;
+  --ring: #b5c4ff;
+  --chart-1: #b5c4ff;
+  --chart-2: #80f9bd;
+  --chart-3: #ca5100;
+  --chart-4: #9da0aa;
+  --chart-5: #757681;
+  --sidebar: #2e3039;
+  --sidebar-foreground: #f0f0fc;
+  --sidebar-primary: #b5c4ff;
+  --sidebar-primary-foreground: #00174d;
+  --sidebar-accent: #344884;
+  --sidebar-accent-foreground: #dbe1ff;
+  --sidebar-border: #344884;
+  --sidebar-ring: #b5c4ff;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-family: var(--font-sans);
   }
   html {
-    @apply font-sans;
+    @apply scroll-smooth;
   }
+}
+
+/* Material Symbols font classes */
+.font-material-symbols {
+  font-family: "Material Symbols Outlined", sans-serif;
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+}
+
+.font-material-symbols-filled {
+  font-family: "Material Symbols Rounded", sans-serif;
+  font-variation-settings:
+    "FILL" 1,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-hairline);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-border-strong);
+}
+
+/* Focus visible styles */
+.focus-visible-ring {
+  @apply focus-visible:ring-primary focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none;
+}
+
+/* Mobile menu slide down animation */
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-down {
+  animation: slide-down 0.2s ease-out forwards;
 }
