@@ -46,8 +46,8 @@ const painPoints = {
           "The headache of manually verifying every potential tenant.",
       },
     ],
-    iconBg: "bg-secondary/10",
-    iconColor: "text-secondary",
+    iconBg: "bg-surface-strong",
+    iconColor: "text-ink",
   },
 };
 
@@ -60,27 +60,25 @@ function PainPointCard({
 }: typeof painPoints.tenants) {
   return (
     <Card className="shadow-sm transition-shadow hover:shadow-md">
-      <CardContent className="space-y-6 p-8">
+      <CardContent className="space-y-4 p-5">
         {/* Header */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2.5">
           <div
-            className={`h-12 w-12 rounded-full ${iconBg} flex flex-shrink-0 items-center justify-center`}
+            className={`h-9 w-9 rounded-full ${iconBg} flex flex-shrink-0 items-center justify-center`}
           >
-            <Icon className={`h-6 w-6 ${iconColor}`} />
+            <Icon className={`h-4 w-4 ${iconColor}`} />
           </div>
-          <h3 className="text-ink text-xl font-bold">{title}</h3>
+          <h3 className="text-ink text-sm font-bold">{title}</h3>
         </div>
 
         {/* Pain Points List */}
-        <ul className="space-y-4">
+        <ul className="space-y-2.5">
           {items.map((item, index) => (
-            <li key={index} className="flex items-start gap-3">
-              <XCircle className="text-destructive mt-0.5 h-5 w-5 flex-shrink-0" />
-              <div className="space-y-1">
-                <div className="text-ink text-base font-medium">
-                  {item.label}
-                </div>
-                <div className="text-muted text-sm">{item.description}</div>
+            <li key={index} className="flex items-start gap-2.5">
+              <XCircle className="text-destructive mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+              <div className="space-y-0.5">
+                <div className="text-ink text-xs font-medium">{item.label}</div>
+                <div className="text-muted text-xs">{item.description}</div>
               </div>
             </li>
           ))}

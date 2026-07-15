@@ -9,7 +9,7 @@ const buttonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-primary text-primary-foreground hover:bg-primary-active focus-visible:ring-primary/20",
+          "bg-primary text-white hover:bg-primary-active focus-visible:ring-primary/20",
         outline:
           "border-hairline bg-background hover:bg-surface-soft hover:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
         secondary:
@@ -21,12 +21,12 @@ const buttonVariants = cva(
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-12 gap-1.5 px-5",
-        sm: "h-9 gap-1 px-4 text-button-sm",
-        lg: "h-12 gap-1.5 px-6",
-        icon: "size-12",
-        "icon-sm": "size-9 rounded-sm",
-        "icon-lg": "size-12",
+        default: "h-9 gap-1 px-3.5",
+        sm: "h-8 gap-1 px-3 text-sm",
+        lg: "h-10 gap-1.5 px-5 text-base",
+        icon: "size-9",
+        "icon-sm": "size-8 rounded-sm",
+        "icon-lg": "size-10",
       },
     },
     defaultVariants: {

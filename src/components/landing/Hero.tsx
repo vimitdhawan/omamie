@@ -1,91 +1,29 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  ArrowRight,
-  MapPin,
-  Calendar,
-  Users,
-  Search,
-  ChevronDown,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-x-hidden px-4 pt-28 pb-16 sm:px-6 sm:pb-20 lg:px-8 lg:pb-24">
+    <section className="relative overflow-x-hidden px-4 pt-16 pb-10 sm:px-6 sm:pb-12 lg:px-8 lg:pb-16">
       <div className="mx-auto max-w-7xl">
-        {/* Search Bar Pill */}
-        <div className="mx-auto mb-12 max-w-4xl">
-          {/* Desktop: Full 3-segment pill */}
-          <div className="hidden md:block">
-            <div className="bg-canvas border-hairline flex h-[64px] items-center rounded-full border px-2 shadow-sm">
-              {/* Where */}
-              <div className="border-hairline flex min-w-0 flex-1 items-center gap-2 border-r px-5 py-2">
-                <MapPin className="text-muted h-5 w-5 flex-shrink-0" />
-                <div className="min-w-0 flex-1 text-left">
-                  <div className="text-muted text-xs font-medium">Where</div>
-                  <div className="text-ink truncate text-sm">Anywhere</div>
-                </div>
-                <ChevronDown className="text-muted h-5 w-5 flex-shrink-0" />
-              </div>
-              {/* When */}
-              <div className="border-hairline flex min-w-0 flex-1 items-center gap-2 border-r px-5 py-2">
-                <Calendar className="text-muted h-5 w-5 flex-shrink-0" />
-                <div className="min-w-0 flex-1 text-left">
-                  <div className="text-muted text-xs font-medium">When</div>
-                  <div className="text-ink truncate text-sm">Add dates</div>
-                </div>
-                <ChevronDown className="text-muted h-5 w-5 flex-shrink-0" />
-              </div>
-              {/* Who */}
-              <div className="flex min-w-0 flex-1 items-center gap-2 px-5 py-2">
-                <Users className="text-muted h-5 w-5 flex-shrink-0" />
-                <div className="min-w-0 flex-1 text-left">
-                  <div className="text-muted text-xs font-medium">Who</div>
-                  <div className="text-ink truncate text-sm">Add guests</div>
-                </div>
-                <ChevronDown className="text-muted h-5 w-5 flex-shrink-0" />
-              </div>
-              {/* Search Orb */}
-              <Button
-                size="icon"
-                className="bg-primary hover:bg-primary-active ml-2 flex-shrink-0 rounded-full shadow-sm"
-                aria-label="Search properties"
-              >
-                <Search className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Mobile: Single tappable pill */}
-          <div className="md:hidden">
-            <button className="bg-canvas border-hairline flex h-14 w-full items-center justify-between rounded-full border px-6 shadow-sm">
-              <div className="flex items-center gap-2">
-                <Search className="text-muted h-5 w-5 flex-shrink-0" />
-                <span className="text-muted text-sm">Search properties</span>
-              </div>
-              <ChevronDown className="text-muted h-5 w-5 flex-shrink-0" />
-            </button>
-          </div>
-        </div>
-
         {/* Hero Content */}
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div className="space-y-6">
-            <h1 className="text-ink text-4xl leading-tight font-bold tracking-tight sm:text-5xl lg:text-6xl">
+            <h1 className="text-ink text-xl leading-tight font-bold tracking-tight sm:text-2xl lg:text-3xl">
               Find the Right Rental Match Faster
             </h1>
-            <p className="text-muted max-w-xl text-lg leading-relaxed sm:text-xl">
+            <p className="text-muted max-w-xl text-sm leading-relaxed sm:text-base">
               We connect tenants and property owners through intelligent
-              matching. Tell us what you need and we&#39;ll help find the best
+              matching. Tell us what you need and we&apos;ll help find the best
               fit.
             </p>
             <div className="flex flex-col gap-4 sm:flex-row">
-              <Button size="lg" className="gap-2">
+              <Button size="default" className="gap-2">
                 Find Property
                 <ArrowRight className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="default">
                 List Your Property
               </Button>
             </div>

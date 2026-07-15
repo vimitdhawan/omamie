@@ -21,7 +21,7 @@ export function Section({
   return (
     <section
       className={cn(
-        "overflow-x-hidden px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24",
+        "overflow-x-hidden px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20",
         variantClasses[variant],
         className
       )}
@@ -42,12 +42,12 @@ export function SectionHeader({
   className?: string;
 }) {
   return (
-    <div className={cn("mb-12 text-center sm:mb-16", className)}>
-      <h2 className="text-ink text-3xl font-bold tracking-tight sm:text-4xl">
+    <div className={cn("mb-6 text-center sm:mb-10", className)}>
+      <h2 className="text-ink text-xl font-bold tracking-tight sm:text-2xl">
         {title}
       </h2>
       {subtitle && (
-        <p className="text-muted mx-auto mt-4 max-w-2xl text-lg">{subtitle}</p>
+        <p className="text-muted mx-auto mt-2 max-w-2xl text-sm">{subtitle}</p>
       )}
     </div>
   );

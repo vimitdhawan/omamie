@@ -17,8 +17,8 @@ export default function HomePage() {
         <PainPoints />
         <HowItWorks />
         <Benefits />
-        <Stats />
         <CTASection />
+        <Stats />
         <Contact />
       </main>
       <Footer />

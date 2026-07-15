@@ -69,11 +69,11 @@ const ownerBenefits: Benefit[] = [
 function BenefitCard({ icon: Icon, title, description }: Benefit) {
   return (
     <Card className="shadow-sm transition-shadow hover:shadow-md">
-      <CardContent className="space-y-3 p-6">
-        <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
-          <Icon className="text-primary h-5 w-5" />
+      <CardContent className="space-y-2 p-5">
+        <div className="bg-primary/10 flex h-9 w-9 items-center justify-center rounded-lg">
+          <Icon className="text-primary h-4 w-4" />
         </div>
-        <h4 className="text-ink text-lg font-medium">{title}</h4>
+        <h4 className="text-ink text-base font-medium">{title}</h4>
         <p className="text-muted text-sm leading-relaxed">{description}</p>
       </CardContent>
     </Card>
@@ -82,10 +82,10 @@ function BenefitCard({ icon: Icon, title, description }: Benefit) {
 
 export default function Benefits() {
   return (
-    <Section variant="default">
+    <Section variant="muted">
       {/* Title */}
-      <div className="mb-12 text-center">
-        <h2 className="text-ink text-3xl font-bold tracking-tight sm:text-4xl">
+      <div className="mb-8 text-center">
+        <h2 className="text-ink text-2xl font-bold tracking-tight sm:text-3xl">
           Why People Choose Omamie
         </h2>
       </div>
@@ -93,15 +93,15 @@ export default function Benefits() {
       {/* Two-column layout: Tenants | Owners */}
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
         {/* Tenants Column */}
-        <div className="space-y-8">
-          <div className="flex items-center gap-3">
+        <div className="space-y-6">
+          <div className="flex items-center gap-2">
             <div className="bg-hairline-soft h-px flex-1" />
-            <h3 className="text-ink text-2xl font-bold whitespace-nowrap">
+            <h3 className="text-ink text-xl font-bold whitespace-nowrap">
               Why Tenants Love Omamie
             </h3>
             <div className="bg-hairline-soft h-px flex-1" />
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {tenantBenefits.map((benefit, index) => (
               <BenefitCard key={index} {...benefit} />
             ))}
@@ -109,15 +109,15 @@ export default function Benefits() {
         </div>
 
         {/* Owners Column */}
-        <div className="space-y-8">
-          <div className="flex items-center gap-3">
+        <div className="space-y-6">
+          <div className="flex items-center gap-2">
             <div className="bg-hairline-soft h-px flex-1" />
-            <h3 className="text-ink text-2xl font-bold whitespace-nowrap">
+            <h3 className="text-ink text-xl font-bold whitespace-nowrap">
               Why Owners Trust Omamie
             </h3>
             <div className="bg-hairline-soft h-px flex-1" />
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {ownerBenefits.map((benefit, index) => (
               <BenefitCard key={index} {...benefit} />
             ))}
