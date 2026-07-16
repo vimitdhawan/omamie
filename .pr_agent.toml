@@ -2,8 +2,8 @@
 # Tailored to the AGENTS.md architecture conventions
 
 [config]
-model = "nvidia_nim/nvidia/nemotron-3-ultra"
-fallback_models = ["nvidia_nim/meta/llama-3.1-70b-instruct"]
+model = "nvidia_nim/meta/llama-3.1-70b-instruct"
+fallback_models = []
 # NVIDIA NIM base URL (defaults to https://integrate.api.nvidia.com/v1/)
 # api_base = "https://integrate.api.nvidia.com/v1/"
 
@@ -18,6 +18,12 @@ Review focus areas for Omamie (Next.js 16 + React 19 + Supabase SSR):
    - actions.ts: Server Actions ONLY, calls service.ts + schema.ts
    - NO direct repository.ts imports in actions.ts
    - NO DB queries in Server Components or client components
+   
+   ⚠️ EXCEPTIONS — These are NOT violations:
+   - Next.js built-in imports: `next/link`, `next/font/google`, `next/navigation`, `next/headers`, `next/cookies`
+   - React imports, shadcn/ui components, utility libraries
+   - Standard TypeScript/JavaScript patterns
+   - Font loading via `next/font/google` (e.g., Geist, Inter)
 
 2. **Next.js 16 Async APIs** (AGENTS.md §5):
    - Must use `await cookies()`, `await headers()`, `await params`, `await searchParams`
@@ -49,7 +55,7 @@ max_comments = 20
 
 [pr_code_suggestions]
 num_code_suggestions = 8
-suggestions_score_threshold = 7
+suggestions_score_threshold = 5
 apply_automatically = false
 
 [pr_description]
