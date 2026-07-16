@@ -89,24 +89,28 @@ function renderStep(step: Step, index: number, isDesktop: boolean) {
 
 export default function HowItWorks() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(() => {
+    if (typeof window !== "undefined") {
+      return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+    return false;
+  });
 
   useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    if (prefersReducedMotion) {
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const prefersReducedMotion = window.matchMedia(
-          "(prefers-reduced-motion: reduce)"
-        ).matches;
-
         if (entry.isIntersecting) {
           setIsVisible(true);
         } else {
           setIsVisible(false);
-        }
-
-        // Handle reduced motion - immediately show all steps
-        if (prefersReducedMotion && !isVisible) {
-          setIsVisible(true);
         }
       },
       { threshold: 0.15 }
@@ -119,7 +123,7 @@ export default function HowItWorks() {
     return () => {
       observer.disconnect();
     };
-  }, [isVisible]);
+  }, []);
 
   return (
     <Section variant="card" ref={sectionRef}>

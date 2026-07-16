@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Globe, ChevronDown } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
+import { FooterLinks } from "@/features/landing/components/FooterLinks";
 
 const footerLinks = {
   Support: [
@@ -47,61 +48,13 @@ export default function Footer() {
           </div>
 
           {/* Column 2: Support */}
-          <div className="space-y-3">
-            <h4 className="text-ink text-xs font-semibold tracking-wider uppercase">
-              Support
-            </h4>
-            <ul className="space-y-2.5">
-              {footerLinks.Support.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-muted hover:text-primary text-xs transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <FooterLinks title="Support" links={footerLinks.Support} />
 
           {/* Column 3: Hosting */}
-          <div className="space-y-3">
-            <h4 className="text-ink text-xs font-semibold tracking-wider uppercase">
-              Hosting
-            </h4>
-            <ul className="space-y-2.5">
-              {footerLinks.Hosting.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-muted hover:text-primary text-xs transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <FooterLinks title="Hosting" links={footerLinks.Hosting} />
 
           {/* Column 4: Company */}
-          <div className="space-y-3">
-            <h4 className="text-ink text-xs font-semibold tracking-wider uppercase">
-              Company
-            </h4>
-            <ul className="space-y-2.5">
-              {footerLinks.Company.map((link) => (
-                <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-muted hover:text-primary text-xs transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <FooterLinks title="Company" links={footerLinks.Company} />
         </div>
 
         {/* Legal Band */}
