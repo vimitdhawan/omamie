@@ -12,25 +12,25 @@ const variantClasses = {
   card: "bg-surface-card",
 };
 
-export function Section({
-  children,
-  className,
-  variant = "default",
-  ...props
-}: SectionProps) {
-  return (
-    <section
-      className={cn(
-        "overflow-x-hidden px-6 py-12 sm:px-8 sm:py-16 lg:px-12 lg:py-20 xl:px-16",
-        variantClasses[variant],
-        className
-      )}
-      {...props}
-    >
-      <div className="mx-auto max-w-7xl">{children}</div>
-    </section>
-  );
-}
+export const Section = React.forwardRef<HTMLElement, SectionProps>(
+  ({ children, className, variant = "default", ...props }, ref) => {
+    return (
+      <section
+        ref={ref}
+        className={cn(
+          "overflow-x-hidden px-6 py-12 sm:px-8 sm:py-16 lg:px-12 lg:py-20 xl:px-16",
+          variantClasses[variant],
+          className
+        )}
+        {...props}
+      >
+        <div className="mx-auto max-w-7xl">{children}</div>
+      </section>
+    );
+  }
+);
+
+Section.displayName = "Section";
 
 export function SectionHeader({
   title,

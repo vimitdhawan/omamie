@@ -320,3 +320,211 @@
 .animate-slide-down {
   animation: slide-down 0.2s ease-out forwards;
 }
+
+/* HowItWorks step reveal animation - 2s continuous cumulative loop */
+/* HowItWorks step reveal animation - 13s cycle with 5s pause */
+@keyframes step-1-loop {
+  0%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes step-2-loop {
+  0%,
+  15% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  15.4%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes step-3-loop {
+  0%,
+  30% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.9);
+  }
+  30.8% {
+    opacity: 1;
+    transform: translateY(0) scale(1.08);
+  }
+  35%,
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes step-4-loop {
+  0%,
+  46% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  46.2%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes line-1-loop {
+  0%,
+  15% {
+    width: 0;
+    opacity: 0;
+  }
+  15.4%,
+  100% {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes line-2-loop {
+  0%,
+  30% {
+    width: 0;
+    opacity: 0;
+  }
+  30.8%,
+  100% {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes line-3-loop {
+  0%,
+  46% {
+    width: 0;
+    opacity: 0;
+  }
+  46.2%,
+  100% {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes line-v-1-loop {
+  0%,
+  15% {
+    height: 0;
+    opacity: 0;
+  }
+  15.4%,
+  100% {
+    height: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes line-v-2-loop {
+  0%,
+  30% {
+    height: 0;
+    opacity: 0;
+  }
+  30.8%,
+  100% {
+    height: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes line-v-3-loop {
+  0%,
+  46% {
+    height: 0;
+    opacity: 0;
+  }
+  46.2%,
+  100% {
+    height: 100%;
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-steps .step-item,
+  .animate-steps .connector-line {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+.animate-steps .step-item {
+  opacity: 0;
+  animation-fill-mode: both;
+  animation-timing-function: ease-in-out;
+  animation-duration: 13s;
+  animation-iteration-count: infinite;
+}
+
+.animate-steps .step-item:nth-child(1) {
+  animation-name: step-1-loop;
+  animation-delay: 0s;
+}
+
+.animate-steps .step-item:nth-child(2) {
+  animation-name: step-2-loop;
+  animation-delay: 0s;
+}
+
+.animate-steps .step-item:nth-child(3) {
+  animation-name: step-3-loop;
+  animation-delay: 0s;
+}
+
+.animate-steps .step-item:nth-child(4) {
+  animation-name: step-4-loop;
+  animation-delay: 0s;
+}
+
+/* Progressive connector lines - desktop */
+.animate-steps .connector-line-1 {
+  animation: line-1-loop 13s ease-in-out infinite;
+  width: 0;
+  opacity: 0;
+}
+
+.animate-steps .connector-line-2 {
+  animation: line-2-loop 13s ease-in-out infinite;
+  width: 0;
+  opacity: 0;
+}
+
+.animate-steps .connector-line-3 {
+  animation: line-3-loop 13s ease-in-out infinite;
+  width: 0;
+  opacity: 0;
+}
+
+/* Progressive connector lines - mobile */
+.animate-steps .connector-line-v-1 {
+  animation: line-v-1-loop 13s ease-in-out infinite;
+  height: 0;
+  opacity: 0;
+}
+
+.animate-steps .connector-line-v-2 {
+  animation: line-v-2-loop 13s ease-in-out infinite;
+  height: 0;
+  opacity: 0;
+}
+
+.animate-steps .connector-line-v-3 {
+  animation: line-v-3-loop 13s ease-in-out infinite;
+  height: 0;
+  opacity: 0;
+}

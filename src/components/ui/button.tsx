@@ -4,20 +4,20 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-xs border border-transparent bg-clip-padding text-button-md font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "group/button inline-flex shrink-0 items-center justify-center rounded-sm border border-transparent bg-clip-padding text-button-md font-medium whitespace-nowrap transition-all duration-200 ease-out outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
         primary:
-          "bg-primary text-primary-foreground hover:bg-primary-active focus-visible:ring-primary/20",
+          "bg-primary text-primary-foreground shadow-sm hover:bg-primary-active hover:shadow-md hover:-translate-y-0.5 focus-visible:ring-primary/20",
         outline:
-          "border-hairline bg-background hover:bg-surface-soft hover:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
+          "border-hairline bg-background hover:bg-surface-soft hover:text-foreground hover:shadow-sm dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-surface-strong aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
+          "bg-secondary text-secondary-foreground hover:bg-surface-strong hover:shadow-sm aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:
-          "hover:bg-surface-soft hover:text-foreground aria-expanded:bg-surface-soft aria-expanded:text-foreground",
+          "hover:bg-surface-soft hover:text-foreground hover:shadow-sm aria-expanded:bg-surface-soft aria-expanded:text-foreground",
         destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20",
+          "bg-destructive/10 text-destructive hover:bg-destructive/20 hover:shadow-sm focus-visible:border-destructive/40 focus-visible:ring-destructive/20",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
@@ -25,7 +25,7 @@ const buttonVariants = cva(
         sm: "h-8 gap-1 px-3 text-sm",
         lg: "h-10 gap-1.5 px-5 text-base",
         icon: "size-9",
-        "icon-sm": "size-8 rounded-xs",
+        "icon-sm": "size-8 rounded-sm",
         "icon-lg": "size-10",
       },
     },
