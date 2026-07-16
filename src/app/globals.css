@@ -75,6 +75,9 @@
   --color-primary-error-text-hover: #9a1515;
   --color-premium: #6174b3;
   --color-featured: #ca5100;
+  --color-tertiary: #ffde59;
+  --color-tertiary-active: #e6c54d;
+  --color-tertiary-disabled: #f5e8a8;
   --color-ink: #757681;
   --color-body: #757681;
   --color-muted: #9da0aa;
@@ -190,6 +193,10 @@
   --chart-3: var(--color-featured);
   --chart-4: var(--color-muted);
   --chart-5: var(--color-ink);
+  --tertiary: var(--color-tertiary);
+  --tertiary-active: var(--color-tertiary-active);
+  --tertiary-disabled: var(--color-tertiary-disabled);
+  --tertiary-foreground: var(--color-on-primary);
   --radius: 8px;
   --sidebar: var(--color-surface-card);
   --sidebar-foreground: var(--color-ink);
@@ -228,6 +235,10 @@
   --chart-3: #ca5100;
   --chart-4: #9da0aa;
   --chart-5: #757681;
+  --tertiary: #ffde59;
+  --tertiary-active: #e6c54d;
+  --tertiary-disabled: #f5e8a8;
+  --tertiary-foreground: #00174d;
   --sidebar: #2e3039;
   --sidebar-foreground: #f0f0fc;
   --sidebar-primary: #b5c4ff;

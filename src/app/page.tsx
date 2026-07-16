@@ -1,12 +1,12 @@
-import Header from "@/components/landing/Header";
-import Hero from "@/components/landing/Hero";
-import PainPoints from "@/components/landing/PainPoints";
-import HowItWorks from "@/components/landing/HowItWorks";
-import Benefits from "@/components/landing/Benefits";
-import StatsSection from "@/components/landing/StatsSection";
-import CTASection from "@/components/landing/CTASection";
-import Contact from "@/components/landing/Contact";
-import Footer from "@/components/landing/Footer";
+import Header from "@/features/landing/components/Header";
+import Hero from "@/features/landing/components/Hero";
+import PainPoints from "@/features/landing/components/PainPoints";
+import HowItWorks from "@/features/landing/components/HowItWorks";
+import Benefits from "@/features/landing/components/Benefits";
+import StatsSection from "@/features/landing/components/StatsSection";
+import CTASection from "@/features/landing/components/CTASection";
+import Contact from "@/features/landing/components/Contact";
+import Footer from "@/features/landing/components/Footer";
 
 export default function HomePage() {
   return (

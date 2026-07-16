@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
@@ -33,10 +34,13 @@ export default function Hero() {
           <div className="group relative">
             <div className="from-primary/10 to-secondary/10 absolute -inset-4 rounded-2xl bg-gradient-to-tr opacity-50 blur-3xl transition-opacity group-hover:opacity-70" />
             <div className="bg-surface-strong border-hairline relative aspect-[4/3] overflow-hidden rounded-xl border shadow-lg">
-              <img
-                className="h-full w-full object-cover"
+              <Image
+                src="/images/hero-apartment.jpg"
                 alt="Modern apartment interior with natural light"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVDrtnrHvED_qAaSCHHbcuvWihb-qatEtQ0FPSF_mDFgLssCK7dEf3SpCH8y8m0fHW4QuxrTa53mmiEugLHIXsqPOUoqGRC-HygziIB4QSqyeMy0GZ0ph23YuRFjOL4AbfR1qc8L_PLQe2Ba6TvslBfJgDsyGJ8Z20EgbQeNCXhJO_D5bTu0ppDTCPB70wzCcuYDlYGHyT3EEsvydTihhOGqaRujYZyw3zKpnN8zgM8bHtH4tQqt2ljyugD65yMIFCSriN4Q7zu2v0"
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
           </div>
