@@ -14,14 +14,14 @@ jobs:
     steps:
       - name: PR Agent action step
         id: pragent
-        uses: the-pr-agent/pr-agent@main
+        uses: the-pr-agent/pr-agent@v0.39.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NVIDIA_NIM_API_KEY: ${{ secrets.NVIDIA_NIM_API_KEY }}
-          config.model: "nvidia_nim/nvidia/nemotron-3-ultra"
-          config.fallback_models: '["nvidia_nim/meta/llama-3.1-70b-instruct"]'
+          config.model: "nvidia_nim/meta/llama-3.1-70b-instruct"
+          config.fallback_models: "[]"
           github_action_config.auto_review: "true"
           github_action_config.auto_describe: "true"
-          github_action_config.auto_improve: "true"
+          github_action_config.auto_improve: "false"
           github_action_config.pr_actions: '["opened", "reopened", "ready_for_review", "synchronize", "review_requested"]'
           config.custom_model_max_tokens: "128000"
