@@ -321,8 +321,7 @@
   animation: slide-down 0.2s ease-out forwards;
 }
 
-/* HowItWorks step reveal animation - 2s continuous cumulative loop */
-/* HowItWorks step reveal animation - 13s cycle with 5s pause */
+/* HowItWorks step reveal animation - 18s cycle (13s build-up + 5s pause) */
 @keyframes step-1-loop {
   0%,
   100% {
@@ -333,11 +332,11 @@
 
 @keyframes step-2-loop {
   0%,
-  15% {
+  8.3% {
     opacity: 0;
     transform: translateY(16px);
   }
-  15.4%,
+  8.3%,
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -346,15 +345,15 @@
 
 @keyframes step-3-loop {
   0%,
-  30% {
+  21.7% {
     opacity: 0;
     transform: translateY(16px) scale(0.9);
   }
-  30.8% {
+  22.2% {
     opacity: 1;
     transform: translateY(0) scale(1.08);
   }
-  35%,
+  33.3%,
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -363,11 +362,11 @@
 
 @keyframes step-4-loop {
   0%,
-  46% {
+  33.3% {
     opacity: 0;
     transform: translateY(16px);
   }
-  46.2%,
+  33.8%,
   100% {
     opacity: 1;
     transform: translateY(0);
@@ -376,11 +375,11 @@
 
 @keyframes line-1-loop {
   0%,
-  15% {
+  8.3% {
     width: 0;
     opacity: 0;
   }
-  15.4%,
+  8.3%,
   100% {
     width: 100%;
     opacity: 1;
@@ -389,11 +388,11 @@
 
 @keyframes line-2-loop {
   0%,
-  30% {
+  21.7% {
     width: 0;
     opacity: 0;
   }
-  30.8%,
+  22.2%,
   100% {
     width: 100%;
     opacity: 1;
@@ -402,11 +401,11 @@
 
 @keyframes line-3-loop {
   0%,
-  46% {
+  33.3% {
     width: 0;
     opacity: 0;
   }
-  46.2%,
+  33.8%,
   100% {
     width: 100%;
     opacity: 1;
@@ -415,11 +414,11 @@
 
 @keyframes line-v-1-loop {
   0%,
-  15% {
+  8.3% {
     height: 0;
     opacity: 0;
   }
-  15.4%,
+  8.3%,
   100% {
     height: 100%;
     opacity: 1;
@@ -428,11 +427,11 @@
 
 @keyframes line-v-2-loop {
   0%,
-  30% {
+  21.7% {
     height: 0;
     opacity: 0;
   }
-  30.8%,
+  22.2%,
   100% {
     height: 100%;
     opacity: 1;
@@ -441,11 +440,11 @@
 
 @keyframes line-v-3-loop {
   0%,
-  46% {
+  33.3% {
     height: 0;
     opacity: 0;
   }
-  46.2%,
+  33.8%,
   100% {
     height: 100%;
     opacity: 1;
@@ -467,7 +466,7 @@
   opacity: 0;
   animation-fill-mode: both;
   animation-timing-function: ease-in-out;
-  animation-duration: 13s;
+  animation-duration: 18s;
   animation-iteration-count: infinite;
 }
 
@@ -493,38 +492,38 @@
 
 /* Progressive connector lines - desktop */
 .animate-steps .connector-line-1 {
-  animation: line-1-loop 13s ease-in-out infinite;
+  animation: line-1-loop 18s ease-in-out infinite;
   width: 0;
   opacity: 0;
 }
 
 .animate-steps .connector-line-2 {
-  animation: line-2-loop 13s ease-in-out infinite;
+  animation: line-2-loop 18s ease-in-out infinite;
   width: 0;
   opacity: 0;
 }
 
 .animate-steps .connector-line-3 {
-  animation: line-3-loop 13s ease-in-out infinite;
+  animation: line-3-loop 18s ease-in-out infinite;
   width: 0;
   opacity: 0;
 }
 
 /* Progressive connector lines - mobile */
 .animate-steps .connector-line-v-1 {
-  animation: line-v-1-loop 13s ease-in-out infinite;
+  animation: line-v-1-loop 18s ease-in-out infinite;
   height: 0;
   opacity: 0;
 }
 
 .animate-steps .connector-line-v-2 {
-  animation: line-v-2-loop 13s ease-in-out infinite;
+  animation: line-v-2-loop 18s ease-in-out infinite;
   height: 0;
   opacity: 0;
 }
 
 .animate-steps .connector-line-v-3 {
-  animation: line-v-3-loop 13s ease-in-out infinite;
+  animation: line-v-3-loop 18s ease-in-out infinite;
   height: 0;
   opacity: 0;
 }

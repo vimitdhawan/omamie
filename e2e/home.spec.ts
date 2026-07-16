@@ -8,33 +8,53 @@ import { expect, test } from "@playwright/test";
  * CI run must pass.
  */
 test.describe("Home page", () => {
-  test("renders hero and primary CTAs", async ({ page }) => {
+  test("renders hero with heading and primary CTAs", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.getByRole("heading", { name: /Omamie/i })).toBeVisible();
+    // Hero heading
     await expect(
-      page.getByRole("link", { name: /Get started/i })
+      page.getByRole("heading", { name: /Find the Right Rental Match Faster/i })
+    ).toBeVisible();
+
+    // Hero CTAs - target the first occurrence in hero section
+    const heroSection = page.locator("section").first();
+    await expect(
+      heroSection.getByRole("button", { name: /Find Property/i })
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: /^Log in$/ }).first()
+      heroSection.getByRole("button", { name: /List Your Property/i })
     ).toBeVisible();
   });
 
-  test("Log in link navigates to /login", async ({ page }) => {
+  test("footer has logo and navigation links", async ({ page }) => {
     await page.goto("/");
-    await page
-      .getByRole("link", { name: /^Log in$/ })
-      .first()
-      .click();
-    await expect(page).toHaveURL(/\/login$/);
+
+    // Footer brand logo (in footer, not header)
+    const footer = page.locator("footer");
+    await expect(
+      footer.getByRole("link", { name: /Omamie Home/i })
+    ).toBeVisible();
+
+    // Footer navigation columns
+    await expect(page.getByText(/Support/i)).toBeVisible();
+    await expect(page.getByText(/Hosting/i)).toBeVisible();
+    await expect(page.getByText(/Company/i)).toBeVisible();
+
+    // Footer links
+    await expect(
+      page.getByRole("link", { name: /Help Center/i })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: /List Your Property/i })
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: /About/i })).toBeVisible();
   });
 
-  test("Sign up link navigates to /signup", async ({ page }) => {
+  test("footer legal links present", async ({ page }) => {
     await page.goto("/");
-    await page
-      .getByRole("link", { name: /Sign up/i })
-      .first()
-      .click();
-    await expect(page).toHaveURL(/\/signup$/);
+
+    await expect(page.getByRole("link", { name: /Privacy/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Terms/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /Sitemap/i })).toBeVisible();
   });
 });
