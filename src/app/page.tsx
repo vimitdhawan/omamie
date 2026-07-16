@@ -3,7 +3,7 @@ import Hero from "@/components/landing/Hero";
 import PainPoints from "@/components/landing/PainPoints";
 import HowItWorks from "@/components/landing/HowItWorks";
 import Benefits from "@/components/landing/Benefits";
-import Stats from "@/components/landing/Stats";
+import StatsSection from "@/components/landing/StatsSection";
 import CTASection from "@/components/landing/CTASection";
 import Contact from "@/components/landing/Contact";
 import Footer from "@/components/landing/Footer";
@@ -17,8 +17,8 @@ export default function HomePage() {
         <PainPoints />
         <HowItWorks />
         <Benefits />
+        <StatsSection />
         <CTASection />
-        <Stats />
         <Contact />
       </main>
       <Footer />

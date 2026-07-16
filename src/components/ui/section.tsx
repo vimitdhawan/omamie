@@ -21,7 +21,7 @@ export function Section({
   return (
     <section
       className={cn(
-        "overflow-x-hidden px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20",
+        "overflow-x-hidden px-6 py-12 sm:px-8 sm:py-16 lg:px-12 lg:py-20 xl:px-16",
         variantClasses[variant],
         className
       )}

@@ -5,7 +5,7 @@ import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-x-hidden px-4 pt-16 pb-10 sm:px-6 sm:pb-12 lg:px-8 lg:pb-16">
+    <section className="relative overflow-x-hidden px-6 pt-24 pb-10 sm:px-8 sm:pb-12 lg:px-12 lg:pb-16 xl:px-16">
       <div className="mx-auto max-w-7xl">
         {/* Hero Content */}
         <div className="grid items-center gap-12 lg:grid-cols-2">
