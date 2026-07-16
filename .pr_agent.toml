@@ -2,7 +2,7 @@
 # Tailored to the AGENTS.md architecture conventions
 
 [config]
-model = "nvidia_nim/nvidia/nemotron-3-ultra"
+model = "nvidia_nim/meta/llama-3.1-70b-instruct"
 fallback_models = []
 # NVIDIA NIM base URL (defaults to https://integrate.api.nvidia.com/v1/)
 # api_base = "https://integrate.api.nvidia.com/v1/"
