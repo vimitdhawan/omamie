@@ -51,13 +51,13 @@ function renderStep(step: Step, index: number, isDesktop: boolean) {
         isDesktop ? "" : "max-w-none flex-row items-start gap-4"
       }`}
     >
-      {isHighlight ? (
+      {isHighlight && step.icon ? (
         <div
           className={`bg-primary text-on-primary mb-4 flex items-center justify-center rounded-full shadow-lg ${
             isDesktop ? circleSize : "flex-shrink-0 " + circleSize
           }`}
         >
-          {step.icon && <step.icon className={circleInner} />}
+          <step.icon className={circleInner} />
         </div>
       ) : (
         <div
