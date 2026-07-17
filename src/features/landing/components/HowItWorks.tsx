@@ -50,12 +50,15 @@ function renderStep(step: Step, index: number, isDesktop: boolean) {
       className={`step-item relative z-10 flex max-w-[200px] flex-col items-center text-center ${
         isDesktop ? "" : "max-w-none flex-row items-start gap-4"
       }`}
+      role="listitem"
+      aria-label={`Step ${step.number}: ${step.title}`}
     >
       {isHighlight && step.icon ? (
         <div
           className={`bg-primary text-on-primary mb-4 flex items-center justify-center rounded-full shadow-lg ${
             isDesktop ? circleSize : "flex-shrink-0 " + circleSize
           }`}
+          aria-hidden="true"
         >
           <step.icon className={circleInner} />
         </div>
@@ -64,6 +67,7 @@ function renderStep(step: Step, index: number, isDesktop: boolean) {
           className={`bg-canvas border-surface-soft mb-4 flex items-center justify-center rounded-full border-4 shadow-sm ${
             isDesktop ? circleSize : "flex-shrink-0 " + circleSize
           }`}
+          aria-hidden="true"
         >
           <span className={`text-primary font-bold ${numberSize}`}>
             {step.number}
@@ -137,13 +141,23 @@ export default function HowItWorks() {
         className={`hidden lg:block ${isVisible ? "animate-steps" : ""}`}
         role="list"
         aria-label="How it works steps"
+        aria-live="off"
       >
         <div className="relative">
           {/* Progressive Connector Lines */}
           <div className="absolute top-10 right-[10%] left-[10%] flex h-0.5 gap-2">
-            <div className="connector-line-1 bg-hairline-soft flex-1" />
-            <div className="connector-line-2 bg-hairline-soft flex-1" />
-            <div className="connector-line-3 bg-hairline-soft flex-1" />
+            <div
+              className="connector-line-1 bg-hairline-soft flex-1"
+              aria-hidden="true"
+            />
+            <div
+              className="connector-line-2 bg-hairline-soft flex-1"
+              aria-hidden="true"
+            />
+            <div
+              className="connector-line-3 bg-hairline-soft flex-1"
+              aria-hidden="true"
+            />
           </div>
 
           <div className="flex items-start justify-between">
@@ -157,17 +171,29 @@ export default function HowItWorks() {
         className={`space-y-6 lg:hidden ${isVisible ? "animate-steps" : ""}`}
         role="list"
         aria-label="How it works steps"
+        aria-live="off"
       >
         {steps.map((step, index) => (
           <div
             key={step.number}
             className="step-item relative flex items-start gap-4"
+            role="listitem"
+            aria-label={`Step ${step.number}: ${step.title}`}
           >
             {renderStep(step, index, false)}
             {index < steps.length - 1 && (
-              <div className="absolute left-7 mt-14 w-0.5 flex-1">
+              <div
+                className="absolute left-7 mt-14 w-0.5 flex-1"
+                aria-hidden="true"
+              >
                 <div
-                  className={`bg-hairline-soft ${index === 0 ? "connector-line-v-1" : index === 1 ? "connector-line-v-2" : "connector-line-v-3"}`}
+                  className={`bg-hairline-soft ${
+                    index === 0
+                      ? "connector-line-v-1"
+                      : index === 1
+                        ? "connector-line-v-2"
+                        : "connector-line-v-3"
+                  }`}
                 />
               </div>
             )}
