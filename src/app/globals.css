@@ -20,6 +20,26 @@
   .bg-primary {
     background-color: var(--color-primary);
   }
+
+  /* Button utility classes for Link components */
+  .btn {
+    @apply text-button-md focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 inline-flex items-center justify-center rounded-sm border border-transparent bg-clip-padding font-medium whitespace-nowrap transition-all duration-200 ease-out outline-none select-none focus-visible:ring-3 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-invalid:ring-3;
+  }
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary-active focus-visible:ring-primary/20 shadow-sm hover:-translate-y-0.5 hover:shadow-md;
+  }
+  .btn-outline {
+    @apply border-hairline bg-background hover:bg-surface-soft hover:text-foreground hover:shadow-sm;
+  }
+  .btn-sm {
+    @apply h-8 gap-1 px-3 text-sm;
+  }
+  .btn-lg {
+    @apply h-10 gap-1.5 px-5 text-base;
+  }
+  .btn-default {
+    @apply h-9 gap-1 px-3.5;
+  }
 }
 
 @custom-variant dark (&:is(.dark *));

@@ -10,20 +10,22 @@ export function BookingStepper({
   onChange,
   min = 0,
   max = 99,
+  disabled,
   className,
 }: {
   value: number;
   onChange: (value: number) => void;
   min?: number;
   max?: number;
+  disabled?: boolean;
   className?: string;
 }) {
   const handleDecrement = () => {
-    if (value > min) onChange(value - 1);
+    if (value > min && !disabled) onChange(value - 1);
   };
 
   const handleIncrement = () => {
-    if (value < max) onChange(value + 1);
+    if (value < max && !disabled) onChange(value + 1);
   };
 
   return (
@@ -31,7 +33,7 @@ export function BookingStepper({
       <button
         type="button"
         onClick={handleDecrement}
-        disabled={value <= min}
+        disabled={value <= min || disabled}
         className="border-hairline bg-canvas text-ink hover:bg-surface-soft flex h-8 w-8 items-center justify-center rounded-sm border disabled:opacity-50"
       >
         <svg
@@ -51,7 +53,7 @@ export function BookingStepper({
       <button
         type="button"
         onClick={handleIncrement}
-        disabled={value >= max}
+        disabled={value >= max || disabled}
         className="border-hairline bg-canvas text-ink hover:bg-surface-soft flex h-8 w-8 items-center justify-center rounded-sm border disabled:opacity-50"
       >
         <svg

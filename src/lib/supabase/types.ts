@@ -61,6 +61,84 @@ export type Database = {
         };
         Relationships: [];
       };
+      properties: {
+        Row: {
+          id: string;
+          owner_id: string | null;
+          listing_role: string;
+          title: string;
+          description: string | null;
+          property_type: string;
+          rent_amount: number;
+          currency: string;
+          address: string;
+          city: string | null;
+          state: string | null;
+          postal_code: string | null;
+          country: string;
+          bedrooms: number;
+          bathrooms: number;
+          furnishing: string;
+          amenities: string[];
+          contact_name: string;
+          contact_email: string;
+          contact_phone: string;
+          status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          owner_id?: string | null;
+          listing_role?: string;
+          title: string;
+          description?: string | null;
+          property_type: string;
+          rent_amount: number;
+          currency?: string;
+          address: string;
+          city?: string | null;
+          state?: string | null;
+          postal_code?: string | null;
+          country?: string;
+          bedrooms?: number;
+          bathrooms?: number;
+          furnishing?: string;
+          amenities?: string[];
+          contact_name: string;
+          contact_email: string;
+          contact_phone: string;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          owner_id?: string | null;
+          listing_role?: string;
+          title?: string;
+          description?: string | null;
+          property_type?: string;
+          rent_amount?: number;
+          currency?: string;
+          address?: string;
+          city?: string | null;
+          state?: string | null;
+          postal_code?: string | null;
+          country?: string;
+          bedrooms?: number;
+          bathrooms?: number;
+          furnishing?: string;
+          amenities?: string[];
+          contact_name?: string;
+          contact_email?: string;
+          contact_phone?: string;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -69,7 +147,10 @@ export type Database = {
       [_ in never]: never;
     };
     Enums: {
-      [_ in never]: never;
+      property_type: "apartment" | "condo" | "house" | "townhouse";
+      furnishing_type: "fully" | "partial" | "none";
+      listing_role: "owner" | "agent";
+      property_status: "draft" | "active" | "rented" | "archived" | "pending";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -202,6 +283,11 @@ export const Constants = {
     Enums: {},
   },
   public: {
-    Enums: {},
+    Enums: {
+      property_type: ["apartment", "condo", "house", "townhouse"],
+      furnishing_type: ["fully", "partial", "none"],
+      listing_role: ["owner", "agent"],
+      property_status: ["draft", "active", "rented", "archived", "pending"],
+    },
   },
 } as const;
