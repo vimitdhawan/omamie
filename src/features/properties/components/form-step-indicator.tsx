@@ -20,6 +20,7 @@ export function FormStepIndicator({
   className,
 }: FormStepIndicatorProps) {
   const currentStepIndex = STEPS.findIndex((s) => s.id === currentStep);
+  const progressPercent = currentStepIndex / (STEPS.length - 1);
 
   return (
     <div
@@ -30,12 +31,12 @@ export function FormStepIndicator({
       aria-valuemin={1}
       aria-valuemax={STEPS.length}
     >
-      {/* Progress Line Background (behind the circles) */}
+      {/* Progress Line Background (behind circles) */}
       <div className="bg-surface-strong absolute top-1/2 right-0 left-0 -z-10 h-[2px] -translate-y-1/2" />
-      {/* Progress Line Fill (highlights visited steps) */}
+      {/* Progress Line Fill */}
       <div
         className="bg-primary absolute top-1/2 left-0 -z-10 h-[2px] -translate-y-1/2 transition-all duration-300"
-        style={{ width: `${(currentStepIndex / (STEPS.length - 1)) * 100}%` }}
+        style={{ width: `${progressPercent * 100}%` }}
       />
 
       {STEPS.map((step, index) => {

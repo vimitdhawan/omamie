@@ -3,7 +3,7 @@ import { Logo } from "@/components/ui/Logo";
 
 export default function Header() {
   return (
-    <header className="border-hairline fixed top-0 right-0 left-0 z-50 h-20 border-b bg-white/80 backdrop-blur-md">
+    <header className="bg-canvas border-hairline fixed top-0 right-0 left-0 z-50 h-16 border-b">
       <div className="mx-auto flex h-full max-w-7xl items-center px-6 sm:px-8 lg:px-12 xl:px-16">
         <Link
           href="/"

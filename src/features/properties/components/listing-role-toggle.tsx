@@ -43,7 +43,7 @@ export function ListingRoleToggle({
               className={cn(
                 "relative flex cursor-pointer items-center rounded-[var(--radius-sm)] border p-[var(--sp-base)] transition-all",
                 selected
-                  ? "border-primary bg-primary/5"
+                  ? "border-primary bg-primary/10"
                   : "border-hairline bg-surface-card hover:border-primary"
               )}
             >

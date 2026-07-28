@@ -2,7 +2,6 @@
 
 import { ListingRoleToggle } from "@/features/properties/components/listing-role-toggle";
 import { PropertyTypeCards } from "@/features/properties/components/property-type-cards";
-import { Input } from "@/components/ui/input";
 import type { FieldErrors } from "react-hook-form";
 import type { ListPropertyFormData } from "@/features/properties/schema";
 
@@ -67,7 +66,7 @@ export function Step1PropertyDetails({
           Property Location <span className="text-destructive">*</span>
         </label>
         <div className="group relative">
-          <div className="text-muted-foreground group-focus-within:text-primary pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 transition-colors">
+          <div className="text-muted-foreground group-focus-within:text-primary pointer-events-none absolute inset-y-0 left-0 flex items-center pl-[var(--sp-base)] transition-colors">
             <span
               className="material-symbols-outlined text-base"
               style={{ fontVariationSettings: '"FILL" 0, "wght" 400' }}
@@ -75,7 +74,7 @@ export function Step1PropertyDetails({
               location_on
             </span>
           </div>
-          <Input
+          <input
             id="location"
             type="text"
             value={formData.location}
@@ -87,7 +86,7 @@ export function Step1PropertyDetails({
             disabled={disabled}
             aria-invalid={errors?.location ? "true" : "false"}
             aria-describedby={errors?.location ? "location-error" : undefined}
-            className="pl-10"
+            className="border-hairline bg-surface-card focus-visible:ring-primary/20 focus-visible:border-primary placeholder:text-muted-soft h-10 w-full rounded-[var(--radius-sm)] border pr-[var(--sp-base)] pl-12 text-base transition-colors outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
         {errors?.location && (
@@ -106,10 +105,10 @@ export function Step1PropertyDetails({
           Monthly Rent (THB) <span className="text-destructive">*</span>
         </label>
         <div className="relative">
-          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-[var(--sp-base)]">
             <span className="text-muted text-sm font-bold">฿</span>
           </div>
-          <Input
+          <input
             id="rentAmount"
             type="number"
             value={formData.rentAmount === 0 ? "" : formData.rentAmount}
@@ -123,7 +122,7 @@ export function Step1PropertyDetails({
             disabled={disabled}
             aria-invalid={errors?.rentAmount ? "true" : "false"}
             aria-describedby={errors?.rentAmount ? "rent-error" : undefined}
-            className="pl-8"
+            className="border-hairline bg-surface-card focus-visible:ring-primary/20 focus-visible:border-primary placeholder:text-muted-soft h-10 w-full rounded-[var(--radius-sm)] border pr-[var(--sp-base)] pl-10 text-base transition-colors outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
         {errors?.rentAmount && (

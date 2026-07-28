@@ -5,8 +5,6 @@ import { useForm, FormProvider } from "react-hook-form";
 import { redirect } from "next/navigation";
 import { listPropertyActionData } from "@/features/properties/actions";
 import type { ListPropertyFormData } from "@/features/properties/schema";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 
 import { Step1PropertyDetails } from "./steps/step-1-property-details";
 import { Step2PhotosAmenities } from "./steps/step-2-photos-amenities";
@@ -71,12 +69,10 @@ const createInitialFormData = (): ListPropertyFormData => ({
 });
 
 interface PublicPropertyFormWizardProps {
-  isAuthenticated: boolean;
   isOwnerOrAgent: boolean;
 }
 
 export function PublicPropertyFormWizard({
-  isAuthenticated,
   isOwnerOrAgent,
 }: PublicPropertyFormWizardProps) {
   const [currentStep, setCurrentStep] = useState<StepId>("property");
@@ -199,30 +195,6 @@ export function PublicPropertyFormWizard({
 
   return (
     <>
-      {/* Page Title Area */}
-      <div className="mb-[var(--sp-xl)]">
-        {isAuthenticated && (
-          <Link
-            href="/dashboard"
-            className="text-primary font-title-md text-nav-link group mb-[var(--sp-sm)] inline-flex items-center gap-[var(--sp-xs)] hover:underline"
-          >
-            <span
-              className="material-symbols-outlined text-[20px] transition-transform group-hover:-translate-x-1"
-              style={{ fontVariationSettings: '"FILL" 0, "wght" 400' }}
-            >
-              chevron_left
-            </span>
-            Back to Dashboard
-          </Link>
-        )}
-        <h1 className="text-display-xl text-ink font-bold">
-          List Your Property
-        </h1>
-        <p className="text-muted font-body-md mt-[var(--sp-xxs)]">
-          Tell us about your property to reach thousands of potential tenants.
-        </p>
-      </div>
-
       {/* Stepper */}
       <FormStepIndicator
         currentStep={currentStep}
@@ -254,12 +226,11 @@ export function PublicPropertyFormWizard({
             {/* Form Navigation */}
             <div className="flex justify-end gap-[var(--sp-base)] pt-[var(--sp-xl)]">
               {!isFirstStep && (
-                <Button
+                <button
                   type="button"
-                  variant="outline"
                   onClick={handleBack}
                   disabled={isPending}
-                  className="gap-[var(--sp-xs)]"
+                  className="font-title-md text-nav-link text-muted-foreground hover:text-ink hover:bg-surface-soft inline-flex h-10 items-center gap-[var(--sp-xs)] rounded-[var(--radius-sm)] px-[var(--sp-base)] transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <span
                     className="material-symbols-outlined text-[20px]"
@@ -268,14 +239,13 @@ export function PublicPropertyFormWizard({
                     arrow_back
                   </span>
                   Back
-                </Button>
+                </button>
               )}
               {isLastStep ? (
-                <Button
+                <button
                   type="submit"
                   disabled={isPending}
-                  size="lg"
-                  className="gap-[var(--sp-xs)]"
+                  className="bg-primary text-on-primary font-title-md hover:bg-primary-active inline-flex h-10 items-center gap-[var(--sp-xs)] rounded-[var(--radius-sm)] px-[var(--sp-xl)] shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {isPending ? "Publishing..." : "List My Property"}
                   <span
@@ -284,14 +254,13 @@ export function PublicPropertyFormWizard({
                   >
                     arrow_forward
                   </span>
-                </Button>
+                </button>
               ) : (
-                <Button
+                <button
                   type="button"
                   onClick={handleNext}
                   disabled={isPending}
-                  size="lg"
-                  className="gap-[var(--sp-xs)]"
+                  className="bg-primary text-on-primary font-title-md hover:bg-primary-active inline-flex h-10 items-center gap-[var(--sp-xs)] rounded-[var(--radius-sm)] px-[var(--sp-xl)] shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   Next
                   <span
@@ -300,7 +269,7 @@ export function PublicPropertyFormWizard({
                   >
                     arrow_forward
                   </span>
-                </Button>
+                </button>
               )}
             </div>
           </form>
