@@ -1,11 +1,8 @@
-import { getCurrentUser } from "@/features/auth/service";
 import { PublicPropertyFormWizard } from "@/features/properties/components/public-property-form-wizard";
 import Header from "@/features/landing/components/Header";
 import Link from "next/link";
 
-export default async function PublicListPropertyPage() {
-  const { user, profile } = await getCurrentUser();
-
+export default function PublicListPropertyPage() {
   return (
     <>
       <Header />
@@ -30,9 +27,7 @@ export default async function PublicListPropertyPage() {
             Tell us about your property to reach thousands of potential tenants.
           </p>
         </div>
-        <PublicPropertyFormWizard
-          isOwnerOrAgent={!!user && !!profile && profile?.role !== "tenant"}
-        />
+        <PublicPropertyFormWizard />
       </main>
     </>
   );

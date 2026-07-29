@@ -43,6 +43,11 @@ export const listPropertySchema = z
       .default(1),
     furnishing: furnishingTypeEnum.default("none"),
     amenities: z.array(z.string()).optional().default([]),
+    description: z
+      .string()
+      .max(2000, "Description must be at most 2000 characters")
+      .optional()
+      .default(""),
     contactName: z
       .string()
       .min(2, "Contact name must be at least 2 characters")
@@ -92,6 +97,11 @@ export const updatePropertySchema = z.object({
     .optional(),
   furnishing: furnishingTypeEnum.default("none").optional(),
   amenities: z.array(z.string()).optional().default([]),
+  description: z
+    .string()
+    .max(2000, "Description must be at most 2000 characters")
+    .optional()
+    .default(""),
   contactName: z
     .string()
     .min(2, "Contact name must be at least 2 characters")

@@ -2,6 +2,8 @@
 
 import { ListingRoleToggle } from "@/features/properties/components/listing-role-toggle";
 import { PropertyTypeCards } from "@/features/properties/components/property-type-cards";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import type { FieldErrors } from "react-hook-form";
 import type { ListPropertyFormData } from "@/features/properties/schema";
 
@@ -16,6 +18,7 @@ export function Step1PropertyDetails({
     propertyType: "apartment" | "condo" | "house" | "townhouse";
     location: string;
     rentAmount: number;
+    description: string;
   };
   onChange: (name: string, value: string | number) => void;
   disabled?: boolean;
@@ -74,7 +77,7 @@ export function Step1PropertyDetails({
               location_on
             </span>
           </div>
-          <input
+          <Input
             id="location"
             type="text"
             value={formData.location}
@@ -86,7 +89,7 @@ export function Step1PropertyDetails({
             disabled={disabled}
             aria-invalid={errors?.location ? "true" : "false"}
             aria-describedby={errors?.location ? "location-error" : undefined}
-            className="border-hairline bg-surface-card focus-visible:ring-primary/20 focus-visible:border-primary placeholder:text-muted-soft h-10 w-full rounded-[var(--radius-sm)] border pr-[var(--sp-base)] pl-12 text-base transition-colors outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="border-hairline bg-surface-card focus-visible:ring-primary/20 focus-visible:border-primary placeholder:text-muted-soft h-10 rounded-[var(--radius-sm)] border pl-12 text-base focus-visible:ring-2"
           />
         </div>
         {errors?.location && (
@@ -108,7 +111,7 @@ export function Step1PropertyDetails({
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-[var(--sp-base)]">
             <span className="text-muted text-sm font-bold">฿</span>
           </div>
-          <input
+          <Input
             id="rentAmount"
             type="number"
             value={formData.rentAmount === 0 ? "" : formData.rentAmount}
@@ -122,7 +125,7 @@ export function Step1PropertyDetails({
             disabled={disabled}
             aria-invalid={errors?.rentAmount ? "true" : "false"}
             aria-describedby={errors?.rentAmount ? "rent-error" : undefined}
-            className="border-hairline bg-surface-card focus-visible:ring-primary/20 focus-visible:border-primary placeholder:text-muted-soft h-10 w-full rounded-[var(--radius-sm)] border pr-[var(--sp-base)] pl-10 text-base transition-colors outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50"
+            className="border-hairline bg-surface-card focus-visible:ring-primary/20 focus-visible:border-primary placeholder:text-muted-soft h-10 rounded-[var(--radius-sm)] border pl-10 text-base focus-visible:ring-2"
           />
         </div>
         {errors?.rentAmount && (
@@ -130,6 +133,42 @@ export function Step1PropertyDetails({
             {errors.rentAmount.message}
           </p>
         )}
+      </div>
+
+      {/* Field 5: Description (optional) */}
+      <div>
+        <label
+          htmlFor="description"
+          className="font-title-md text-nav-link text-ink mb-[var(--sp-xs)] block"
+        >
+          Description{" "}
+          <span className="text-muted-foreground text-sm font-normal">
+            (optional)
+          </span>
+        </label>
+        <Textarea
+          id="description"
+          value={formData.description}
+          onChange={(e) => onChange("description", e.target.value)}
+          placeholder="Tell potential tenants what makes your property special..."
+          maxLength={2000}
+          disabled={disabled}
+          aria-invalid={errors?.description ? "true" : "false"}
+          aria-describedby={
+            errors?.description ? "description-error" : undefined
+          }
+          className="border-hairline bg-surface-card focus-visible:ring-primary/20 focus-visible:border-primary placeholder:text-muted-soft min-h-[100px] rounded-[var(--radius-sm)] border px-[var(--sp-base)] py-[var(--sp-sm)] text-base focus-visible:ring-2"
+        />
+        <div className="text-caption-sm text-muted-foreground mt-1 flex justify-between">
+          <span>
+            {errors?.description && (
+              <span id="description-error" className="text-destructive">
+                {errors.description.message}
+              </span>
+            )}
+          </span>
+          <span>{formData.description.length}/2000</span>
+        </div>
       </div>
     </div>
   );

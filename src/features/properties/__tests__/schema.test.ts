@@ -12,6 +12,7 @@ const validPropertyData: ListPropertyFormData = {
   bathrooms: 2,
   furnishing: "fully",
   amenities: ["air_conditioning", "wifi", "parking"],
+  description: "Spacious condo with city views, close to BTS.",
   contactName: "John Doe",
   contactEmail: "john@example.com",
   contactPhone: "+66 81 234 5678",
@@ -113,6 +114,7 @@ describe("properties schema", () => {
         expect(result.data.furnishing).toBe("none");
         expect(result.data.status).toBe("draft");
         expect(result.data.acceptMarketing).toBe(false);
+        expect(result.data.description).toBe("");
       }
     });
 
@@ -145,6 +147,61 @@ describe("properties schema", () => {
       if (result.success) {
         expect(result.data.amenities).toEqual([]);
       }
+    });
+
+    it("persists description when provided", () => {
+      const data = {
+        ...validPropertyData,
+        description: "Quiet condo near the river, recently renovated.",
+      };
+      const result = listPropertySchema.safeParse(data);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.description).toBe(
+          "Quiet condo near the river, recently renovated."
+        );
+      }
+    });
+
+    it("accepts an empty description string", () => {
+      const data = { ...validPropertyData, description: "" };
+      const result = listPropertySchema.safeParse(data);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.description).toBe("");
+      }
+    });
+
+    it("uses default empty string when description is omitted", () => {
+      const { description: _omitted, ...withoutDescription } =
+        validPropertyData;
+      void _omitted;
+      const result = listPropertySchema.safeParse(withoutDescription);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.description).toBe("");
+      }
+    });
+
+    it("rejects description longer than 2000 characters", () => {
+      const data = {
+        ...validPropertyData,
+        description: "x".repeat(2001),
+      };
+      const result = listPropertySchema.safeParse(data);
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error.issues[0].message).toContain("2000");
+      }
+    });
+
+    it("accepts description at exactly 2000 characters", () => {
+      const data = {
+        ...validPropertyData,
+        description: "x".repeat(2000),
+      };
+      const result = listPropertySchema.safeParse(data);
+      expect(result.success).toBe(true);
     });
   });
 

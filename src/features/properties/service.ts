@@ -53,7 +53,7 @@ export async function listProperty(
     owner_id: isOwnerOrAgent ? user!.id : null,
     listing_role: input.listingRole,
     title: generateTitle(input),
-    description: "",
+    description: input.description,
     property_type: input.propertyType,
     rent_amount: input.rentAmount,
     currency: input.currency,

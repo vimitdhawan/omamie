@@ -33,7 +33,13 @@ const STEPS = [
 type StepId = (typeof STEPS)[number]["id"];
 
 const STEP_FIELDS: Record<StepId, (keyof ListPropertyFormData)[]> = {
-  property: ["listingRole", "propertyType", "location", "rentAmount"],
+  property: [
+    "listingRole",
+    "propertyType",
+    "location",
+    "rentAmount",
+    "description",
+  ],
   photos: ["bedrooms", "bathrooms", "furnishing"],
   contact: ["contactName", "contactEmail", "contactPhone", "acceptTerms"],
 };
@@ -60,6 +66,7 @@ const createInitialFormData = (): ListPropertyFormData => ({
   bathrooms: 1,
   furnishing: "none" as const,
   amenities: [] as string[],
+  description: "",
   contactName: "",
   contactEmail: "",
   contactPhone: "",
@@ -68,13 +75,7 @@ const createInitialFormData = (): ListPropertyFormData => ({
   status: "draft" as const,
 });
 
-interface PublicPropertyFormWizardProps {
-  isOwnerOrAgent: boolean;
-}
-
-export function PublicPropertyFormWizard({
-  isOwnerOrAgent,
-}: PublicPropertyFormWizardProps) {
+export function PublicPropertyFormWizard() {
   const [currentStep, setCurrentStep] = useState<StepId>("property");
   const [isPending, setIsPending] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -126,11 +127,7 @@ export function PublicPropertyFormWizard({
     try {
       const result: PropertyActionResult = await listPropertyActionData(data);
       if (result.success) {
-        if (isOwnerOrAgent) {
-          redirect("/dashboard/welcome");
-        } else {
-          redirect("/list-property/success");
-        }
+        redirect("/list-property/success");
       } else {
         setSubmitError(
           result.error ?? "Failed to list property. Please try again."
@@ -165,6 +162,7 @@ export function PublicPropertyFormWizard({
               propertyType,
               location: formData.location,
               rentAmount: formData.rentAmount,
+              description: formData.description,
             }}
             onChange={handleInputChange}
             disabled={isPending}

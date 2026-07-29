@@ -30,12 +30,8 @@ export async function listPropertyAction(
     bathrooms: Number(formData.get("bathrooms") ?? 1),
     furnishing: (formData.get("furnishing") ?? "none") as string,
     amenities: formData.getAll("amenities") as string[],
+    description: (formData.get("description") ?? "") as string,
     contactName: (formData.get("contactName") ?? "") as string,
-    contactEmail: (formData.get("contactEmail") ?? "") as string,
-    contactPhone: (formData.get("contactPhone") ?? "") as string,
-    acceptTerms: formData.get("acceptTerms") === "true",
-    acceptMarketing: formData.get("acceptMarketing") === "true",
-    status: (formData.get("status") ?? "draft") as string,
   };
 
   const parsed = listPropertySchema.safeParse(raw);
@@ -114,6 +110,7 @@ export async function updatePropertyAction(
       | "partial"
       | "none",
     amenities: formData.getAll("amenities") as string[],
+    description: (formData.get("description") ?? "") as string,
     contactName: (formData.get("contactName") ?? "") as string,
     contactEmail: (formData.get("contactEmail") ?? "") as string,
     contactPhone: (formData.get("contactPhone") ?? "") as string,

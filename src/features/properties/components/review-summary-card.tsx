@@ -89,6 +89,12 @@ export function ReviewSummaryCard({ formData }: ReviewSummaryCardProps) {
             <dt className="text-muted-foreground">Furnishing</dt>
             <dd className="text-ink font-medium">{furnishing}</dd>
           </div>
+          {formData.description && (
+            <div className="col-span-2 flex flex-col gap-1">
+              <dt className="text-muted-foreground">Description</dt>
+              <dd className="text-ink text-sm">{formData.description}</dd>
+            </div>
+          )}
         </dl>
       </div>
 
