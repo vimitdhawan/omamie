@@ -61,6 +61,57 @@ export type Database = {
         };
         Relationships: [];
       };
+      properties: {
+        Row: {
+          id: string;
+          profile_id: string;
+          title: string;
+          property_type: string;
+          location: string;
+          monthly_rent: number;
+          description: string | null;
+          bedrooms: number;
+          bathrooms: number;
+          furnished_status: string;
+          amenities: string[];
+          status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          profile_id?: string;
+          title: string;
+          property_type: string;
+          location: string;
+          monthly_rent: number;
+          description?: string | null;
+          bedrooms?: number;
+          bathrooms?: number;
+          furnished_status: string;
+          amenities?: string[];
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          profile_id?: string;
+          title?: string;
+          property_type?: string;
+          location?: string;
+          monthly_rent?: number;
+          description?: string | null;
+          bedrooms?: number;
+          bathrooms?: number;
+          furnished_status?: string;
+          amenities?: string[];
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;

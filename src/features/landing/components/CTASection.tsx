@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Section, SectionHeader } from "@/components/ui/section";
@@ -16,9 +17,11 @@ export default function CTASection() {
           Find Property
           <ArrowRight className="h-4 w-4" />
         </Button>
-        <Button variant="outline" size="default">
-          List Your Property
-        </Button>
+        <Link href="/list-property">
+          <Button variant="outline" size="default">
+            List Your Property
+          </Button>
+        </Link>
       </div>
     </Section>
   );
