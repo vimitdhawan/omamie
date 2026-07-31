@@ -1,0 +1,121 @@
+src/features/properties/components/step-amenities.tsx
+  s_5c449246c00969::t_b5127987299ab1 56-57
+  s_5c449246c00969::t_20b1e687ad64b3 76
+  s_5c449246c00969::t_f45217c06ace0a 1-55,58-75,77-203
+src/features/properties/components/step-property-details.tsx
+  s_5c449246c00969::t_4592f6a3ed0667 94,96-98
+  s_5c449246c00969::t_124f6f13d2a9ac 139,148-150
+  s_5c449246c00969::t_b6e111777e4b80 42-43
+  s_5c449246c00969::t_b38ddffb1bd5fc 1-16,18-37,39-41,44-83,85-93,95,99-103,105-113,115-120,124-128,130-138,140-147,151-169
+  s_5c449246c00969::t_911687b086ebd8 84
+  s_5c449246c00969::t_5d740c9700276d 129
+  s_5c449246c00969::t_1548d6fab7cc2d 104
+  s_5c449246c00969::t_6bc54b58d0093e 38
+  s_5c449246c00969::t_5e6ce273edba4b 17
+  s_5c449246c00969::t_7b4ab59dfcbba1 114,121-123
+  s_5c449246c00969::t_68d03241995e94 170-172
+components.json
+  s_5c449246c00969::t_88e53d1b373c6d 24-26
+supabase/migrations/20260731000000_create_properties.sql
+  s_5c449246c00969::t_55e04d370c5e24 1-50
+src/app/globals.css
+  s_5c449246c00969::t_5a9fa3d9f3b951 23-36
+src/features/properties/repository.ts
+  s_5c449246c00969::t_a56490aafbf1a8 1-70
+src/features/properties/actions.ts
+  s_5c449246c00969::t_103705d8fbc5ce 1-58
+src/app/(public)/list-property/page.tsx
+  s_5c449246c00969::t_1222e11d8bf610 1,4-6,14-15
+  s_5c449246c00969::t_f9dedabc79c61e 2-3,7-13
+src/features/properties/__tests__/schema.test.ts
+  s_5c449246c00969::t_4e2be99dd16495 1-88,90,92-234
+  s_5c449246c00969::t_79ee759391876c 89,91
+src/lib/supabase/types.ts
+  s_5c449246c00969::t_33dd20de45b9b1 64-114
+src/components/reui/stepper.tsx
+  s_5c449246c00969::t_8290d3a9e7e9f1 145
+  s_5c449246c00969::t_f1fc79f7a88a4f 1
+  s_5c449246c00969::t_f34e838c3c4b77 258
+  s_5c449246c00969::t_1c428eb41624a6 2-144,146-250,253-257,259-475
+  s_5c449246c00969::t_78ca1fbd2903f8 251-252
+  s_5c449246c00969::t_45c2708fe76114 476-477
+src/features/properties/types.ts
+  s_5c449246c00969::t_469572aff8b7c2 9-13
+  s_5c449246c00969::t_d82a57bee46438 1-8,14-24
+src/features/landing/components/Footer.tsx
+  s_5c449246c00969::t_ee8c34240cce26 16
+src/components/ui/toast.tsx
+  s_5c449246c00969::t_fa1328ac2aadc0 1-224
+  s_5c449246c00969::t_21b667f67c5545 225-227
+e2e/list-property.spec.ts
+  s_5c449246c00969::t_5ef975d8d41c3c 1-102
+  s_5c449246c00969::t_0ffb795edb0fac 103-105
+src/features/landing/components/CTASection.tsx
+  s_5c449246c00969::t_6066ecd269a777 20-24
+  s_5c449246c00969::t_6c30cf8df3bb3f 3
+src/hooks/use-toast.ts
+  s_5c449246c00969::t_0f3483e1417a87 1-10,12-18,20,22-24,26-42
+  s_5c449246c00969::t_5c1a216a462cb9 11,19,21,25
+src/features/properties/components/list-property-form.tsx
+  s_5c449246c00969::t_2a651b0d3d447e 51-53,65-82,84-91,96
+  s_5c449246c00969::t_931c6be534e670 54-58,60-61,64
+  s_5c449246c00969::t_82a40f59a73d59 169
+  s_5c449246c00969::t_271a4ce4f65467 7-16
+  s_5c449246c00969::t_4235384e287d33 4
+  s_5c449246c00969::t_1c0354ae77f49e 3,6
+  s_5c449246c00969::t_466aabfb462ef5 185
+  s_5c449246c00969::t_c48a5b7db8e539 225-234
+  s_5c449246c00969::t_4546978b7c63a2 127-153
+  s_5c449246c00969::t_97045cb480f72e 159-168,170-171
+  s_5c449246c00969::t_9f62eb639d4901 59
+  s_5c449246c00969::t_a08fa8eec1f388 1-2,5,17-50,83,92-95,97-101,115-126,154-158,172-184,186-221,236-259
+  s_5c449246c00969::t_b2281d51c4faf5 102-114
+  s_5c449246c00969::t_e85714b324c14a 62-63
+  s_5c449246c00969::t_e70b4ff01d8640 222-224,235
+  s_5c449246c00969::t_962ab60c252bfc 260-262
+src/features/landing/components/Hero.tsx
+  s_5c449246c00969::t_17881fc95999c1 4
+  s_5c449246c00969::t_9c3679a87ba9ed 28-32
+src/app/layout.tsx
+  s_5c449246c00969::t_44a936be3cccc5 3
+  s_5c449246c00969::t_0bfd21c3344f91 32-35
+src/features/properties/service.ts
+  s_5c449246c00969::t_31e4bfe222ce14 1-68
+src/features/properties/__tests__/service.test.ts
+  s_5c449246c00969::t_49c950c05d1264 1-262
+src/features/properties/components/step-review.tsx
+  s_5c449246c00969::t_2c7490963d82c7 44-45
+  s_5c449246c00969::t_2c1aae7b292e6c 1-43,46-171
+  s_5c449246c00969::t_1418fb74a2e397 172-174
+src/app/(public)/list-property/success/page.tsx
+  s_5c449246c00969::t_fb8d84737fe11f 1-5,8-27,46,48-67,69-129,131-132,136-137,139
+  s_5c449246c00969::t_23dec1659edf8d 6-7
+  s_5c449246c00969::t_b744a9abd7aa60 130
+  s_5c449246c00969::t_600b88283e66f0 68
+  s_5c449246c00969::t_1e0a9fbd17685a 28-45
+  s_5c449246c00969::t_19dbb1092fbdde 47
+  s_5c449246c00969::t_8ca387ca91d341 133-135
+  s_5c449246c00969::t_e6a64c47e16275 138
+  s_5c449246c00969::t_a3e6efbd2735a3 140-142
+src/features/properties/schema.ts
+  s_5c449246c00969::t_2f80b6c9adcf55 3-72,74-84,86-98,100-101,103-121
+  s_5c449246c00969::t_b37d2bf44ccbad 99,102
+  s_5c449246c00969::t_0f9d2984126cdf 85
+  s_5c449246c00969::t_45ede21aa36f63 73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "537feaec9cba927351d05f9f3454140c54dae2cf",
+  "prompts": {},
+  "sessions": {
+    "s_5c449246c00969": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_04894a9cbffeiMdBbXaqZHIguu",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Vimit Dhawan <vimit.dhawan@foodpanda.com>"
+    }
+  }
+}
