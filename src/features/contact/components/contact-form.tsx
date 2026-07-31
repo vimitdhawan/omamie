@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useActionState } from "react";
 import { useForm } from "react-hook-form";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 import { submitContactAction } from "../actions";
 import {
@@ -39,6 +40,8 @@ export function ContactForm() {
     ContactActionState,
     FormData
   >(submitContactAction, { errors: {} });
+
+  const { toast } = useToast();
 
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
@@ -73,148 +76,168 @@ export function ContactForm() {
         subject: "general",
         message: "",
       });
+      toast({
+        title: "Message sent successfully!",
+        description: "We'll get back to you within 24 hours.",
+      });
     }
-  }, [state?.success, form]);
+  }, [state?.success, form, toast]);
 
   return (
     <Form {...form}>
-      <form action={action} className="space-y-[var(--sp-lg)]">
+      <form action={action} className="space-y-6">
         {state?.errorMessage && (
           <Alert variant="destructive">
             <AlertDescription>{state.errorMessage}</AlertDescription>
           </Alert>
         )}
 
-        {state?.success && (
-          <Alert>
-            <CheckCircle2 className="h-4 w-4" />
-            <AlertDescription>
-              Thanks for reaching out! We&apos;ll get back to you within
-              24 hours.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        <div className="grid grid-cols-1 gap-[var(--sp-base)] md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="fullName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input
-                    type="text"
-                    placeholder="John Doe"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="john@example.com"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 gap-[var(--sp-base)] md:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone (optional)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="tel"
-                    placeholder="+1 (555) 000-0000"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="subject"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Reason for Contact</FormLabel>
-                <Select
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  name={field.name}
-                >
+        {/* Form Fields with Better Spacing */}
+        <div className="space-y-6">
+          {/* Name & Email Row */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="fullName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Full Name <span className="text-destructive">*</span>
+                  </FormLabel>
                   <FormControl>
-                    <SelectTrigger className="h-9 w-full">
-                      <SelectValue placeholder="Select an option" />
-                    </SelectTrigger>
+                    <Input
+                      type="text"
+                      placeholder="John Doe"
+                      className="h-11"
+                      {...field}
+                    />
                   </FormControl>
-                  <SelectContent>
-                    {CONTACT_SUBJECT_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Email <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="john@example.com"
+                      className="h-11"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Phone & Subject Row */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone (optional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="tel"
+                      placeholder="+1 (555) 000-0000"
+                      className="h-11"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="subject"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Reason for Contact{" "}
+                    <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    name={field.name}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="h-11 w-full">
+                        <SelectValue placeholder="Select an option" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {CONTACT_SUBJECT_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* Message Field */}
+          <FormField
+            control={form.control}
+            name="message"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  Message <span className="text-destructive">*</span>
+                </FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="How can we help you?"
+                    className="min-h-[120px] resize-none"
+                    rows={5}
+                    {...field}
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="message"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Message</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="How can we help you?"
-                  rows={4}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="pt-[var(--sp-base)]">
+        {/* Submit Button */}
+        <div className="pt-2">
           <Button
             type="submit"
-            className="h-12 w-full"
+            size="lg"
+            className="h-12 w-full text-base"
             disabled={isPending}
           >
-            {isPending && (
-              <Loader2 className="mr-[var(--sp-sm)] h-4 w-4 animate-spin" />
+            {isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              "Send Message"
             )}
-            Send Message
           </Button>
         </div>
 
-        <p className="text-muted text-center text-sm">
-          Typical response time is within 24 hours.
+        {/* Helper Text */}
+        <p className="text-muted-foreground text-center text-sm">
+          We typically respond within 24 hours during business days.
         </p>
       </form>
     </Form>

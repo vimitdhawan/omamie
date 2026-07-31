@@ -1,64 +1,70 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft } from "lucide-react";
 
 import Footer from "@/features/landing/components/Footer";
 import Header from "@/features/landing/components/Header";
 import { ContactForm } from "@/features/contact/components/contact-form";
+import { Card } from "@/components/ui/card";
 
 export default function ContactPage() {
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-7xl px-[var(--sp-base)] pt-28 pb-[var(--sp-section)] md:px-[var(--sp-xxl)] lg:px-[var(--sp-section)]">
-        <div className="flex flex-col items-start gap-[var(--sp-xxl)] md:flex-row">
-          {/* Left panel: professional image */}
-          <div className="relative w-full md:w-1/2">
-            <div className="relative aspect-square w-full overflow-hidden rounded-lg">
-              <Image
-                src="/images/apartment-interior.jpg"
-                alt="Modern apartment interior"
-                fill
-                className="object-cover"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-[var(--sp-lg)] left-[var(--sp-lg)] right-[var(--sp-lg)] text-white">
-                <h2 className="text-ink mb-[var(--sp-sm)] text-2xl font-bold text-white sm:text-3xl">
-                  Find Your Perfect Space
-                </h2>
-                <p className="max-w-sm text-sm opacity-90 sm:text-base">
-                  Experience the next generation of property discovery with
-                  Omamie&apos;s curated high-end listings.
-                </p>
-              </div>
-            </div>
+      <main className="min-h-screen bg-gray-50/50">
+        <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 lg:px-8">
+          {/* Back to Home - Outside grid for better positioning */}
+          <div className="mb-6">
+            <Link
+              href="/"
+              className="group text-primary hover:text-primary/80 inline-flex items-center gap-2 text-sm transition-colors"
+            >
+              <span className="material-symbols-outlined text-[18px] leading-none transition-transform group-hover:-translate-x-1">
+                arrow_back
+              </span>
+              Back to Home
+            </Link>
           </div>
 
-          {/* Right panel: contact form */}
-          <div className="w-full md:w-1/2">
-            {/* Back link */}
-            <div className="mb-[var(--sp-lg)]">
-              <Link
-                href="/"
-                className="text-primary hover:text-primary/80 inline-flex items-center gap-[var(--sp-sm)] text-sm transition-colors"
-              >
-                <ArrowLeft className="h-[18px] w-[18px] leading-none" />
-                Back to Home
-              </Link>
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[2fr_3fr] lg:gap-12">
+            {/* Left: Image Section (40%) - Matches card height */}
+            <div className="order-2 lg:order-1">
+              <Card className="relative h-full min-h-[400px] overflow-hidden border-gray-200 p-0 shadow-lg">
+                <Image
+                  src="/images/apartment-interior.jpg"
+                  alt="Modern apartment interior"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute top-10 right-8 left-8 text-white">
+                  <h2 className="mb-3 text-3xl font-bold">
+                    Find Your Perfect Space
+                  </h2>
+                  <p className="text-lg opacity-90">
+                    Experience premium property management with Omamie&apos;s
+                    curated listings.
+                  </p>
+                </div>
+              </Card>
             </div>
 
-            <div className="mb-[var(--sp-xl)]">
-              <h1 className="text-ink mb-[var(--sp-sm)] text-2xl font-bold sm:text-3xl">
-                Contact Us
-              </h1>
-              <p className="text-muted text-sm sm:text-base">
-                We&apos;re here to help. Reach out with any questions about
-                listings, partnerships, or just to say hello.
-              </p>
-            </div>
+            {/* Right: Form Section (60%) in Card */}
+            <div className="order-1 lg:order-2">
+              <Card className="border-gray-200 bg-white p-8 shadow-lg sm:p-10">
+                <div className="mb-8">
+                  <h1 className="text-4xl font-bold text-gray-900">
+                    Contact Us
+                  </h1>
+                  <p className="mt-3 text-lg text-gray-600">
+                    We&apos;re here to help with any questions about listings,
+                    partnerships, or property management.
+                  </p>
+                </div>
 
-            <ContactForm />
+                <ContactForm />
+              </Card>
+            </div>
           </div>
         </div>
       </main>
