@@ -1,0 +1,46 @@
+src/components/ui/toast.tsx
+  s_5c449246c00969::t_80db9d1e10c36b 1-129
+src/features/contact/components/contact-form.tsx
+  s_5c449246c00969::t_95135bbaf96f8b 119
+  s_5c449246c00969::t_4416af5eb10af4 203
+  s_5c449246c00969::t_03426fea63150d 7,28,44-45,79-82,84,88,95-118,120-196,199,202,206-209,219-220,223-224,227-233,238-239
+  s_5c449246c00969::t_3f11679f694aa3 204
+  s_5c449246c00969::t_4d57662ef0adc3 240
+package.json
+  s_5c449246c00969::t_df3f341d0139b7 24
+src/app/layout.tsx
+  s_5c449246c00969::t_d095478343a69e 32-35
+  s_5c449246c00969::t_61601198e67589 4
+src/hooks/use-toast.ts
+  s_5c449246c00969::t_3283f19246c095 26,30,34,38
+  s_5c449246c00969::t_0f7464a3287536 1-25,27-29,31-33,35-37,39-179
+src/components/ui/toaster.tsx
+  s_5c449246c00969::t_1a4f0184fd12fd 1-35
+src/app/(public)/contact/page.tsx
+  s_5c449246c00969::t_16dfb470d565b4 7,13-14,30,32-38,40,42-44,47-48,52-63,65-67
+  s_5c449246c00969::t_e88397a8968191 15-25,28-29,31,39,41,45-46,49
+src/lib/supabase/types.ts
+  s_5c449246c00969::t_4c36c8791e76bf 10-11,15,17-25,27-45,71-109,111,116,118-120
+  s_5c449246c00969::t_89d4d3de686de7 110
+  s_5c449246c00969::t_751b1f55e5f55b 112-115
+  s_5c449246c00969::t_c95b2eaacb94ac 117
+  s_5c449246c00969::t_763cee66a7805c 121
+package-lock.json
+  s_5c449246c00969::t_e987b4b5cc8c08 14,3184-3485,4606
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "16ecf9c6583543f9e58890258a7ef8c0cb4ee24a",
+  "prompts": {},
+  "sessions": {
+    "s_5c449246c00969": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_04894a9cbffeiMdBbXaqZHIguu",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Vimit Dhawan <vimit.dhawan@foodpanda.com>"
+    }
+  }
+}
