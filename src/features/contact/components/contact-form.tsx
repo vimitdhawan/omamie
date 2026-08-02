@@ -1,12 +1,11 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useActionState } from "react";
 import { useForm } from "react-hook-form";
 import { Loader2 } from "lucide-react";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Select,
   SelectContent,
@@ -54,6 +53,8 @@ export function ContactForm() {
     },
   });
 
+  const lastErrorRef = useRef<string | null>(null);
+
   useEffect(() => {
     if (state?.errors) {
       Object.entries(state.errors).forEach(([key, messages]) => {
@@ -65,10 +66,18 @@ export function ContactForm() {
         }
       });
     }
-  }, [state, form]);
 
-  useEffect(() => {
+    if (state?.errorMessage && state.errorMessage !== lastErrorRef.current) {
+      lastErrorRef.current = state.errorMessage;
+      toast({
+        variant: "destructive",
+        title: "Message not sent",
+        description: state.errorMessage,
+      });
+    }
+
     if (state?.success) {
+      lastErrorRef.current = null;
       form.reset({
         fullName: "",
         email: "",
@@ -81,17 +90,11 @@ export function ContactForm() {
         description: "We'll get back to you within 24 hours.",
       });
     }
-  }, [state?.success, form, toast]);
+  }, [state, form, toast]);
 
   return (
     <Form {...form}>
       <form action={action} className="space-y-6">
-        {state?.errorMessage && (
-          <Alert variant="destructive">
-            <AlertDescription>{state.errorMessage}</AlertDescription>
-          </Alert>
-        )}
-
         {/* Form Fields with Better Spacing */}
         <div className="space-y-6">
           {/* Name & Email Row */}
@@ -175,7 +178,7 @@ export function ContactForm() {
                     name={field.name}
                   >
                     <FormControl>
-                      <SelectTrigger className="h-11 w-full">
+                      <SelectTrigger size="lg" className="w-full">
                         <SelectValue placeholder="Select an option" />
                       </SelectTrigger>
                     </FormControl>
