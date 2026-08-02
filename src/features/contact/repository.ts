@@ -6,18 +6,14 @@ export async function createContactMessage(
 ): Promise<ContactResult> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("contact_messages")
-    .insert({
-      full_name: input.full_name,
-      email: input.email,
-      phone: input.phone || null,
-      subject: input.subject,
-      message: input.message,
-    })
-    .select()
-    .single();
+  const { error } = await supabase.from("contact_messages").insert({
+    full_name: input.full_name,
+    email: input.email,
+    phone: input.phone || null,
+    subject: input.subject,
+    message: input.message,
+  });
 
   if (error) return { data: null, error };
-  return { data: data as ContactResult["data"], error: null };
+  return { data: null, error: null };
 }

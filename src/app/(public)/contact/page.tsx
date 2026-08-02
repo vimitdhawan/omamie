@@ -25,7 +25,7 @@ export default function ContactPage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[2fr_3fr] lg:gap-12">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-[9fr_11fr] lg:gap-12">
             {/* Left: Image Section (40%) - Matches card height */}
             <div className="order-2 lg:order-1">
               <Card className="relative h-full min-h-[400px] overflow-hidden border-gray-200 p-0 shadow-lg">
