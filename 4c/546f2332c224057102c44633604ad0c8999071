@@ -1,0 +1,38 @@
+src/app/(public)/contact/page.tsx
+  s_5c449246c00969::t_b5b2904cbc8549 28
+src/features/contact/repository.ts
+  s_5c449246c00969::t_50fa2ef45eca34 9-15,18
+src/components/ui/form.tsx
+  s_5c449246c00969::t_9d449f28ce120c 143-150,157
+src/features/contact/components/contact-form.tsx
+  s_5c449246c00969::t_3a36945ccf5f06 61
+  s_5c449246c00969::t_0cd32c591b229b 91-92
+  s_5c449246c00969::t_c01faad0a6437a 131-132
+  s_5c449246c00969::t_08be1eeb988ce5 189
+  s_5c449246c00969::t_dfeecc6d0bcca8 161
+  s_5c449246c00969::t_2212107e822a83 218
+  s_5c449246c00969::t_a9f6d2f99b4e91 4,38-40,46,50,60,62,64-68,70-74,76,84-85,93-129,136-142,162-167,190-195,219-224,247,280-285
+  s_5c449246c00969::t_109cc3285c19ea 130
+  s_5c449246c00969::t_e58ad8cb8a6425 286
+src/hooks/use-toast.ts
+  s_5c449246c00969::t_85a5996095afa6 8
+src/components/ui/select.tsx
+  s_5c449246c00969::t_f9f81fd45858e1 123
+  s_5c449246c00969::t_fbcc9965ec3b74 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "4c546f2332c224057102c44633604ad0c8999071",
+  "prompts": {},
+  "sessions": {
+    "s_5c449246c00969": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_04894a9cbffeiMdBbXaqZHIguu",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Vimit Dhawan <vimit.dhawan@foodpanda.com>"
+    }
+  }
+}
