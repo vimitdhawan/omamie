@@ -1,0 +1,40 @@
+src/features/auth/components/signup-form.tsx
+  s_1de96f28422b38::t_f827fc64f29f1e 9,21-26,50-51,53,89,102,167,189
+  s_1de96f28422b38::t_8473fe9d3b7d74 5-8,18-19,27-40,46,56-57,129,162,206,211,222
+  s_1de96f28422b38::t_d436a7856b94df 77-88,90-101,103-128,130-161
+  s_1de96f28422b38::t_ab14dbda09ce58 163-166,168-188,190-205,207-210,212-221,223-235
+  s_1de96f28422b38::t_d084a83460da54 3,15,17
+  s_1de96f28422b38::t_93c50224e3dabf 48-49,54-55,58-62,64-69,71-75
+  s_1de96f28422b38::t_1bb05942b032e0 20
+  s_1de96f28422b38::t_1a734a1c59a24d 47
+src/features/auth/schema.ts
+  s_1de96f28422b38::t_4404c577a9f695 2
+  s_1de96f28422b38::t_87ecbdcd075a7a 28-29
+src/app/(public)/signup/page.tsx
+  s_1de96f28422b38::t_b8b0a956ca376e 11
+  s_1de96f28422b38::t_d1fc56c24adf84 6-9,12,18,22
+  s_1de96f28422b38::t_2c738a82527574 16
+  s_1de96f28422b38::t_dbe9d6b53bbdf4 1-2,13-15,17,19-21,23
+src/components/ui/field.tsx
+  s_1de96f28422b38::t_64336db4628bc7 1-238
+src/components/ui/radio-group.tsx
+  s_1de96f28422b38::t_1d19751ff21a76 1-38
+src/lib/validations/password.ts
+  s_1de96f28422b38::t_612e6313e8ab05 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "e92587039d9ce9390ae6e6ce8203ada58ec86516",
+  "prompts": {},
+  "sessions": {
+    "s_1de96f28422b38": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_03e1d603cffe099DoWxhXn0ofT",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Vimit Dhawan <vimit.dhawan@foodpanda.com>"
+    }
+  }
+}
