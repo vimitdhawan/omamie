@@ -12,7 +12,7 @@ colors:
   primary-error-text: "#ba1a1a" # Error text for forms
   primary-error-text-hover: "#9a1515" # Error text hover state
   premium: "#6174b3" # Premium badge / accent (e.g., featured property)
-  featured: "#ca5100" # Featured badge / accent
+  featured: "#ffde59" # Featured badge / accent — Vibrant Yellow (maps to --color-tertiary in globals.css)
   ink: "#757681" # Default text on light surfaces
   body: "#757681" # Secondary text / long-form copy
   muted: "#9da0aa"
@@ -128,8 +128,8 @@ rounded:
   none: 0px
   xs: 4px
   sm: 8px
-  md: 14px
-  lg: 20px
+  md: 16px
+  lg: 16px
   xl: 32px
   full: 9999px
 
@@ -150,8 +150,8 @@ components:
     textColor: "{colors.on-primary}"
     typography: "{typography.button-md}"
     rounded: "{rounded.sm}"
-    padding: 14px 24px
-    height: 48px
+    padding: 8px 16px
+    height: 40px
   button-primary-active:
     backgroundColor: "{colors.primary-active}"
     textColor: "{colors.on-primary}"
@@ -165,8 +165,8 @@ components:
     textColor: "{colors.ink}"
     typography: "{typography.button-md}"
     rounded: "{rounded.sm}"
-    padding: 13px 23px
-    height: 48px
+    padding: 8px 16px
+    height: 40px
   button-tertiary-text:
     backgroundColor: transparent
     textColor: "{colors.ink}"
@@ -196,7 +196,7 @@ components:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
     typography: "{typography.nav-link}"
-    height: 80px
+    height: 64px
   product-tab-active:
     backgroundColor: transparent
     textColor: "{colors.ink}"
@@ -211,8 +211,8 @@ components:
     textColor: "{colors.ink}"
     typography: "{typography.body-sm}"
     rounded: "{rounded.full}"
-    padding: 14px 24px
-    height: 64px
+    padding: 8px 16px
+    height: 44px
   search-field-segment:
     backgroundColor: transparent
     textColor: "{colors.ink}"
@@ -294,8 +294,8 @@ components:
     textColor: "{colors.ink}"
     typography: "{typography.body-md}"
     rounded: "{rounded.sm}"
-    padding: 14px 12px
-    height: 56px
+    padding: 8px 12px
+    height: 40px
   footer-light:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
@@ -348,7 +348,7 @@ components:
 
 ## Overview
 
-The platform is the canonical example of a generous, photography-led Omamie property management marketplace. The base canvas is **pure white** (`{colors.canvas}` — #ffffff) with a modern, medium-dark neutral (`{colors.ink}` — #757681) for headlines and body, and a single voltage of **primary blue** (`{colors.primary}` — #336cfb) carrying every primary CTA, the search-button orb, and inline brand links. The **Muted Navy** (`{colors.premium}` — #6174b3) and **Burnt Orange** (`{colors.featured}` — #ca5100) tokens are sub-brand accents that only appear inside premium / featured property contexts to provide visual distinction without breaking the professional tone.
+The platform is the canonical example of a generous, photography-led Omamie property management marketplace. The base canvas is **pure white** (`{colors.canvas}` — #ffffff) with a modern, medium-dark neutral (`{colors.ink}` — #757681) for headlines and body, and a single voltage of **primary blue** (`{colors.primary}` — #336cfb) carrying every primary CTA, the search-button orb, and inline brand links. The **Muted Navy** (`{colors.premium}` — #6174b3) and **Vibrant Yellow** (`{colors.featured}` — #ffde59, maps to `--color-tertiary`) tokens are sub-brand accents that only appear inside premium / featured property contexts to provide visual distinction without breaking the professional tone.
 
 Type runs **Inter** (a variable font), with a system stack underneath (`system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif`).
 
@@ -363,6 +363,7 @@ The shape language is **rounded**. Buttons are 8px radius (`{rounded.sm}`), prop
 - Property cards are photo-first: aspect-ratio rectangles with `{rounded.md}` corner clipping, swipeable image carousel, "Guest favorite" floating badge top-left, heart icon top-right.
 - The design system caps elevation at one shadow tier — used on hover-floated cards and search/account dropdowns.
 - 8px base spacing system, with major sections at `{spacing.section}` (64px) — generous but efficient.
+- **Token alignment**: every color, radius, and spacing token here is mirrored as a CSS variable in `src/app/globals.css` and surfaced as Tailwind v4 utilities (`bg-primary`, `text-foreground`, `rounded-lg`, `gap-6`). When Stitch emits screens, output Tailwind classes — never inline hex or `style={{}}` for colors. See **Tailwind & shadcn Alignment** below.
 
 ## Colors
 
@@ -372,7 +373,7 @@ The shape language is **rounded**. Buttons are 8px radius (`{rounded.sm}`), prop
 - **Primary Active** (`{colors.primary-active}` — #1e52d9): The press / pointer-down variant — slightly deeper blue.
 - **Primary Disabled** (`{colors.primary-disabled}` — #adc6ff): A pale blue tint used on disabled CTAs.
 - **Premium** (`{colors.premium}` — #6174b3): Sub-brand accent for premium/first property tier.
-- **Featured** (`{colors.featured}` — #ca5100): Sub-brand accent for featured property. High-contrast orange used for visibility.
+- **Featured** (`{colors.featured}` — #ffde59, aligns with `--color-tertiary`): Sub-brand accent for featured property. Vibrant yellow used for visibility and highlighting special offers.
 
 ### Surface
 
@@ -404,6 +405,109 @@ The shape language is **rounded**. Buttons are 8px radius (`{rounded.sm}`), prop
 ### Scrim
 
 - **Scrim** (`{colors.scrim}` — #000000 at 50% opacity): The global modal backdrop tone — date picker, login dialog, language picker. Stored as the base hex; opacity is applied at render time.
+
+## Tailwind & shadcn Alignment
+
+Every token in this DESIGN.md maps to a CSS variable defined in `src/app/globals.css` and surfaced as a Tailwind v4 theme utility. **Generated code must emit Tailwind classes (`bg-primary`, `text-foreground`, `rounded-lg`), not inline hex values or `style={{}}` attributes.** Use `cn()` from `@/lib/utils` to compose classes conditionally.
+
+### Color Token Map
+
+| DESIGN.md token              | CSS variable (`globals.css`)             | Tailwind class to emit                      |
+| ---------------------------- | ---------------------------------------- | ------------------------------------------- |
+| `colors.primary`             | `--color-primary` → `--primary`          | `bg-primary text-primary-foreground`        |
+| `colors.primary-active`      | `--primary-active`                       | `active:bg-primary-active` (custom variant) |
+| `colors.primary-disabled`    | `--primary-disabled`                     | `disabled:bg-primary-disabled`              |
+| `colors.ink` / `colors.body` | `--foreground`                           | `text-foreground`                           |
+| `colors.muted`               | `--muted-foreground`                     | `text-muted-foreground`                     |
+| `colors.muted-soft`          | `--color-muted-soft`                     | `text-[var(--color-muted-soft)]`            |
+| `colors.canvas`              | `--background`                           | `bg-background`                             |
+| `colors.surface-soft`        | `--muted` / `--accent`                   | `bg-muted` or `bg-accent`                   |
+| `colors.surface-card`        | `--card`                                 | `bg-card text-card-foreground`              |
+| `colors.surface-strong`      | `--color-surface-strong`                 | `bg-[var(--color-surface-strong)]`          |
+| `colors.hairline`            | `--border` / `--input`                   | `border` or `border-input`                  |
+| `colors.hairline-soft`       | `--color-hairline-soft`                  | `border-[var(--color-hairline-soft)]`       |
+| `colors.border-strong`       | `--color-border-strong`                  | `border-[var(--color-border-strong)]`       |
+| `colors.premium`             | `--color-premium` → `--chart-2`          | `bg-premium text-on-primary`                |
+| `colors.featured` (yellow)   | `--color-tertiary` → `--tertiary`        | `bg-tertiary text-tertiary-foreground`      |
+| `colors.primary-error-text`  | `--destructive`                          | `text-destructive`                          |
+| `colors.scrim`               | `--color-scrim`                          | `bg-[var(--color-scrim)]/50`                |
+| `colors.on-primary`          | `--primary-foreground`                   | `text-primary-foreground`                   |
+| `colors.star-rating`         | `--color-star-rating` (= `--foreground`) | `text-foreground`                           |
+| `colors.legal-link`          | `--color-legal-link` (= `--primary`)     | `text-primary`                              |
+
+### Radius Token Map
+
+| DESIGN.md token     | Tailwind class | Use                              |
+| ------------------- | -------------- | -------------------------------- |
+| `rounded.none`      | `rounded-none` | Grid / list edges                |
+| `rounded.xs` (4px)  | `rounded-xs`   | Subtle hover indicators          |
+| `rounded.sm` (8px)  | `rounded-md`   | **Buttons**, inputs, small chips |
+| `rounded.md` (16px) | `rounded-lg`   | **Cards**, photo containers      |
+| `rounded.lg` (16px) | `rounded-lg`   | (alias of `rounded.md` — cards)  |
+| `rounded.xl` (32px) | `rounded-3xl`  | Hero / modal inner frame         |
+| `rounded.full`      | `rounded-full` | Pills, search orb, icon buttons  |
+
+> Note: shadcn default `--radius` is `8px`; `rounded-md` resolves to `0.8 * 8 = 6.4px`, which is close enough to the 8px button radius above. When pixel-perfect 8px buttons are required, emit `className="rounded-[8px]"`. Cards use `rounded-lg` (8px default `--radius`).
+
+### Spacing Token Map
+
+| DESIGN.md token          | CSS variable   | Tailwind class    |
+| ------------------------ | -------------- | ----------------- |
+| `spacing.xxs` (2px)      | `--sp-xxs`     | `gap-[2px]`       |
+| `spacing.xs` (4px)       | `--sp-xs`      | `gap-1` (0.25rem) |
+| `spacing.sm` (8px)       | `--sp-sm`      | `gap-2` (0.5rem)  |
+| `spacing.md` (12px)      | `--sp-md`      | `gap-3` (0.75rem) |
+| `spacing.base` (16px)    | `--sp-base`    | `gap-4` (1rem)    |
+| `spacing.lg` (24px)      | `--sp-lg`      | `gap-6` (1.5rem)  |
+| `spacing.xl` (32px)      | `--sp-xl`      | `gap-8` (2rem)    |
+| `spacing.xxl` (48px)     | `--sp-xxl`     | `gap-12` (3rem)   |
+| `spacing.section` (64px) | `--sp-section` | `gap-16` (4rem)   |
+
+### Component → shadcn Primitive Map
+
+| DESIGN.md component        | shadcn primitive               | Props / classes                                                     |
+| -------------------------- | ------------------------------ | ------------------------------------------------------------------- |
+| `button-primary`           | `Button`                       | default (h-10, px-4, rounded-md)                                    |
+| `button-primary-active`    | `Button`                       | `active:bg-primary-active`                                          |
+| `button-primary-disabled`  | `Button`                       | `disabled:opacity-50 disabled:bg-primary-disabled`                  |
+| `button-secondary`         | `Button`                       | `variant="outline"`                                                 |
+| `button-tertiary-text`     | `Button`                       | `variant="link"`                                                    |
+| `button-pill-primary`      | `Button`                       | `size="sm" className="rounded-full"`                                |
+| `search-orb`               | `Button`                       | `size="icon" className="rounded-full bg-primary h-12 w-12"`         |
+| `icon-button-circle`       | `Button`                       | `size="icon"`                                                       |
+| `icon-button-outline`      | `Button`                       | `size="icon" variant="outline"`                                     |
+| `text-input`               | `Input`                        | default (h-10)                                                      |
+| `search-bar-pill`          | composed `div` + `Input`       | `className="rounded-full h-11 border"`                              |
+| `search-field-segment`     | custom flex child              | `className="flex-1 px-2"`                                           |
+| `top-nav`                  | `<header className="h-16">`    | `border-b`                                                          |
+| `product-tab-active`       | `Button`                       | `variant="ghost" size="sm"`                                         |
+| `property-card`            | `Card`                         | default (`rounded-lg`)                                              |
+| `property-card-photo`      | `<div className="rounded-lg">` | `overflow-hidden rounded-lg`                                        |
+| `experience-card`          | `Card`                         | default                                                             |
+| `reservation-card`         | `Card`                         | default + `p-6`                                                     |
+| `host-card`                | `Card`                         | default + `p-6`                                                     |
+| `rating-display-card`      | custom div                     | `text-rating-display font-bold` (64px)                              |
+| `guest-favorite-badge`     | `Badge`                        | `variant="default" className="rounded-full"`                        |
+| `new-tag`                  | `Badge`                        | `variant="secondary" className="rounded-full uppercase text-[8px]"` |
+| `premium-badge`            | `Badge`                        | `className="bg-premium text-on-primary rounded-full"`               |
+| `featured-badge`           | `Badge`                        | `className="bg-tertiary text-tertiary-foreground rounded-full"`     |
+| `date-picker-day`          | `Calendar` (react-day-picker)  | default                                                             |
+| `date-picker-day-selected` | `Calendar`                     | default selected state                                              |
+| `hairline-divider`         | `Separator`                    | default                                                             |
+| `hairline-soft-divider`    | `Separator`                    | `className="bg-[var(--color-hairline-soft)]"`                       |
+| `modal-backdrop`           | `Dialog` / `Sheet` / `Drawer`  | default scrim (uses `--color-scrim`)                                |
+| `footer-link`              | `<a>`/`Link`                   | `className="text-sm text-foreground hover:text-primary"`            |
+
+### Generation Rules — "Stop. Do not emit."
+
+- ❌ No inline `style={{...}}` for **colors** — always Tailwind classes. Inline styles only for dynamic values (e.g., carousel translateX).
+- ❌ No hardcoded hex literals (e.g., `bg-[#336cfb]`) when a semantic token exists — use `bg-primary`.
+- ❌ No arbitrary height classes for shadcn components — use the `size` prop (`size="default"`, `size="sm"`, `size="icon"`). Only add height overrides when no prop fits (e.g., `h-12` for search orb).
+- ❌ No `rounded-[8px]` arbitrary radii when a token class exists — use `rounded-md` / `rounded-lg` / `rounded-full`.
+- ❌ No Material Symbols font for icons — use `lucide-react` (`iconLibrary: lucide` in `components.json`).
+- ✅ Compose conditional classes with `cn(cls1, cond && cls2)` from `@/lib/utils`.
+- ✅ Use `size` prop on shadcn primitives; only override via `className` for token-specific cases (rounded-full, hit-area padding).
+- ✅ For touch-critical CTAs, wrap the shadcn Button in a `min-h-[44px]` flex container on mobile to meet WCAG AAA hit area without inflating visual height.
 
 ## Typography
 
@@ -479,27 +583,27 @@ There are no progressive elevation tiers — the system either has the one shado
 
 ### Buttons
 
-**`button-primary`** — Primary blue fill (#336cfb), white text, 8px radius, 14×24px padding, 48px height, weight 500. The most common CTA across the system: "Reserve", "Continue", "Search", account-flow primaries.
+**`button-primary`** — Primary blue fill (#336cfb), white text, 8px radius (`rounded-md`), 8×16px padding, 40px height (shadcn `size="default"`), weight 500. The most common CTA across the system: "Reserve", "Continue", "Search", account-flow primaries. Use `<Button size="default" />` — do not emit explicit height classes.
 
 **`button-primary-active`** — The press state. Background flips to `{colors.primary-active}` (#1e52d9).
 
 **`button-primary-disabled`** — Pale blue tint at #adc6ff with white text. Cursor not-allowed.
 
-**`button-secondary`** — White fill with ink text and a 1px ink outline. 8px radius. Used for "Save", "Cancel", and inverse CTAs over primary surfaces.
+**`button-secondary`** — White fill with ink text and a 1px ink outline (`variant="outline"`), 8px radius. 40px height (shadcn default). Used for "Save", "Cancel", and inverse CTAs over primary surfaces.
 
 **`button-tertiary-text`** — Plain ink text, no surface, no border. Underlined on hover. Used for "Show more" type links and modal close labels.
 
-**`button-pill-primary`** — A pill-shaped primary blue CTA — 9999px radius, 10×20px padding, 14px label.
+**`button-pill-primary`** — A pill-shaped primary blue CTA — `rounded-full`, 10×20px padding, 14px label (shadcn `size="sm"` with `className="rounded-full"`).
 
 ### Search Surface
 
-**`search-bar-pill`** — The signature global search bar. White fill, 9999px radius, 64px height, 1px hairline border. Internally divided by vertical hairline rules into `{component.search-field-segment}` cells (Where / When / Who).
+**`search-bar-pill`** — The signature global search bar. White fill, `rounded-full`, 44px height (`h-11`), 1px hairline border. Internally divided by vertical hairline rules into `{component.search-field-segment}` cells (Where / When / Who).
 
-**`search-orb`** — The circular primary blue orb terminating the right edge of the search bar. 48×48px, fully rounded, white magnifying-glass icon centered. The hottest single color moment on the homepage.
+**`search-orb`** — The circular primary blue orb terminating the right edge of the search bar. 48×48px (`size="icon"` + `className="h-12 w-12 rounded-full bg-primary"`), fully rounded, white magnifying-glass icon centered. The hottest single color moment on the homepage.
 
 ### Top Navigation
 
-**`top-nav`** — White surface, 80px height, 1px bottom hairline. The Omamie wordmark sits flush left.
+**`top-nav`** — White surface, 64px height (`h-16`), 1px bottom hairline (`border-b`). The Omamie wordmark sits flush left.
 
 **`new-tag`** — A tiny rounded-pill badge anchored top-right of an icon, carrying the uppercase "NEW" label.
 
@@ -517,13 +621,89 @@ There are no progressive elevation tiers — the system either has the one shado
 
 ### Forms
 
-**`text-input`** — White surface, 1px hairline outline, `{rounded.sm}` 8px radius, 56px height. On focus, the border thickens to 2px and the border color flips to `{colors.ink}` — no glow, no ring.
+**`text-input`** — White surface, 1px hairline outline (`border border-input`), 8px radius (`rounded-md`), 40px height (shadcn default `h-10`). On focus, the border thickens to 2px and the border color flips to `{colors.ink}` (`focus-visible:border-foreground`) — no glow, no ring. Use `<Input />` directly; do not override height.
 
 ### Footer
 
 **`footer-light`** — White surface (matches the page canvas), 48×80px padding. Three columns of link blocks (Support / Hosting / Legal).
 
 **`legal-band`** — A bottom strip beneath the footer columns carrying the copyright line, language picker, and social icons. All text in muted `{colors.muted}` at `{typography.caption-sm}`.
+
+## Asset Export Specification
+
+All SVG illustrations, brand marks, and standalone graphics must be emitted as **separate, self-contained `.svg` files** so AI agents and developers can drop them into the project without parsing inline path data from layout JSX. The screen layout file references them via `<img>` or `next/image` — never `dangerouslySetInnerHTML` with raw path strings inline.
+
+### Folder layout (matches Next.js `public/` convention)
+
+```text
+public/
+├── icons/          # UI line icons — prefer lucide-react, only custom SVGs live here
+├── brand/          # Omamie wordmark, monogram, search-orb glyph (currentColor)
+├── illustrations/  # Hand-drawn ornaments and badges (laurel wreath, hero collage)
+└── favicons/       # Multi-size favicon set (16/32/180/512)
+```
+
+### SVG emission rules
+
+Every emitted SVG must:
+
+1. Use `viewBox="0 0 W H"` — no fixed `width`/`height` attributes (the consumer controls size via CSS/className).
+2. Use `currentColor` for stroke or fill so the asset inherits text color from the surrounding Tailwind class (e.g., `<img src="/brand/omamie-wordmark.svg" class="text-foreground" />`).
+3. Strip editor metadata (`<!-- Generator: ... -->`, Inkscape/Sodipodi namespaces, `xmlns:inkscape`).
+4. Round path coordinates to 1 decimal place — keeps the file under 1KB and friendly to copy-paste.
+5. Be named in `kebab-case` matching the origin token — e.g. `laurel-wreath.svg`, `guest-favorite-badge.svg`, `search-orb-glyph.svg`.
+6. Include an `aria-hidden="true"` attribute when used decoratively (the surrounding `<button>` or `<a>` carries the label).
+
+### Icon library mapping
+
+Common UI icons (search, heart, calendar, chevron, user, map-pin, etc.) must use **`lucide-react`** — `iconLibrary: "lucide"` is already declared in `components.json`. Never emit a custom SVG when a lucide icon exists. Example: `<Search className="h-4 w-4" />` inside the search orb.
+
+Custom illustrations that ARE legitimate separate SVGs (lucide does not cover these):
+
+| Asset                      | Path                                            | Used in                                                     |
+| -------------------------- | ----------------------------------------------- | ----------------------------------------------------------- |
+| `laurel-wreath.svg`        | `public/illustrations/laurel-wreath.svg`        | Flanks `{component.rating-display-card}`                    |
+| `omamie-wordmark.svg`      | `public/brand/omamie-wordmark.svg`              | `{component.top-nav}` flush left                            |
+| `search-orb-glyph.svg`     | `public/brand/search-orb-glyph.svg`             | Magnifier centered inside the primary blue orb              |
+| `guest-favorite-badge.svg` | `public/illustrations/guest-favorite-badge.svg` | Optional cluster; px-or-png fallback allowed                |
+| `property-placeholder.svg` | `public/illustrations/property-placeholder.svg` | Gray aerial/area photo placeholder for cards without images |
+| `hero-collage.svg`         | `public/illustrations/hero-collage.svg`         | Optional homepage hero collage backdrop                     |
+
+### Generating assets via Stitch
+
+When requesting a new screen from Stitch, append this instruction to the prompt:
+
+> Generate assets as separate `.svg` files following the `Asset Export Specification` section of DESIGN.md. Emit each SVG with `viewBox`, `currentColor`, kebab-case filename, and place into `public/brand/`, `public/illustrations/`, or `public/icons/`. Then emit the screen layout with `<img>` references — do not inline path data inside JSX.
+
+Expected output format per screen:
+
+```text
+public/
+├── brand/omamie-wordmark.svg
+├── illustrations/laurel-wreath.svg
+└── icons/ (when lucide does not cover)
+src/app/<route>/page.tsx        ← references the SVGs above
+```
+
+### Consumer example (don't emit this in DESIGN.md — shown for clarity)
+
+```tsx
+import Image from "next/image";
+import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+<Button size="icon" className="rounded-full bg-primary h-12 w-12">
+  <Search className="h-4 w-4 text-primary-foreground" aria-hidden="true" />
+</Button>
+
+<Image
+  src="/illustrations/laurel-wreath.svg"
+  alt=""
+  width={32}
+  height={32}
+  className="text-foreground"
+/>
+```
 
 ## Responsive Behavior
 
@@ -536,10 +716,11 @@ There are no progressive elevation tiers — the system either has the one shado
 
 ### Touch Targets
 
-- Primary CTAs at minimum 48×48px (above WCAG AAA).
-- Search orb is 48×48px circular — the most-tapped element on the page.
-- Heart save button is 32×32px circular — borderline for AAA but compensated by a generous 12px padding inside the photo card.
-- Date-picker day cells are 40×40px circular.
+- **Primary CTAs**: 40px visual height (shadcn `size="default"` / `h-10`). Meets WCAG AA. For WCAG AAA (44px) on mobile, wrap the `<Button>` in a `min-h-[44px]` flex container — e.g., `<div className="flex min-h-[44px] items-center"><Button/></div>` — so visual height stays at 40px but tap area is 44px.
+- **Search orb**: 48×48px circular (`size="icon" className="h-12 w-12"`). Already meets AAA.
+- **Heart save button**: 32×32px visual (`size="icon" className="h-8 w-8"`), 44×44px hit area via `p-1` wrapper. Compensates generously per WCAG AAA without inflating the photo-overlay silhouette.
+- **Date-picker day cells**: 40×40px circular (react-day-picker default).
+- **Icon-only buttons** (`icon-button-circle`): use shadcn `size="icon"` (36px) — meets AA; for AAA-target contexts add `p-1` wrapper per the heart-button pattern above.
 
 ### Collapsing Strategy
 
