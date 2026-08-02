@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PasswordInputValidation } from "@/lib/validations/password";
 
 export const roleEnum = z.enum(["agent", "owner", "tenant"], {
   message: "Please select a role",
@@ -24,10 +25,8 @@ export const loginSchema = z.object({
 export const signupSchema = z
   .object({
     email: z.string().email("Please enter a valid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z
-      .string()
-      .min(6, "Password must be at least 6 characters"),
+    password: PasswordInputValidation,
+    confirmPassword: z.string(),
     fullName: z.string().min(1, "Full name is required"),
     role: roleEnum,
   })
