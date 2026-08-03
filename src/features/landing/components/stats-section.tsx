@@ -1,6 +1,6 @@
 "use client";
 
-import { Section } from "@/components/ui/section";
+import { Section } from "@/components/custom/section";
 
 const stats = [
   { value: "1,240+", label: "Active Users", color: "text-primary" },

@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Section } from "@/components/ui/section";
+import { Section } from "@/components/custom/section";
 import {
   Sparkles,
   Clock,

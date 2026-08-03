@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/ui/Logo";
+import { Logo } from "@/components/custom/logo";
 
 export function Header() {
   return (
@@ -10,14 +10,14 @@ export function Header() {
           <div className="flex items-center space-x-6">
             <Link
               href="/"
-              className="flex shrink-0 items-center"
+              className="items-centers flex shrink-0"
               aria-label="Omamie Home"
             >
               <Logo className="h-8 w-auto" />
             </Link>
           </div>
           <div className="flex items-center gap-4 md:flex-col">
-            <Button size="sm">
+            <Button size="default">
               <Link href="/login">Login</Link>
             </Button>
           </div>
