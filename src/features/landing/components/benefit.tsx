@@ -80,7 +80,7 @@ function BenefitCard({ icon: Icon, title, description }: Benefit) {
   );
 }
 
-export default function Benefits() {
+export function Benefits() {
   return (
     <Section variant="muted">
       {/* Title */}

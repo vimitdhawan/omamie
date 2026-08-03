@@ -8,7 +8,7 @@ const stats = [
   { value: "420+", label: "Successful Matches", color: "text-ink" },
 ];
 
-export default function StatsSection() {
+export function StatsSection() {
   return (
     <Section
       variant="default"

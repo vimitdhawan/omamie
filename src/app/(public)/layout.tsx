@@ -1,7 +1,20 @@
+import { Footer } from "@/features/landing/components/footer";
+import { Header } from "@/features/landing/components/header";
+
 export default function PublicLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      <div className="relative min-h-screen">
+        <div className="relative z-10">
+          <Header />
+          {children}
+          <Footer />
+        </div>
+      </div>
+    </>
+  );
 }
