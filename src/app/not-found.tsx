@@ -15,7 +15,7 @@ export default function NotFound() {
           The page you are looking for does not exist or has been moved.
         </p>
         <div className="pt-4">
-          <Link href="/" className={buttonVariants({ variant: "primary" })}>
+          <Link href="/" className={buttonVariants({ variant: "link" })}>
             Return Home
           </Link>
         </div>

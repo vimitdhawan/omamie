@@ -1,6 +1,6 @@
 "use client";
 
-import { Section } from "@/components/ui/section";
+import { Section } from "@/components/custom/section";
 
 const stats = [
   { value: "1,240+", label: "Active Users", color: "text-primary" },
@@ -8,7 +8,7 @@ const stats = [
   { value: "420+", label: "Successful Matches", color: "text-ink" },
 ];
 
-export default function StatsSection() {
+export function StatsSection() {
   return (
     <Section
       variant="default"

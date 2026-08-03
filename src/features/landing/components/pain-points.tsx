@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Section, SectionHeader } from "@/components/ui/section";
+import { Section, SectionHeader } from "@/components/custom/section";
 import { XCircle, Search, Home } from "lucide-react";
 
 const painPoints = {
@@ -88,7 +88,7 @@ function PainPointCard({
   );
 }
 
-export default function PainPoints() {
+export function PainPoints() {
   return (
     <Section variant="muted">
       <SectionHeader

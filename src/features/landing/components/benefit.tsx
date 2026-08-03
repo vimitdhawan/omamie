@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Section } from "@/components/ui/section";
+import { Section } from "@/components/custom/section";
 import {
   Sparkles,
   Clock,
@@ -80,7 +80,7 @@ function BenefitCard({ icon: Icon, title, description }: Benefit) {
   );
 }
 
-export default function Benefits() {
+export function Benefits() {
   return (
     <Section variant="muted">
       {/* Title */}
