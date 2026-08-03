@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* eslint-disable-next-line @next/next/no-page-custom-font -- Material Symbols variable font not fully supported by next/font yet */}
         <link
@@ -28,7 +28,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className={`${inter.variable} h-full antialiased`}>{children}</body>
     </html>
   );
 }

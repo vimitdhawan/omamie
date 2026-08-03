@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Globe, ChevronDown } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
-import { FooterLinks } from "@/features/landing/components/FooterLinks";
+import { FooterLinks } from "@/features/landing/components/footer-links";
 
 const footerLinks = {
   Support: [
