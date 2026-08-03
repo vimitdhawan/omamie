@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Section } from "@/components/ui/section";
+import { Section } from "@/components/custom/section";
 
 export function Contact() {
   return (

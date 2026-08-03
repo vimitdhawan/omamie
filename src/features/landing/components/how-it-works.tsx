@@ -1,6 +1,6 @@
 "use client";
 
-import { Section, SectionHeader } from "@/components/ui/section";
+import { Section, SectionHeader } from "@/components/custom/section";
 import { Brain, type LucideIcon } from "lucide-react";
 
 interface Step {
