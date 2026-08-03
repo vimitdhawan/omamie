@@ -88,7 +88,7 @@ function PainPointCard({
   );
 }
 
-export default function PainPoints() {
+export function PainPoints() {
   return (
     <Section variant="muted">
       <SectionHeader

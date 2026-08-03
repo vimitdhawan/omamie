@@ -1,5 +1,6 @@
-import Footer from "@/features/landing/components/footer";
-import Navbar from "@/features/landing/components/header";
+import { Footer } from "@/features/landing/components/footer";
+import { Header } from "@/features/landing/components/header";
+
 export default function PublicLayout({
   children,
 }: {
@@ -9,7 +10,7 @@ export default function PublicLayout({
     <>
       <div className="relative min-h-screen">
         <div className="relative z-10">
-          <Navbar />
+          <Header />
           {children}
           <Footer />
         </div>

@@ -37,7 +37,7 @@ const steps: Step[] = [
   },
 ];
 
-export default function HowItWorks() {
+export function HowItWorks() {
   return (
     <Section variant="card">
       <SectionHeader

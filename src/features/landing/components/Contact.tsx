@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Section } from "@/components/ui/section";
 
-export default function Contact() {
+export function Contact() {
   return (
     <Section variant="muted">
       <Card className="mx-auto max-w-2xl shadow-sm">

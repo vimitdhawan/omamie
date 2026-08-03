@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Section, SectionHeader } from "@/components/ui/section";
 
-export default function CTASection() {
+export function CTASection() {
   return (
     <Section variant="default">
       <SectionHeader

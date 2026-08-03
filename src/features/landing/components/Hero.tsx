@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
-export default function Hero() {
+export function Hero() {
   return (
     <section className="relative overflow-x-hidden px-6 pt-8 pb-10 sm:px-8 sm:pb-12 lg:px-12 lg:pt-16 lg:pb-16 xl:px-16">
       <div className="mx-auto max-w-7xl">
