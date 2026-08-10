@@ -1,24 +1,24 @@
 import type { ContactSubject } from "./schema";
 
-export type ContactMessage = {
-  id: string;
-  full_name: string;
+export type ContactInput = {
+  fullName: string;
   email: string;
   phone: string | null;
   subject: ContactSubject;
   message: string;
-  created_at: string;
 };
 
-export type ContactInsert = {
-  full_name: string;
+export type Contact = {
+  id: string;
+  fullName: string;
   email: string;
-  phone?: string | null;
+  phone: string | null;
   subject: ContactSubject;
   message: string;
+  createdAt: string;
 };
 
 export type ContactResult = {
-  data: ContactMessage | null;
+  data: Contact | null;
   error: { message: string } | null;
 };

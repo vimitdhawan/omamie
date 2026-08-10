@@ -1,5 +1,5 @@
-import { Footer } from "@/features/landing/components/footer";
 import { Header } from "@/features/landing/components/header";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function PublicLayout({
   children,
@@ -12,7 +12,7 @@ export default function PublicLayout({
         <div className="relative z-10">
           <Header />
           {children}
-          <Footer />
+          <Toaster />
         </div>
       </div>
     </>

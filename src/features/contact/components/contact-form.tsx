@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useActionState } from "react";
 import { useForm } from "react-hook-form";
 import { Loader2 } from "lucide-react";
@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 import { submitContactAction } from "../actions";
 import {
@@ -35,15 +35,10 @@ import {
 } from "../schema";
 
 export function ContactForm() {
-  // Track submission count to force effect re-runs
-  const [submissionCount, setSubmissionCount] = useState(0);
-
-  const [state, action, isPending] = useActionState<
+  const [state, formAction, isPending] = useActionState<
     ContactActionState,
     FormData
   >(submitContactAction, { errors: {} });
-
-  const { toast, dismiss } = useToast();
 
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
@@ -57,89 +52,26 @@ export function ContactForm() {
     },
   });
 
-  const {
-    formState: { isValid },
-  } = form;
-
-  // Determine if button should be disabled
-  // Disabled only when there are validation errors OR form is invalid
-  const hasServerFieldErrors =
-    state?.errors && Object.keys(state.errors).length > 0;
-  const isButtonDisabled = isPending || hasServerFieldErrors || !isValid;
-
-  // Success effect - clear form and show toast
   useEffect(() => {
-    if (state?.success && submissionCount > 0) {
-      // Dismiss all existing toasts first
-      dismiss();
-
-      // Reset form immediately
-      form.reset({
-        fullName: "",
-        email: "",
-        phone: "",
-        subject: "general",
-        message: "",
-      });
-
-      // Show success toast
-      toast({
-        title: "Message sent successfully!",
-        description: "We'll get back to you within 24 hours.",
+    if (state?.errors) {
+      Object.entries(state.errors).forEach(([key, messages]) => {
+        form.setError(key as keyof ContactFormData, {
+          type: "manual",
+          message: Array.isArray(messages) ? messages.join("\n") : messages,
+        });
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state?.success, submissionCount]);
-
-  // Error effects - handle both field and network errors
-  useEffect(() => {
-    if (submissionCount > 0) {
-      // Field validation errors from server
-      if (state?.errors && Object.keys(state.errors).length > 0) {
-        // Dismiss all toasts
-        dismiss();
-
-        // Set field errors in the form
-        Object.entries(state.errors).forEach(([key, messages]) => {
-          if (messages && messages.length > 0) {
-            form.setError(key as keyof ContactFormData, {
-              type: "server",
-              message: messages[0],
-            });
-          }
-        });
-
-        // Show validation error toast
-        toast({
-          variant: "destructive",
-          title: "Please check your input",
-          description: "Some fields have errors that need to be fixed.",
-        });
-      }
-
-      // Network or general errors (no field errors)
-      if (state?.errorMessage && !state?.errors) {
-        dismiss();
-
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: state.errorMessage,
-        });
-      }
+    if (state.errorMessage) {
+      toast.error(state.errorMessage);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state?.errors, state?.errorMessage, submissionCount]);
+    if (state.success) {
+      toast.success("We've received your inquiry. We'll contact you soon.");
+    }
+  }, [state, form]);
 
   return (
     <Form {...form}>
-      <form
-        action={async (formData) => {
-          setSubmissionCount((prev) => prev + 1);
-          await action(formData);
-        }}
-        className="space-y-6"
-      >
+      <form action={formAction} className="space-y-6">
         {/* Form Fields with Better Spacing */}
         <div className="space-y-6">
           {/* Name & Email Row */}
@@ -154,16 +86,12 @@ export function ContactForm() {
                   </FormLabel>
                   <FormControl>
                     <Input
+                      {...field}
                       type="text"
                       placeholder="John Doe"
-                      className="h-11"
-                      {...field}
-                      onBlur={() => {
-                        field.onBlur(); // Call react-hook-form's onBlur
-                        form.trigger("fullName"); // Trigger validation
-                      }}
-                      onFocus={() => {
-                        form.clearErrors("fullName"); // Clear error on focus
+                      onChange={(e) => {
+                        field.onChange(e);
+                        form.clearErrors("fullName");
                       }}
                     />
                   </FormControl>
@@ -171,7 +99,6 @@ export function ContactForm() {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="email"
@@ -182,15 +109,11 @@ export function ContactForm() {
                   </FormLabel>
                   <FormControl>
                     <Input
+                      {...field}
                       type="email"
                       placeholder="john@example.com"
-                      className="h-11"
-                      {...field}
-                      onBlur={() => {
-                        field.onBlur();
-                        form.trigger("email");
-                      }}
-                      onFocus={() => {
+                      onChange={(e) => {
+                        field.onChange(e);
                         form.clearErrors("email");
                       }}
                     />
@@ -211,15 +134,11 @@ export function ContactForm() {
                   <FormLabel>Phone (optional)</FormLabel>
                   <FormControl>
                     <Input
+                      {...field}
                       type="tel"
                       placeholder="+1 (555) 000-0000"
-                      className="h-11"
-                      {...field}
-                      onBlur={() => {
-                        field.onBlur();
-                        form.trigger("phone");
-                      }}
-                      onFocus={() => {
+                      onChange={(e) => {
+                        field.onChange(e);
                         form.clearErrors("phone");
                       }}
                     />
@@ -244,7 +163,7 @@ export function ContactForm() {
                     name={field.name}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-full" size="lg">
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select an option" />
                       </SelectTrigger>
                     </FormControl>
@@ -273,15 +192,12 @@ export function ContactForm() {
                 </FormLabel>
                 <FormControl>
                   <Textarea
+                    {...field}
                     placeholder="How can we help you?"
                     className="min-h-[120px] resize-none"
                     rows={5}
-                    {...field}
-                    onBlur={() => {
-                      field.onBlur();
-                      form.trigger("message");
-                    }}
-                    onFocus={() => {
+                    onChange={(e) => {
+                      field.onChange(e);
                       form.clearErrors("message");
                     }}
                   />
@@ -296,9 +212,8 @@ export function ContactForm() {
         <div className="pt-2">
           <Button
             type="submit"
-            size="lg"
-            className="h-12 w-full text-base"
-            disabled={isButtonDisabled}
+            className="w-full cursor-pointer text-base"
+            disabled={isPending}
           >
             {isPending ? (
               <>

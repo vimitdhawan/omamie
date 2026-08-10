@@ -29,18 +29,16 @@ export const contactSchema = z.object({
   fullName: z
     .string()
     .trim()
-    .min(2, "Full name must be at least 2 characters")
-    .max(100, "Full name must be less than 100 characters"),
+    .min(2, "At least 2 characters")
+    .max(40, "Maximum 40 characters"),
   email: z
-    .string()
+    .email("Enter a valid email address")
     .trim()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address")
-    .max(254, "Email must be less than 254 characters"),
+    .max(254, "Less than 254 characters"),
   phone: z
     .string()
     .trim()
-    .max(30, "Phone must be less than 30 characters")
+    .max(20, "Must be less than 20 characters")
     .optional()
     .or(z.literal("")),
   subject: contactSubjectEnum,
@@ -52,7 +50,6 @@ export const contactSchema = z.object({
 });
 
 export type ContactFormData = z.infer<typeof contactSchema>;
-export type ContactFormInput = z.input<typeof contactSchema>;
 
 export type ContactActionState = {
   errors?: {
