@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { loginSchema, signupSchema, roleEnum, USER_ROLES } from "../schema";
+import { loginSchema, signupFormSchema, roleEnum, USER_ROLES } from "../schema";
 
 describe("loginSchema", () => {
   it("accepts a valid email and a 6+ character password", () => {
     const parsed = loginSchema.safeParse({
       email: "user@example.com",
-      password: "secret1",
+      password: "ValidPassword123!",
     });
     expect(parsed.success).toBe(true);
   });
@@ -13,7 +13,7 @@ describe("loginSchema", () => {
   it("rejects an invalid email", () => {
     const parsed = loginSchema.safeParse({
       email: "not-an-email",
-      password: "secret1",
+      password: "ValidPassword123!",
     });
     expect(parsed.success).toBe(false);
     if (!parsed.success) {
@@ -33,21 +33,21 @@ describe("loginSchema", () => {
   });
 });
 
-describe("signupSchema", () => {
+describe("signupFormSchema", () => {
   const validBase = {
     email: "user@example.com",
-    password: "secret1",
-    confirmPassword: "secret1",
+    password: "ValidPassword123!",
+    confirmPassword: "ValidPassword123!",
     fullName: "Ada Lovelace",
     role: "tenant",
   };
 
   it("accepts a valid payload with matching passwords", () => {
-    expect(signupSchema.safeParse(validBase).success).toBe(true);
+    expect(signupFormSchema.safeParse(validBase).success).toBe(true);
   });
 
   it("rejects when passwords do not match", () => {
-    const parsed = signupSchema.safeParse({
+    const parsed = signupFormSchema.safeParse({
       ...validBase,
       confirmPassword: "different",
     });
@@ -61,7 +61,7 @@ describe("signupSchema", () => {
   });
 
   it("rejects a missing full name", () => {
-    const parsed = signupSchema.safeParse({
+    const parsed = signupFormSchema.safeParse({
       ...validBase,
       fullName: "",
     });
@@ -69,7 +69,7 @@ describe("signupSchema", () => {
   });
 
   it("rejects an unknown role", () => {
-    const parsed = signupSchema.safeParse({
+    const parsed = signupFormSchema.safeParse({
       ...validBase,
       role: "admin",
     });

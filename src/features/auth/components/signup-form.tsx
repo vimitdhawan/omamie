@@ -2,6 +2,8 @@
 
 import { useActionState, useState, useEffect } from "react";
 import Link from "next/link";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,16 +14,7 @@ import {
   CardDescription,
   CardFooter,
 } from "@/components/ui/card";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { toast } from "sonner";
 import { signupFormSchema, SignupActionState, SignupFormData } from "../schema";
 import { handleSignup } from "../actions";
@@ -74,161 +67,172 @@ export function SignupForm({ role }: SignupFormProps) {
 
   return (
     <Card className="bg-surface-soft/50 w-full max-w-sm">
-      <Form {...form}>
-        <form action={formAction}>
-          <CardHeader className="text-center">
-            <CardTitle className="text-display-xl">
-              Create Your Account
-            </CardTitle>
-            <CardDescription className="text-body-md text-muted">
-              {description}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6 pt-6">
-            <FormField
-              control={form.control}
-              name="fullName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Full Name <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="text"
-                      placeholder="John Doe"
-                      onChange={(e) => {
-                        field.onChange(e);
-                        form.clearErrors("fullName");
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* Email Field */}
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      type="email"
-                      placeholder="m@example.com"
-                      onChange={(e) => {
-                        field.onChange(e);
-                        form.clearErrors("email");
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* Password Field with Toggle */}
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <LockKeyhole className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-                      <Input
-                        {...field}
-                        type={showPassword ? "text" : "password"}
-                        className="!pr-10 !pl-10"
-                        onChange={(e) => {
-                          field.onChange(e);
-                          form.clearErrors("password");
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword((prev) => !prev)}
-                        className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
-                        aria-label={
-                          showPassword ? "Hide password" : "Show password"
-                        }
-                      >
-                        {showPassword ? (
-                          <EyeOff className="size-4" />
-                        ) : (
-                          <Eye className="size-4" />
-                        )}
-                      </button>
-                    </div>
-                  </FormControl>
-                  <FormMessage className="whitespace-pre-line" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
-                  <FormControl>
-                    <div className="relative">
-                      <LockKeyhole className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-                      <Input
-                        {...field}
-                        type={showConfirmPassword ? "text" : "password"}
-                        className="!pr-10 !pl-10"
-                        onChange={(e) => {
-                          field.onChange(e);
-                          form.clearErrors("confirmPassword");
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword((prev) => !prev)}
-                        className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
-                        aria-label={
-                          showPassword ? "Hide password" : "Show password"
-                        }
-                      >
-                        {showPassword ? (
-                          <EyeOff className="size-4" />
-                        ) : (
-                          <Eye className="size-4" />
-                        )}
-                      </button>
-                    </div>
-                  </FormControl>
-                  <FormMessage className="whitespace-pre-line" />
-                </FormItem>
-              )}
-            />
-            {/* Hidden Role Input */}
-            <input type="hidden" name="role" value={role} />
-          </CardContent>
-          <CardFooter className="bg-surface-strong flex flex-col">
-            <Button type="submit" className="w-full cursor-pointer">
-              {isPending ? "Creating account..." : "Create account"}
-            </Button>
-            {/* Login Link */}
-            <div className="pt-4 text-center">
-              <p className="font-body-sm text-body-sm text-muted">
-                Already have an account?{" "}
-                <Link
-                  href="/login"
-                  className="text-primary font-semibold transition-colors hover:underline"
-                >
-                  Log in
-                </Link>
-              </p>
-            </div>
-          </CardFooter>
-        </form>
-      </Form>
+      <form action={formAction}>
+        <CardHeader className="text-center">
+          <CardTitle className="text-display-xl">Create Your Account</CardTitle>
+          <CardDescription className="text-body-md text-muted">
+            {description}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6 pt-6">
+          <Controller
+            name="fullName"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>
+                  Full Name <span className="text-destructive">*</span>
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="text"
+                  placeholder="John Doe"
+                  aria-invalid={fieldState.invalid}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    form.clearErrors("fullName");
+                  }}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          <Controller
+            name="email"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>
+                  Email <span className="text-destructive">*</span>
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="email"
+                  placeholder="m@example.com"
+                  aria-invalid={fieldState.invalid}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    form.clearErrors("email");
+                  }}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          <Controller
+            name="password"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>
+                  Password <span className="text-destructive">*</span>
+                </FieldLabel>
+                <div className="relative">
+                  <LockKeyhole className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type={showPassword ? "text" : "password"}
+                    className="pr-10 pl-10"
+                    aria-invalid={fieldState.invalid}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.clearErrors("password");
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showPassword ? (
+                      <EyeOff className="size-4" />
+                    ) : (
+                      <Eye className="size-4" />
+                    )}
+                  </button>
+                </div>
+                {fieldState.invalid && fieldState.error?.message && (
+                  <FieldError
+                    errors={fieldState.error.message
+                      .split("\n")
+                      .filter(Boolean)
+                      .map((msg) => ({ message: msg.trim() }))}
+                  />
+                )}
+              </Field>
+            )}
+          />
+          <Controller
+            name="confirmPassword"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>
+                  Confirm Password <span className="text-destructive">*</span>
+                </FieldLabel>
+                <div className="relative">
+                  <LockKeyhole className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type={showConfirmPassword ? "text" : "password"}
+                    className="pr-10 pl-10"
+                    aria-invalid={fieldState.invalid}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.clearErrors("confirmPassword");
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword((prev) => !prev)}
+                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
+                    aria-label={
+                      showConfirmPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="size-4" />
+                    ) : (
+                      <Eye className="size-4" />
+                    )}
+                  </button>
+                </div>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          <input type="hidden" name="role" value={role} />
+        </CardContent>
+        <CardFooter className="bg-surface-strong flex flex-col">
+          <Button type="submit" className="w-full cursor-pointer">
+            {isPending ? "Creating account..." : "Create account"}
+          </Button>
+          <div className="pt-4 text-center">
+            <p className="font-body-sm text-body-sm text-muted">
+              Already have an account?{" "}
+              <Link
+                href="/login"
+                className="text-primary font-semibold transition-colors hover:underline"
+              >
+                Log in
+              </Link>
+            </p>
+          </div>
+        </CardFooter>
+      </form>
     </Card>
   );
 }

@@ -5,6 +5,7 @@ import { login, signup, logout } from "./service";
 import type { AuthActionResult } from "./types";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { isAppError } from "@/lib/errors";
 
 function extractFirstError(issues: Array<{ message: string }>): string {
   return issues[0]?.message ?? "Invalid input";
@@ -24,11 +25,23 @@ export async function loginAction(
     return { success: false, error: extractFirstError(parsed.error.issues) };
   }
 
-  const result = await login(parsed.data);
-  if (result.success) {
-    redirect("/dashboard");
+  try {
+    const result = await login(parsed.data);
+    if (result.success) {
+      redirect("/dashboard");
+    }
+    return result;
+  } catch (error) {
+    if (isAppError(error)) {
+      return { success: false, error: error.message };
+    }
+
+    console.error("Unexpected error during login:", error);
+    return {
+      success: false,
+      error: "An unexpected error occurred. Please try again later",
+    };
   }
-  return result;
 }
 
 export async function handleSignup(
@@ -44,18 +57,31 @@ export async function handleSignup(
   }
 
   const { email, password, fullName, role } = validationResult.data;
-  const result = await signup({ email, password, fullName, role });
 
-  if (result.success && !result.message) {
+  try {
+    await signup({ email, password, fullName, role });
     redirect("/dashboard");
+  } catch (error) {
+    if (isAppError(error)) {
+      return {
+        errorMessage: error.message,
+      };
+    }
+    return {
+      errorMessage: "An unexpected error occurred. Please try again later",
+    };
   }
-  return result;
 }
 
 export async function logoutAction(): Promise<void> {
-  const result = await logout();
-  if (!result.success) {
-    console.error("Logout failed, forcing session clear:", result.error);
+  try {
+    await logout();
+  } catch (error) {
+    if (isAppError(error)) {
+      console.error("Logout failed:", error.message);
+    } else {
+      console.error("Unexpected error during logout:", error);
+    }
     const supabase = await createClient();
     await supabase.auth.signOut({ scope: "local" });
   }

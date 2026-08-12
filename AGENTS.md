@@ -126,14 +126,19 @@ The project uses a two-layer testing stack aligned with the Next.js 16 / React 1
 
 ```
 src/features/<name>/__tests__/         # co-located unit/component tests
-  *.test.ts                              # logic (schema, service, utils)
+  *.test.ts                              # logic (schema, service, utils, actions)
   *.test.tsx                             # component tests (RTL)
 
-e2e/                                     # Playwright specs
-  *.spec.ts
-  supabase/seed.sql                      # test seed applied via explicit `psql -f` step
+src/lib/__mocks__/                       # centralized mocks (shared across all features)
+  supabase.ts                            # Supabase client mock with error mapping
+  test-utils.ts                          # mock data creators & assertion helpers
 
-src/lib/test/supabase-mock.ts           # shared Supabase client mock builder
+src/lib/__tests__/
+  *.test.ts                              # lib-layer tests (errors, validations)
+
+e2e/
+  *.spec.ts                              # Playwright specs
+
 vitest.config.ts                         # Vitest configuration
 vitest.setup.ts                          # RTL jest-dom + next/* mocks
 playwright.config.ts                     # Playwright configuration
@@ -151,9 +156,10 @@ npm run test:e2e:ui         # playwright interactive UI mode for local debugging
 
 ### 7.3 Unit Test Conventions
 
-- **Layer to test**: `service.ts`, `utils.ts`, `schema.ts`, and any pure helper. Avoid unit-testing `actions.ts` (Server Actions) — those are covered by E2E.
-- **Repository tests**: `repository.ts` tests mock `@/lib/supabase/server`'s `createClient` factory, **never** the repository module itself. The repository code still runs against the mock client.
-- **Mock pattern**: use `vi.hoisted()` to build the client inline and wire `vi.mock("@/lib/supabase/server", () => ({ createClient }))`. See `src/features/auth/__tests__/service.test.ts` for the canonical pattern. Do not import `@/lib/test/supabase-mock` from inside the `vi.hoisted` factory — Node's CJS `require` cannot resolve `.ts` paths so the helper must be imported at the top of the test instead.
+- **Layer to test**: `service.ts`, `utils.ts`, `schema.ts`, `repository.ts`, and `actions.ts`. Use Arrange-Act-Assert pattern.
+- **Centralized mocks**: Import mock clients from `@/lib/__mocks__/supabase.ts` and utilities from `@/lib/__mocks__/test-utils.ts`. These are shared across all features.
+- **Mock pattern**: Use `vi.hoisted()` to build mocks at module level, then `vi.mock("@/lib/supabase/server", () => ({ createClient: mockFactory }))`. See `src/features/auth/__tests__/repository.test.ts` for the canonical pattern.
+- **Actions tests**: Test error handling (AppError vs generic errors) and form validation state. Use `vi.mock()` for `next/navigation` redirect and service layer dependencies.
 - **Co-locate tests** under `src/features/<name>/__tests__/`. Filename suffix: `*.test.ts(x)`.
 - **Async Server Components** are not unit-tested. Cover them with Playwright instead (per Next.js docs guidance).
 

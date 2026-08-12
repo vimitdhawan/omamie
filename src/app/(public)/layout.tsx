@@ -1,4 +1,5 @@
 import { Header } from "@/features/landing/components/header";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function PublicLayout({
   children,
@@ -11,6 +12,7 @@ export default function PublicLayout({
         <div className="relative z-10">
           <Header />
           {children}
+          <Toaster />
         </div>
       </div>
     </>

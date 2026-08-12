@@ -13,6 +13,12 @@ export const roleEnum = z.enum(["agent", "owner", "tenant"]);
 
 export type UserRole = z.infer<typeof roleEnum>;
 
+export const USER_ROLES = {
+  agent: "Agent",
+  owner: "Owner",
+  tenant: "Tenant",
+} as const;
+
 export const signupFormBaseSchema = z.object({
   email: z
     .email("Enter a valid email address")

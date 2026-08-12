@@ -47,7 +47,7 @@ export default async function SignupPage({
   // Step 4: List Property with valid role → show form
   if (intent === "list-property" && (role === "agent" || role === "owner")) {
     return (
-      <main className="flex min-h-svh items-center justify-center px-6 py-8 md:p-10">
+      <main className="flex min-h-[calc(100vh-4rem)] flex-col items-center p-8 pt-20">
         <SignupForm role={role as "agent" | "owner"} />
       </main>
     );
