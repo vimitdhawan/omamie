@@ -22,14 +22,3 @@ export function createMockFormData(
   });
   return formData;
 }
-
-export function expectAppError(
-  error: unknown,
-  expectedCode: string,
-  expectedStatusCode: number
-) {
-  expect(error).toBeDefined();
-  expect(error).toHaveProperty("code", expectedCode);
-  expect(error).toHaveProperty("statusCode", expectedStatusCode);
-  expect(error).toHaveProperty("message");
-}

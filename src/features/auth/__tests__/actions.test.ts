@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { handleSignup, loginAction, logoutAction } from "../actions";
 import { AppError } from "@/lib/errors";
+import type { AuthResponse } from "@supabase/supabase-js";
 
 const mockCreateClient = vi.hoisted(() => vi.fn());
 
@@ -138,7 +139,13 @@ describe("Auth Actions", () => {
       formData.append("fullName", "Jane Doe");
       formData.append("role", "tenant");
 
-      vi.mocked(signup).mockResolvedValueOnce({ success: true });
+      const mockSignupData: AuthResponse["data"] = {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        user: { id: "123" } as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        session: { access_token: "token" } as any,
+      };
+      vi.mocked(signup).mockResolvedValueOnce(mockSignupData);
 
       try {
         await handleSignup(null, formData);
