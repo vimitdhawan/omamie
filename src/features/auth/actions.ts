@@ -1,6 +1,6 @@
 "use server";
 
-import { loginSchema, signupSchema } from "./schema";
+import { loginSchema, signupFormSchema, SignupActionState } from "./schema";
 import { login, signup, logout } from "./service";
 import type { AuthActionResult } from "./types";
 import { redirect } from "next/navigation";
@@ -31,30 +31,24 @@ export async function loginAction(
   return result;
 }
 
-export async function signupAction(
-  _prev: AuthActionResult | null,
+export async function handleSignup(
+  _prev: SignupActionState | null,
   formData: FormData
-): Promise<AuthActionResult> {
-  const raw = {
-    email: (formData.get("email") ?? "") as string,
-    password: (formData.get("password") ?? "") as string,
-    confirmPassword: (formData.get("confirmPassword") ?? "") as string,
-    fullName: (formData.get("fullName") ?? "") as string,
-    role: (formData.get("role") ?? "") as string,
-  };
-
-  const parsed = signupSchema.safeParse(raw);
-  if (!parsed.success) {
-    return { success: false, error: extractFirstError(parsed.error.issues) };
+): Promise<SignupActionState> {
+  const form = Object.fromEntries(formData);
+  const validationResult = signupFormSchema.safeParse(form);
+  if (!validationResult.success) {
+    return {
+      errors: validationResult.error.flatten().fieldErrors,
+    };
   }
 
-  const { email, password, fullName, role } = parsed.data;
+  const { email, password, fullName, role } = validationResult.data;
   const result = await signup({ email, password, fullName, role });
 
   if (result.success && !result.message) {
     redirect("/dashboard");
   }
-
   return result;
 }
 

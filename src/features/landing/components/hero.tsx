@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
@@ -19,14 +20,18 @@ export function Hero() {
               matching. Tell us what you need and we&apos;ll help find the best
               fit.
             </p>
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <Button size="default" className="gap-2">
-                Find Property
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="default">
-                List Your Property
-              </Button>
+            <div className="flex gap-4 sm:flex-row">
+              <Link href="/signup?intent=find-property">
+                <Button size="default" className="cursor-pointer gap-2">
+                  Find Property
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/signup?intent=list-property">
+                <Button variant="outline" className="cursor-pointer">
+                  List Your Property
+                </Button>
+              </Link>
             </div>
           </div>
 

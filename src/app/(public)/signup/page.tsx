@@ -1,26 +1,58 @@
-import Header from "@/features/landing/components/Header";
-import Footer from "@/features/landing/components/Footer";
+import { redirect } from "next/navigation";
 import { SignupForm } from "@/features/auth/components/signup-form";
+import { IntentStep } from "@/features/auth/components/intent-step";
+import { RoleStep } from "@/features/auth/components/role-step";
 
-export default function SignupPage() {
-  // Default intent is "list-property"
-  // In the future, this can be derived from URL params or context
-  const intent = "list-property" as const;
+export const dynamic = "force-dynamic";
 
-  return (
-    <div className="bg-canvas flex min-h-screen flex-col">
-      {/* Header */}
-      <Header />
+interface SignupSearchParams {
+  intent?: string;
+  role?: string;
+}
 
-      {/* Main content */}
-      <main className="flex min-h-svh w-full items-center items-start justify-center p-6 md:p-10">
-        <div className="w-full max-w-sm">
-          <SignupForm intent={intent} />
-        </div>
+export default async function SignupPage({
+  searchParams,
+}: {
+  searchParams: Promise<SignupSearchParams>;
+}) {
+  const { intent, role } = await searchParams;
+
+  // Step 1: No intent → show intent selection
+  if (!intent) {
+    return (
+      <main className="flex min-h-[calc(100vh-4rem)] flex-col items-center p-8 pt-20">
+        <IntentStep />
       </main>
+    );
+  }
 
-      {/* Footer */}
-      <Footer />
-    </div>
-  );
+  // Step 2: Find Property → go straight to form with tenant role
+  if (intent === "find-property") {
+    return (
+      <main className="flex min-h-[calc(100vh-4rem)] flex-col items-center p-8 pt-20">
+        <SignupForm role="tenant" />
+      </main>
+    );
+  }
+
+  // Step 3: List Property without role → show role selection
+  if (intent === "list-property" && !role) {
+    return (
+      <main className="flex min-h-[calc(100vh-4rem)] flex-col items-center p-8 pt-20">
+        <RoleStep />
+      </main>
+    );
+  }
+
+  // Step 4: List Property with valid role → show form
+  if (intent === "list-property" && (role === "agent" || role === "owner")) {
+    return (
+      <main className="flex min-h-svh items-center justify-center px-6 py-8 md:p-10">
+        <SignupForm role={role as "agent" | "owner"} />
+      </main>
+    );
+  }
+
+  // Invalid combination → redirect to first step
+  redirect("/signup");
 }

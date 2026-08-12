@@ -1,4 +1,3 @@
-import { Footer } from "@/features/landing/components/footer";
 import { Header } from "@/features/landing/components/header";
 
 export default function PublicLayout({
@@ -12,7 +11,6 @@ export default function PublicLayout({
         <div className="relative z-10">
           <Header />
           {children}
-          <Footer />
         </div>
       </div>
     </>
