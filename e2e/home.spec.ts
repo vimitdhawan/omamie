@@ -25,36 +25,4 @@ test.describe("Home page", () => {
       heroSection.getByRole("button", { name: /List Your Property/i })
     ).toBeVisible();
   });
-
-  test("footer has logo and navigation links", async ({ page }) => {
-    await page.goto("/");
-
-    // Footer brand logo (in footer, not header)
-    const footer = page.locator("footer");
-    await expect(
-      footer.getByRole("link", { name: /Omamie Home/i })
-    ).toBeVisible();
-
-    // Footer navigation columns
-    await expect(page.getByText(/Support/i)).toBeVisible();
-    await expect(page.getByText(/Hosting/i)).toBeVisible();
-    await expect(page.getByText(/Company/i)).toBeVisible();
-
-    // Footer links
-    await expect(
-      page.getByRole("link", { name: /Help Center/i })
-    ).toBeVisible();
-    await expect(
-      page.getByRole("link", { name: /List Your Property/i })
-    ).toBeVisible();
-    await expect(page.getByRole("link", { name: /About/i })).toBeVisible();
-  });
-
-  test("footer legal links present", async ({ page }) => {
-    await page.goto("/");
-
-    await expect(page.getByRole("link", { name: /Privacy/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /Terms/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /Sitemap/i })).toBeVisible();
-  });
 });

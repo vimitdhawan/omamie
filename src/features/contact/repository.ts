@@ -19,7 +19,6 @@ export async function create(input: ContactInput) {
   }
 }
 
-// src/features/contact/repository.ts
 function mapContactInputToInsert(input: ContactInput): ContactInsert {
   return {
     full_name: input.fullName,

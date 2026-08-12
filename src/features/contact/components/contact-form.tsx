@@ -65,6 +65,13 @@ export function ContactForm() {
       toast.error(state.errorMessage);
     }
     if (state.success) {
+      form.reset({
+        fullName: "",
+        email: "",
+        phone: "",
+        subject: "general",
+        message: "",
+      });
       toast.success("We've received your inquiry. We'll contact you soon.");
     }
   }, [state, form]);

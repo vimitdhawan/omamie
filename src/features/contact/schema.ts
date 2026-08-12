@@ -29,16 +29,13 @@ export const contactSchema = z.object({
   fullName: z
     .string()
     .trim()
-    .min(2, "At least 2 characters")
-    .max(40, "Maximum 40 characters"),
-  email: z
-    .email("Enter a valid email address")
-    .trim()
-    .max(254, "Less than 254 characters"),
+    .min(2, "Name must be at least 2 characters")
+    .max(40, "Name must be less than 40 characters"),
+  email: z.string().trim().pipe(z.email("Enter a valid email address")),
   phone: z
     .string()
     .trim()
-    .max(20, "Must be less than 20 characters")
+    .max(20, "Phone number must be less than 20 characters")
     .optional()
     .or(z.literal("")),
   subject: contactSubjectEnum,

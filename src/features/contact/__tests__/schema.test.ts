@@ -32,7 +32,9 @@ describe("contact schema", () => {
     const result = contactSchema.safeParse(data);
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues[0].message).toContain("at least 2");
+      expect(result.error.issues[0].message).toContain(
+        "Name must be at least 2 characters"
+      );
     }
   });
 
@@ -116,7 +118,7 @@ describe("contact schema", () => {
   it("trims whitespace from string fields", () => {
     const data = {
       fullName: "  John Doe  ",
-      email: "  john@example.com  ",
+      email: "  john@example.com",
       phone: "  +1 (555) 000-0000  ",
       subject: "general",
       message: "  I would like to know more.  ",

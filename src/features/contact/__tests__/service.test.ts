@@ -3,7 +3,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const { supabase, createClient } = vi.hoisted(() => {
   const fn = <T = unknown>() =>
     vi.fn() as unknown as ReturnType<typeof vi.fn> & T;
-  const from = fn();
+  const insert = fn();
+  const from = fn().mockReturnValue({ insert });
   const client = { from };
   return { supabase: client, createClient: vi.fn().mockResolvedValue(client) };
 });
@@ -11,112 +12,66 @@ const { supabase, createClient } = vi.hoisted(() => {
 vi.mock("@/lib/supabase/server", () => ({ createClient }));
 
 import { submitContactMessage } from "../service";
-import { createContactMessage as repoCreateContactMessage } from "../repository";
+import { create as repoCreateContactMessage } from "../repository";
+import { AppError } from "@/lib/types/error";
+import type { ContactInput } from "../types";
 
 function setInsertChain(
   client: { from: ReturnType<typeof vi.fn> },
-  resolved: { data: unknown; error: unknown }
+  resolved: { error: unknown }
 ) {
-  const single = vi.fn().mockResolvedValue(resolved);
-  const chain: Record<string, ReturnType<typeof vi.fn>> = {};
-  chain.insert = vi.fn().mockReturnValue(chain);
-  chain.select = vi.fn().mockReturnValue(chain);
-  chain.single = single;
-  client.from.mockImplementation(() => chain);
-  return { single, insert: chain.insert };
+  const insert = vi.fn().mockResolvedValue(resolved);
+  client.from.mockImplementation(() => ({ insert }));
+  return { insert };
 }
+
+const validInput: ContactInput = {
+  fullName: "John Doe",
+  email: "john@example.com",
+  phone: "+1 (555) 000-0000",
+  subject: "general",
+  message: "I would like to know more about your property listings.",
+};
 
 beforeEach(() => {
   vi.clearAllMocks();
   createClient.mockResolvedValue(supabase);
-  setInsertChain(supabase, { data: null, error: null });
+  setInsertChain(supabase, { error: null });
 });
-
-const validInput = {
-  full_name: "John Doe",
-  email: "john@example.com",
-  phone: "+1 (555) 000-0000",
-  subject: "general" as const,
-  message: "I would like to know more about your property listings.",
-};
 
 describe("contact service — submitContactMessage orchestration", () => {
-  it("returns success when the repository insert succeeds", async () => {
-    setInsertChain(supabase, {
-      data: {
-        id: "msg-1",
-        full_name: "John Doe",
-        email: "john@example.com",
-        phone: "+1 (555) 000-0000",
-        subject: "general",
-        message: "I would like to know more about your property listings.",
-        created_at: "2026-07-31T00:00:00Z",
-      },
-      error: null,
+  it("returns void when the repository insert succeeds", async () => {
+    const { insert } = setInsertChain(supabase, { error: null });
+
+    await expect(submitContactMessage(validInput)).resolves.toBeUndefined();
+    expect(insert).toHaveBeenCalledWith({
+      full_name: "John Doe",
+      email: "john@example.com",
+      phone: "+1 (555) 000-0000",
+      subject: "general",
+      message: "I would like to know more about your property listings.",
     });
-
-    const result = await submitContactMessage(validInput);
-
-    expect(result).toEqual({ success: true });
   });
 
-  it("maps row-level security violation to a friendly message", async () => {
+  it("propagates the AppError thrown by the repository on insert failure", async () => {
     setInsertChain(supabase, {
-      data: null,
-      error: {
-        message:
-          "new row violates row-level security policy for table contact_messages",
-      },
+      error: { message: "connection refused" },
     });
 
-    const result = await submitContactMessage(validInput);
-
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.errorMessage).toContain("Unable to submit your message");
-    }
-  });
-
-  it("maps duplicate key error to a friendly message", async () => {
-    setInsertChain(supabase, {
-      data: null,
-      error: { message: "duplicate key value violates unique constraint" },
+    await expect(submitContactMessage(validInput)).rejects.toMatchObject({
+      name: "AppError",
+      code: "INTERNAL_ERROR",
+      message: "Failed to create contact message",
     });
-
-    const result = await submitContactMessage(validInput);
-
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.errorMessage).toContain("already been submitted");
-    }
-  });
-
-  it("passes through unmapped error messages verbatim", async () => {
-    setInsertChain(supabase, {
-      data: null,
-      error: { message: "Some unexpected error" },
-    });
-
-    const result = await submitContactMessage(validInput);
-
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.errorMessage).toBe("Some unexpected error");
-    }
   });
 });
 
-describe("contact repository — createContactMessage direct call", () => {
-  it("calls .from('contact_messages').insert(...).select().single()", async () => {
-    const { single, insert } = setInsertChain(supabase, {
-      data: { id: "msg-1" },
-      error: null,
-    });
+describe("contact repository — create direct call", () => {
+  it("calls .from('contact_messages').insert(...) with mapped snake_case fields", async () => {
+    const { insert } = setInsertChain(supabase, { error: null });
 
-    const { data, error } = await repoCreateContactMessage(validInput);
+    await repoCreateContactMessage(validInput);
 
-    expect(error).toBeNull();
-    expect(data).toEqual({ id: "msg-1" });
     expect(supabase.from).toHaveBeenCalledWith("contact_messages");
     expect(insert).toHaveBeenCalledWith({
       full_name: "John Doe",
@@ -125,31 +80,31 @@ describe("contact repository — createContactMessage direct call", () => {
       subject: "general",
       message: "I would like to know more about your property listings.",
     });
-    expect(single).toHaveBeenCalledTimes(1);
   });
 
-  it("coerces an empty phone to null before inserting", async () => {
-    const { insert } = setInsertChain(supabase, {
-      data: { id: "msg-1" },
-      error: null,
-    });
+  it("coerces a null phone to null before inserting", async () => {
+    const { insert } = setInsertChain(supabase, { error: null });
 
-    await repoCreateContactMessage({ ...validInput, phone: "" });
+    await repoCreateContactMessage({ ...validInput, phone: null });
 
     expect(insert).toHaveBeenCalledWith(
       expect.objectContaining({ phone: null })
     );
   });
 
-  it("forwards the error when the insert fails", async () => {
+  it("throws AppError(INTERNAL_ERROR) when the insert fails", async () => {
     setInsertChain(supabase, {
-      data: null,
       error: { message: "connection refused" },
     });
 
-    const { data, error } = await repoCreateContactMessage(validInput);
-
-    expect(data).toBeNull();
-    expect(error).toEqual({ message: "connection refused" });
+    await expect(repoCreateContactMessage(validInput)).rejects.toSatisfy(
+      (err: unknown) => {
+        if (!(err instanceof AppError)) return false;
+        return (
+          err.code === "INTERNAL_ERROR" &&
+          err.message === "Failed to create contact message"
+        );
+      }
+    );
   });
 });
