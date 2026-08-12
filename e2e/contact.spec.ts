@@ -47,7 +47,10 @@ test.describe("Contact page — smoke", () => {
   test("footer Contact link navigates to /contact", async ({ page }) => {
     await page.goto("/");
     const footer = page.locator("footer");
-    await footer.getByRole("link", { name: /^Contact$/i }).first().click();
+    await footer
+      .getByRole("link", { name: /^Contact$/i })
+      .first()
+      .click();
     await expect(page).toHaveURL(/\/contact$/);
   });
 });
@@ -59,9 +62,13 @@ test.describe("Contact page — form validation", () => {
     await page.goto("/contact");
     await page.getByRole("button", { name: /Send Message/i }).click();
 
-    await expect(page.getByText(/Full name must be at least 2 characters/i)).toBeVisible();
+    await expect(
+      page.getByText(/Full name must be at least 2 characters/i)
+    ).toBeVisible();
     await expect(page.getByText(/Email is required/i)).toBeVisible();
-    await expect(page.getByText(/Message must be at least 10 characters/i)).toBeVisible();
+    await expect(
+      page.getByText(/Message must be at least 10 characters/i)
+    ).toBeVisible();
   });
 });
 
@@ -82,15 +89,13 @@ test.describe("Contact page — successful submission (local Supabase)", () => {
     await page.getByLabel(/Phone \(optional\)/i).fill("+1 (555) 123-4567");
     await page.getByLabel(/Reason for Contact/i).click();
     await page.getByRole("option", { name: /General Question/i }).click();
-    await page.getByLabel(/Message/i).fill(
-      "I'd love to learn more about Omamie's property listings."
-    );
+    await page
+      .getByLabel(/Message/i)
+      .fill("I'd love to learn more about Omamie's property listings.");
 
     await page.getByRole("button", { name: /Send Message/i }).click();
 
-    await expect(
-      page.getByText(/Thanks for reaching out/i)
-    ).toBeVisible();
+    await expect(page.getByText(/Thanks for reaching out/i)).toBeVisible();
 
     // Form should be cleared after successful submission
     await expect(page.getByLabel(/Full Name/i)).toHaveValue("");
