@@ -36,9 +36,11 @@ test.describe("Login page", () => {
     await page.goto("/login");
 
     // Fill with invalid email without triggering onChange (which clears errors)
-    await page.locator('input[name="email"]').evaluate((el) => {
-      el.value = "not-an-email";
-    });
+    await page
+      .locator('input[name="email"]')
+      .evaluate((el: HTMLInputElement) => {
+        el.value = "not-an-email";
+      });
 
     // Fill password to pass that validation
     await page
@@ -142,9 +144,11 @@ test.describe("Login form recovery", () => {
     await page.goto("/login");
 
     // Enter invalid email and submit (set value without triggering onChange)
-    await page.locator('input[name="email"]').evaluate((el) => {
-      el.value = "invalid";
-    });
+    await page
+      .locator('input[name="email"]')
+      .evaluate((el: HTMLInputElement) => {
+        el.value = "invalid";
+      });
     await page
       .getByRole("textbox", { name: /Password/i })
       .fill("ValidPassword123!");
