@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { loginSchema, signupFormSchema, roleEnum, USER_ROLES } from "../schema";
+import {
+  loginFormSchema,
+  signupFormSchema,
+  roleEnum,
+  USER_ROLES,
+} from "../schema";
 
-describe("loginSchema", () => {
+describe("loginFormSchema", () => {
   it("accepts a valid email and a 6+ character password", () => {
-    const parsed = loginSchema.safeParse({
+    const parsed = loginFormSchema.safeParse({
       email: "user@example.com",
       password: "ValidPassword123!",
     });
@@ -11,7 +16,7 @@ describe("loginSchema", () => {
   });
 
   it("rejects an invalid email", () => {
-    const parsed = loginSchema.safeParse({
+    const parsed = loginFormSchema.safeParse({
       email: "not-an-email",
       password: "ValidPassword123!",
     });
@@ -22,7 +27,7 @@ describe("loginSchema", () => {
   });
 
   it("rejects a password shorter than 6 characters", () => {
-    const parsed = loginSchema.safeParse({
+    const parsed = loginFormSchema.safeParse({
       email: "user@example.com",
       password: "abc",
     });

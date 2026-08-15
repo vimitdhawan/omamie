@@ -196,7 +196,7 @@ describe("Auth Actions", () => {
 
       const result = await loginAction(null, formData);
 
-      expect(result.error).toBe("Invalid email or password");
+      expect(result.errorMessage).toBe("Invalid email or password");
     });
 
     it("should return generic error on non-AppError exceptions", async () => {
@@ -208,7 +208,7 @@ describe("Auth Actions", () => {
 
       const result = await loginAction(null, formData);
 
-      expect(result.error).toBe(
+      expect(result.errorMessage).toBe(
         "An unexpected error occurred. Please try again later"
       );
     });
