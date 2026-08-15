@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Section } from "@/components/custom/section";
@@ -20,7 +21,9 @@ export function Contact() {
             </p>
           </div>
           <div className="pt-1">
-            <Button size="default">Contact Us</Button>
+            <Link href="/contact">
+              <Button className="cursor-pointer">Contact Us</Button>
+            </Link>
           </div>
         </CardContent>
       </Card>
