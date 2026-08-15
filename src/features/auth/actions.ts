@@ -1,7 +1,7 @@
 "use server";
 
 import {
-  loginSchema,
+  loginFormSchema,
   signupFormSchema,
   SignupActionState,
   LoginActionState,
@@ -15,35 +15,27 @@ export async function loginAction(
   _prev: LoginActionState | null,
   formData: FormData
 ): Promise<LoginActionState> {
-  const raw = {
-    email: (formData.get("email") ?? "") as string,
-    password: (formData.get("password") ?? "") as string,
-  };
-
-  const parsed = loginSchema.safeParse(raw);
-  if (!parsed.success) {
+  const form = Object.fromEntries(formData);
+  const validationResult = loginFormSchema.safeParse(form);
+  if (!validationResult.success) {
     return {
-      errors: parsed.error.flatten().fieldErrors as {
-        email?: string[];
-        password?: string[];
-      },
+      errors: validationResult.error.flatten().fieldErrors,
     };
   }
-
+  const { email, password } = validationResult.data;
   try {
-    const result = await login(parsed.data);
+    const result = await login({ email, password });
     if (result.success) {
       redirect("/dashboard");
     }
     return result as LoginActionState;
   } catch (error) {
     if (isAppError(error)) {
-      return { error: error.message };
+      return { errorMessage: error.message };
     }
-
     console.error("Unexpected error during login:", error);
     return {
-      error: "An unexpected error occurred. Please try again later",
+      errorMessage: "An unexpected error occurred. Please try again later",
     };
   }
 }

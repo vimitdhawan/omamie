@@ -179,7 +179,7 @@ describe("Auth Actions", () => {
 
       expect(result.errors).toBeDefined();
       expect(result.errors?.password).toBeDefined();
-      expect(result.errors?.password?.[0]).toMatch(/at least 6/i);
+      expect(result.errors?.password?.[0]).toMatch(/at least 8/i);
     });
 
     it("should return UNAUTHORIZED error for invalid credentials", async () => {
@@ -196,7 +196,7 @@ describe("Auth Actions", () => {
 
       const result = await loginAction(null, formData);
 
-      expect(result.error).toBe("Invalid email or password");
+      expect(result.errorMessage).toBe("Invalid email or password");
     });
 
     it("should return generic error on non-AppError exceptions", async () => {
@@ -208,7 +208,7 @@ describe("Auth Actions", () => {
 
       const result = await loginAction(null, formData);
 
-      expect(result.error).toBe(
+      expect(result.errorMessage).toBe(
         "An unexpected error occurred. Please try again later"
       );
     });
