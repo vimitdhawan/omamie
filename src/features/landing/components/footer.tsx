@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { Globe, ChevronDown } from "lucide-react";
-import { Logo } from "@/components/ui/Logo";
-import { FooterLinks } from "@/features/landing/components/FooterLinks";
+import { Logo } from "@/components/custom/logo";
+import { FooterLinks } from "@/features/landing/components/footer-links";
 
 const footerLinks = {
   Support: [
@@ -22,11 +22,11 @@ const footerLinks = {
     { label: "About", href: "#" },
     { label: "Careers", href: "#" },
     { label: "Press", href: "#" },
-    { label: "Contact", href: "#" },
+    { label: "Contact", href: "/contact" },
   ],
 };
 
-export default function Footer() {
+export function Footer() {
   return (
     <footer className="bg-canvas border-hairline overflow-x-hidden border-t px-6 py-12 sm:px-8 lg:px-12 xl:px-16">
       <div className="mx-auto max-w-7xl">

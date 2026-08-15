@@ -5,9 +5,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
-export default function Hero() {
+export function Hero() {
   return (
-    <section className="relative overflow-x-hidden px-6 pt-24 pb-10 sm:px-8 sm:pb-12 lg:px-12 lg:pb-16 xl:px-16">
+    <section className="relative overflow-x-hidden px-6 pt-8 pb-10 sm:px-8 sm:pb-12 lg:px-12 lg:pt-16 lg:pb-16 xl:px-16">
       <div className="mx-auto max-w-7xl">
         {/* Hero Content */}
         <div className="grid items-center gap-12 lg:grid-cols-2">
@@ -20,13 +20,15 @@ export default function Hero() {
               matching. Tell us what you need and we&apos;ll help find the best
               fit.
             </p>
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <Button size="default" className="gap-2">
-                Find Property
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Link href="/list-property">
-                <Button variant="outline" size="default">
+            <div className="flex gap-4 sm:flex-row">
+              <Link href="/signup?intent=find-property">
+                <Button size="default" className="cursor-pointer gap-2">
+                  Find Property
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+              <Link href="/signup?intent=list-property">
+                <Button variant="outline" className="cursor-pointer">
                   List Your Property
                 </Button>
               </Link>

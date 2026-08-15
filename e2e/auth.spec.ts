@@ -15,8 +15,10 @@ test.describe("Login page", () => {
     await page.goto("/login");
 
     await expect(page.getByText(/Welcome back/i)).toBeVisible();
-    await expect(page.getByLabel(/Email/i)).toBeVisible();
-    await expect(page.getByLabel(/Password/i)).toBeVisible();
+    await expect(page.getByRole("textbox", { name: /Email/i })).toBeVisible();
+    await expect(
+      page.getByRole("textbox", { name: /Password/i })
+    ).toBeVisible();
     await expect(page.getByRole("button", { name: /Sign in/i })).toBeVisible();
   });
 

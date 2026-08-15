@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
 
 const inter = Inter({
@@ -21,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* eslint-disable-next-line @next/next/no-page-custom-font -- Material Symbols variable font not fully supported by next/font yet */}
         <link
@@ -29,10 +28,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="flex min-h-full flex-col">
-        {children}
-        <Toaster />
-      </body>
+      <body className={`${inter.variable} h-full antialiased`}>{children}</body>
     </html>
   );
 }

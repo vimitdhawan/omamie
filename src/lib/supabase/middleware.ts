@@ -4,7 +4,7 @@ import { env } from "@/lib/validations/env";
 import { type Database } from "./types";
 
 const authRoutes = ["/login", "/signup"];
-const publicRoutes = ["/", "/list-property", ...authRoutes];
+const publicRoutes = ["/", "/contact", ...authRoutes];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
