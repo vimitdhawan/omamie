@@ -67,13 +67,13 @@ export function SignupForm({ role }: SignupFormProps) {
 
   return (
     <Card className="bg-surface-soft/50 w-full max-w-sm">
+      <CardHeader className="text-center">
+        <CardTitle className="text-display-xl">Create Your Account</CardTitle>
+        <CardDescription className="text-body-md text-muted">
+          {description}
+        </CardDescription>
+      </CardHeader>
       <form action={formAction}>
-        <CardHeader className="text-center">
-          <CardTitle className="text-display-xl">Create Your Account</CardTitle>
-          <CardDescription className="text-body-md text-muted">
-            {description}
-          </CardDescription>
-        </CardHeader>
         <CardContent className="space-y-6 pt-6">
           <Controller
             name="fullName"
