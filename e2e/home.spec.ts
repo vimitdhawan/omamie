@@ -26,28 +26,29 @@ test.describe("Home page", () => {
     ).toBeVisible();
   });
 
-  test.skip("footer has logo and navigation links", async ({ page }) => {
+  test("footer has logo and navigation links", async ({ page }) => {
     await page.goto("/");
 
-    // Footer brand logo (in footer, not header)
     const footer = page.locator("footer");
+
+    // Footer brand logo (in footer, not header)
     await expect(
       footer.getByRole("link", { name: /Omamie Home/i })
     ).toBeVisible();
 
     // Footer navigation columns
-    await expect(page.getByText(/Support/i)).toBeVisible();
-    await expect(page.getByText(/Hosting/i)).toBeVisible();
-    await expect(page.getByText(/Company/i)).toBeVisible();
+    await expect(footer.getByText(/Support/i)).toBeVisible();
+    await expect(footer.getByText(/Hosting/i)).toBeVisible();
+    await expect(footer.getByText(/Company/i)).toBeVisible();
 
     // Footer links
     await expect(
-      page.getByRole("link", { name: /Help Center/i })
+      footer.getByRole("link", { name: /Help Center/i })
     ).toBeVisible();
     await expect(
-      page.getByRole("link", { name: /List Your Property/i })
+      footer.getByRole("link", { name: /List Your Property/i })
     ).toBeVisible();
-    await expect(page.getByRole("link", { name: /About/i })).toBeVisible();
+    await expect(footer.getByRole("link", { name: /About/i })).toBeVisible();
   });
 
   test("footer legal links present", async ({ page }) => {
