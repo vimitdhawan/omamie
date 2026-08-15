@@ -7,7 +7,7 @@ import {
 } from "../schema";
 
 describe("loginFormSchema", () => {
-  it("accepts a valid email and a 6+ character password", () => {
+  it("accepts a valid email and a strong password", () => {
     const parsed = loginFormSchema.safeParse({
       email: "user@example.com",
       password: "ValidPassword123!",
@@ -26,14 +26,14 @@ describe("loginFormSchema", () => {
     }
   });
 
-  it("rejects a password shorter than 6 characters", () => {
+  it("rejects a weak password", () => {
     const parsed = loginFormSchema.safeParse({
       email: "user@example.com",
       password: "abc",
     });
     expect(parsed.success).toBe(false);
     if (!parsed.success) {
-      expect(parsed.error.issues[0]?.message).toMatch(/at least 6/i);
+      expect(parsed.error.issues[0]?.message).toMatch(/at least 8/i);
     }
   });
 });
