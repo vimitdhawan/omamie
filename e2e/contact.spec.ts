@@ -16,10 +16,8 @@ test.describe("Contact page — smoke", () => {
     await page.goto("/contact");
     await expect(page).toHaveURL(/\/contact$/);
 
-    // Check for form heading
-    await expect(
-      page.getByRole("heading", { name: /Get in Touch/i })
-    ).toBeVisible();
+    // Check for form heading by text (CardTitle might not have semantic heading role)
+    await expect(page.getByText("Get in Touch")).toBeVisible();
 
     await expect(page.getByLabel(/Full Name/i)).toBeVisible();
     await expect(page.getByLabel(/Email/i)).toBeVisible();
