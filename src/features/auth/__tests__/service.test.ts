@@ -78,9 +78,10 @@ beforeEach(() => {
 });
 
 describe("auth service — signup orchestration", () => {
-  it("returns success with email-confirmation message when no session is created", async () => {
+  it("returns signup data when successful", async () => {
+    const mockData = { user: { id: "u1" }, session: null };
     supabase.auth.signUp.mockResolvedValueOnce({
-      data: { user: { id: "u1" }, session: null },
+      data: mockData,
       error: null,
     });
 
@@ -98,15 +99,13 @@ describe("auth service — signup orchestration", () => {
         options: { data: { full_name: "Ada", role: "tenant" } },
       })
     );
-    expect(result).toEqual({
-      success: true,
-      message: "Check your email to confirm your account before signing in.",
-    });
+    expect(result).toEqual(mockData);
   });
 
-  it("returns bare success when a session is created", async () => {
+  it("returns signup data with session when auto-confirmed", async () => {
+    const mockData = { user: { id: "u1" }, session: { access_token: "abc" } };
     supabase.auth.signUp.mockResolvedValueOnce({
-      data: { user: { id: "u1" }, session: { access_token: "abc" } },
+      data: mockData,
       error: null,
     });
 
@@ -116,38 +115,39 @@ describe("auth service — signup orchestration", () => {
       fullName: "Ada",
       role: "tenant",
     });
-    expect(result).toEqual({ success: true });
+    expect(result).toEqual(mockData);
   });
 
-  it("maps the 'User already registered' error to a friendly message", async () => {
+  it("throws AppError for 'User already registered'", async () => {
     supabase.auth.signUp.mockResolvedValueOnce({
       data: null,
       error: { message: "User already registered" },
     });
 
-    const result = await signup({
-      email: "user@example.com",
-      password: "secret1",
-      fullName: "Ada",
-      role: "tenant",
-    });
-    expect(result.success).toBe(false);
-    expect(result.error).toBe("An account with this email already exists");
+    await expect(
+      signup({
+        email: "user@example.com",
+        password: "secret1",
+        fullName: "Ada",
+        role: "tenant",
+      })
+    ).rejects.toThrow("An account with this email already exists");
   });
 
-  it("passes server error through unchanged when unmapped", async () => {
+  it("throws AppError for unexpected server errors", async () => {
     supabase.auth.signUp.mockResolvedValueOnce({
       data: null,
-      error: { message: "Some unexpected response" },
+      error: { message: "Some unexpected response", status: 500 },
     });
 
-    const result = await signup({
-      email: "user@example.com",
-      password: "secret1",
-      fullName: "Ada",
-      role: "tenant",
-    });
-    expect(result.error).toBe("Some unexpected response");
+    await expect(
+      signup({
+        email: "user@example.com",
+        password: "secret1",
+        fullName: "Ada",
+        role: "tenant",
+      })
+    ).rejects.toThrow();
   });
 });
 
@@ -169,18 +169,18 @@ describe("auth service — login orchestration", () => {
     });
   });
 
-  it("maps 'Invalid login credentials' to a friendly message", async () => {
+  it("throws AppError for 'Invalid login credentials'", async () => {
     supabase.auth.signInWithPassword.mockResolvedValueOnce({
       data: null,
       error: { message: "Invalid login credentials" },
     });
 
-    const result = await login({
-      email: "user@example.com",
-      password: "secret1",
-    });
-    expect(result.success).toBe(false);
-    expect(result.error).toBe("Invalid email or password");
+    await expect(
+      login({
+        email: "user@example.com",
+        password: "secret1",
+      })
+    ).rejects.toThrow("Invalid email or password");
   });
 });
 
@@ -192,13 +192,11 @@ describe("auth service — logout orchestration", () => {
     expect(supabase.auth.signOut).toHaveBeenCalledWith({ scope: "local" });
   });
 
-  it("forwards logout failure as a mapped error", async () => {
+  it("throws AppError on logout failure", async () => {
     supabase.auth.signOut.mockResolvedValueOnce({
-      error: { message: "unknown" },
+      error: { message: "unknown", status: 500 },
     });
-    const result = await logout();
-    expect(result.success).toBe(false);
-    expect(result.error).toBe("unknown");
+    await expect(logout()).rejects.toThrow();
   });
 });
 
@@ -208,8 +206,8 @@ describe("auth repository — direct Supabase calls", () => {
       data: { user: { id: "u1" }, session: { access_token: "abc" } },
       error: null,
     });
-    const { error } = await repoSignIn("user@example.com", "secret1");
-    expect(error).toBeNull();
+    const result = await repoSignIn("user@example.com", "secret1");
+    expect(result).toBeDefined();
     expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith({
       email: "user@example.com",
       password: "secret1",
@@ -218,24 +216,23 @@ describe("auth repository — direct Supabase calls", () => {
 
   it("signOut forwards the local scope flag", async () => {
     supabase.auth.signOut.mockResolvedValueOnce({ error: null });
-    const { error } = await repoSignOut();
-    expect(error).toBeNull();
+    await expect(repoSignOut()).resolves.not.toThrow();
     expect(supabase.auth.signOut).toHaveBeenCalledWith({ scope: "local" });
   });
 
-  it("signUp surfaces auth errors verbatim", async () => {
+  it("signUp throws AppError for rate limit exceeded", async () => {
     supabase.auth.signUp.mockResolvedValueOnce({
       data: null,
-      error: { message: "Email rate limit exceeded" },
+      error: { message: "Email rate limit exceeded", status: 500 },
     });
-    const { data, error } = await repoSignUp({
-      email: "user@example.com",
-      password: "secret1",
-      fullName: "Ada",
-      role: "tenant",
-    });
-    expect(data).toBeNull();
-    expect(error).toEqual({ message: "Email rate limit exceeded" });
+    await expect(
+      repoSignUp({
+        email: "user@example.com",
+        password: "secret1",
+        fullName: "Ada",
+        role: "tenant",
+      })
+    ).rejects.toThrow();
   });
 });
 

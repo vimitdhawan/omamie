@@ -1,19 +1,24 @@
 import { describe, expect, it } from "vitest";
-import { loginSchema, signupSchema, roleEnum, USER_ROLES } from "../schema";
+import {
+  loginFormSchema,
+  signupFormSchema,
+  roleEnum,
+  USER_ROLES,
+} from "../schema";
 
-describe("loginSchema", () => {
-  it("accepts a valid email and a 6+ character password", () => {
-    const parsed = loginSchema.safeParse({
+describe("loginFormSchema", () => {
+  it("accepts a valid email and a strong password", () => {
+    const parsed = loginFormSchema.safeParse({
       email: "user@example.com",
-      password: "secret1",
+      password: "ValidPassword123!",
     });
     expect(parsed.success).toBe(true);
   });
 
   it("rejects an invalid email", () => {
-    const parsed = loginSchema.safeParse({
+    const parsed = loginFormSchema.safeParse({
       email: "not-an-email",
-      password: "secret1",
+      password: "ValidPassword123!",
     });
     expect(parsed.success).toBe(false);
     if (!parsed.success) {
@@ -21,33 +26,33 @@ describe("loginSchema", () => {
     }
   });
 
-  it("rejects a password shorter than 6 characters", () => {
-    const parsed = loginSchema.safeParse({
+  it("rejects a weak password", () => {
+    const parsed = loginFormSchema.safeParse({
       email: "user@example.com",
       password: "abc",
     });
     expect(parsed.success).toBe(false);
     if (!parsed.success) {
-      expect(parsed.error.issues[0]?.message).toMatch(/at least 6/i);
+      expect(parsed.error.issues[0]?.message).toMatch(/at least 8/i);
     }
   });
 });
 
-describe("signupSchema", () => {
+describe("signupFormSchema", () => {
   const validBase = {
     email: "user@example.com",
-    password: "secret1",
-    confirmPassword: "secret1",
+    password: "ValidPassword123!",
+    confirmPassword: "ValidPassword123!",
     fullName: "Ada Lovelace",
     role: "tenant",
   };
 
   it("accepts a valid payload with matching passwords", () => {
-    expect(signupSchema.safeParse(validBase).success).toBe(true);
+    expect(signupFormSchema.safeParse(validBase).success).toBe(true);
   });
 
   it("rejects when passwords do not match", () => {
-    const parsed = signupSchema.safeParse({
+    const parsed = signupFormSchema.safeParse({
       ...validBase,
       confirmPassword: "different",
     });
@@ -61,7 +66,7 @@ describe("signupSchema", () => {
   });
 
   it("rejects a missing full name", () => {
-    const parsed = signupSchema.safeParse({
+    const parsed = signupFormSchema.safeParse({
       ...validBase,
       fullName: "",
     });
@@ -69,7 +74,7 @@ describe("signupSchema", () => {
   });
 
   it("rejects an unknown role", () => {
-    const parsed = signupSchema.safeParse({
+    const parsed = signupFormSchema.safeParse({
       ...validBase,
       role: "admin",
     });

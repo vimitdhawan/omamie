@@ -1,9 +1,15 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState, useEffect } from "react";
 import Link from "next/link";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { loginAction } from "@/features/auth/actions";
-import type { AuthActionResult } from "@/features/auth/types";
+import {
+  LoginActionState,
+  loginFormSchema,
+  LoginFormData,
+} from "@/features/auth/schema";
 import {
   Card,
   CardContent,
@@ -13,59 +19,122 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { toast } from "sonner";
+import { Eye, EyeOff, LockKeyhole } from "lucide-react";
 
 export function LoginForm() {
+  const [showPassword, setShowPassword] = useState(false);
+
   const [state, formAction, isPending] = useActionState<
-    AuthActionResult | null,
+    LoginActionState | null,
     FormData
   >(loginAction, null);
 
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginFormSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+    mode: "onBlur",
+  });
+
+  useEffect(() => {
+    if (state?.errorMessage) {
+      toast.error(state.errorMessage);
+    }
+  }, [state]);
+
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader>
-        <CardTitle>Welcome back</CardTitle>
-        <CardDescription>Sign in to your account</CardDescription>
+    <Card className="bg-surface-soft/50 w-full max-w-sm">
+      <CardHeader className="text-center">
+        <CardTitle className="text-display-xl">Welcome back</CardTitle>
+        <CardDescription className="text-body-md text-muted">
+          Sign in to your account
+        </CardDescription>
       </CardHeader>
       <form action={formAction}>
-        <CardContent className="flex flex-col gap-4">
-          {state?.error && (
-            <div className="border-destructive/50 bg-destructive/10 text-destructive rounded-lg border px-3 py-2 text-sm">
-              {state.error}
-            </div>
-          )}
-          {state?.message && (
-            <div className="border-primary/30 bg-primary/5 text-foreground rounded-lg border px-3 py-2 text-sm">
-              {state.message}
-            </div>
-          )}
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="••••••"
-              required
-            />
-          </div>
+        <CardContent className="space-y-6 pt-6">
+          <Controller
+            name="email"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>
+                  Email <span className="text-destructive">*</span>
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id={field.name}
+                  type="email"
+                  placeholder="you@example.com"
+                  aria-invalid={fieldState.invalid}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    form.clearErrors("email");
+                  }}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          <Controller
+            name="password"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>
+                  Password <span className="text-destructive">*</span>
+                </FieldLabel>
+                <div className="relative">
+                  <LockKeyhole className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••"
+                    className="pr-10 pl-10"
+                    aria-invalid={fieldState.invalid}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.clearErrors("password");
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showPassword ? (
+                      <EyeOff className="size-4" />
+                    ) : (
+                      <Eye className="size-4" />
+                    )}
+                  </button>
+                </div>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
         </CardContent>
-        <CardFooter className="flex flex-col gap-3">
-          <Button type="submit" className="w-full" disabled={isPending}>
+        <CardFooter className="bg-surface-strong mt-8 flex flex-col">
+          <Button
+            type="submit"
+            className="w-full cursor-pointer"
+            disabled={isPending}
+          >
             {isPending ? "Signing in..." : "Sign in"}
           </Button>
-          <p className="text-muted-foreground text-sm">
+          <p className="text-muted-foreground pt-4 text-sm">
             {"Don't have an account? "}
             <Link
               href="/signup"
