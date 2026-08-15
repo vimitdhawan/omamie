@@ -14,9 +14,9 @@ const baseURL = `http://127.0.0.1:${PORT}`;
  */
 export default defineConfig({
   testDir: "./e2e",
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
   retries: process.env.CI ? 2 : 0,
   timeout: 60_000,
@@ -39,7 +39,7 @@ export default defineConfig({
     command: "npm run start",
     url: baseURL,
     timeout: 120_000,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     // NOTE: NEXT_PUBLIC_* env must be present at `next build` time (they're
     // inlined into the client bundle). The webServer block does not re-build.
   },
