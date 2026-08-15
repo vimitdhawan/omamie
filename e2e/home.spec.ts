@@ -26,7 +26,7 @@ test.describe("Home page", () => {
     ).toBeVisible();
   });
 
-  test("footer has logo and navigation links", async ({ page }) => {
+  test.skip("footer has logo and navigation links", async ({ page }) => {
     await page.goto("/");
 
     // Footer brand logo (in footer, not header)

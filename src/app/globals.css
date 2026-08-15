@@ -106,14 +106,6 @@
   --sp-xxl: 48px;
   --sp-section: 64px;
 
-  /* Design system custom border-radius */
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 32px;
-  --radius-full: 9999px;
-
   /* Design system custom font-sizes */
   --text-display-xl: 28px;
   --text-display-xl--line-height: 1.43;
