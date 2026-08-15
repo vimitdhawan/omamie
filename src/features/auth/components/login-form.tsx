@@ -1,9 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { loginAction } from "@/features/auth/actions";
-import type { AuthActionResult } from "@/features/auth/types";
+import { LoginActionState } from "@/features/auth/schema";
 import {
   Card,
   CardContent,
@@ -13,14 +13,30 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
+import { toast } from "sonner";
+import { Eye, EyeOff, LockKeyhole } from "lucide-react";
 
 export function LoginForm() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [clearedFields, setClearedFields] = useState<Set<string>>(new Set());
+
   const [state, formAction, isPending] = useActionState<
-    AuthActionResult | null,
+    LoginActionState | null,
     FormData
   >(loginAction, null);
+
+  if (state?.error) {
+    toast.error(state.error);
+  }
+
+  const getFieldError = (fieldName: "email" | "password") => {
+    if (clearedFields.has(fieldName)) {
+      return undefined;
+    }
+    return state?.errors?.[fieldName];
+  };
 
   return (
     <Card className="w-full max-w-md">
@@ -30,36 +46,85 @@ export function LoginForm() {
       </CardHeader>
       <form action={formAction}>
         <CardContent className="flex flex-col gap-4">
-          {state?.error && (
-            <div className="border-destructive/50 bg-destructive/10 text-destructive rounded-lg border px-3 py-2 text-sm">
-              {state.error}
-            </div>
-          )}
-          {state?.message && (
-            <div className="border-primary/30 bg-primary/5 text-foreground rounded-lg border px-3 py-2 text-sm">
-              {state.message}
-            </div>
-          )}
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="email">Email</Label>
+          <Field
+            data-invalid={
+              !!(getFieldError("email") && getFieldError("email")!.length > 0)
+            }
+          >
+            <FieldLabel htmlFor="email">
+              Email <span className="text-destructive">*</span>
+            </FieldLabel>
             <Input
               id="email"
               name="email"
               type="email"
               placeholder="you@example.com"
-              required
+              aria-invalid={
+                !!(getFieldError("email") && getFieldError("email")!.length > 0)
+              }
+              onChange={() => {
+                setClearedFields((prev) => new Set([...prev, "email"]));
+              }}
             />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              placeholder="••••••"
-              required
-            />
-          </div>
+            {getFieldError("email") && getFieldError("email")!.length > 0 && (
+              <FieldError
+                errors={getFieldError("email")!.map((msg) => ({
+                  message: msg,
+                }))}
+              />
+            )}
+          </Field>
+          <Field
+            data-invalid={
+              !!(
+                getFieldError("password") &&
+                getFieldError("password")!.length > 0
+              )
+            }
+          >
+            <FieldLabel htmlFor="password">
+              Password <span className="text-destructive">*</span>
+            </FieldLabel>
+            <div className="relative">
+              <LockKeyhole className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+              <Input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••"
+                className="pr-10 pl-10"
+                aria-invalid={
+                  !!(
+                    getFieldError("password") &&
+                    getFieldError("password")!.length > 0
+                  )
+                }
+                onChange={() => {
+                  setClearedFields((prev) => new Set([...prev, "password"]));
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 transition-colors"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? (
+                  <EyeOff className="size-4" />
+                ) : (
+                  <Eye className="size-4" />
+                )}
+              </button>
+            </div>
+            {getFieldError("password") &&
+              getFieldError("password")!.length > 0 && (
+                <FieldError
+                  errors={getFieldError("password")!.map((msg) => ({
+                    message: msg,
+                  }))}
+                />
+              )}
+          </Field>
         </CardContent>
         <CardFooter className="flex flex-col gap-3">
           <Button type="submit" className="w-full" disabled={isPending}>

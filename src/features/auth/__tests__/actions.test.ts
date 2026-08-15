@@ -165,8 +165,9 @@ describe("Auth Actions", () => {
 
       const result = await loginAction(null, formData);
 
-      expect(result.success).toBe(false);
-      expect(result.error).toMatch(/valid email/i);
+      expect(result.errors).toBeDefined();
+      expect(result.errors?.email).toBeDefined();
+      expect(result.errors?.email?.[0]).toMatch(/valid email/i);
     });
 
     it("should return validation error for short password", async () => {
@@ -176,8 +177,9 @@ describe("Auth Actions", () => {
 
       const result = await loginAction(null, formData);
 
-      expect(result.success).toBe(false);
-      expect(result.error).toMatch(/at least 6/i);
+      expect(result.errors).toBeDefined();
+      expect(result.errors?.password).toBeDefined();
+      expect(result.errors?.password?.[0]).toMatch(/at least 6/i);
     });
 
     it("should return UNAUTHORIZED error for invalid credentials", async () => {
@@ -194,7 +196,6 @@ describe("Auth Actions", () => {
 
       const result = await loginAction(null, formData);
 
-      expect(result.success).toBe(false);
       expect(result.error).toBe("Invalid email or password");
     });
 
@@ -207,7 +208,6 @@ describe("Auth Actions", () => {
 
       const result = await loginAction(null, formData);
 
-      expect(result.success).toBe(false);
       expect(result.error).toBe(
         "An unexpected error occurred. Please try again later"
       );

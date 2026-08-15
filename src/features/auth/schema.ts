@@ -8,6 +8,15 @@ export const loginSchema = z.object({
 
 export type LoginFormData = z.infer<typeof loginSchema>;
 
+export type LoginActionState = {
+  errors?: {
+    email?: string[];
+    password?: string[];
+  };
+  error?: string;
+  success?: boolean;
+};
+
 // signup
 export const roleEnum = z.enum(["agent", "owner", "tenant"]);
 

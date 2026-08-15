@@ -1,20 +1,20 @@
 "use server";
 
-import { loginSchema, signupFormSchema, SignupActionState } from "./schema";
+import {
+  loginSchema,
+  signupFormSchema,
+  SignupActionState,
+  LoginActionState,
+} from "./schema";
 import { login, signup, logout } from "./service";
-import type { AuthActionResult } from "./types";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isAppError } from "@/lib/errors";
 
-function extractFirstError(issues: Array<{ message: string }>): string {
-  return issues[0]?.message ?? "Invalid input";
-}
-
 export async function loginAction(
-  _prev: AuthActionResult | null,
+  _prev: LoginActionState | null,
   formData: FormData
-): Promise<AuthActionResult> {
+): Promise<LoginActionState> {
   const raw = {
     email: (formData.get("email") ?? "") as string,
     password: (formData.get("password") ?? "") as string,
@@ -22,7 +22,12 @@ export async function loginAction(
 
   const parsed = loginSchema.safeParse(raw);
   if (!parsed.success) {
-    return { success: false, error: extractFirstError(parsed.error.issues) };
+    return {
+      errors: parsed.error.flatten().fieldErrors as {
+        email?: string[];
+        password?: string[];
+      },
+    };
   }
 
   try {
@@ -30,15 +35,14 @@ export async function loginAction(
     if (result.success) {
       redirect("/dashboard");
     }
-    return result;
+    return result as LoginActionState;
   } catch (error) {
     if (isAppError(error)) {
-      return { success: false, error: error.message };
+      return { error: error.message };
     }
 
     console.error("Unexpected error during login:", error);
     return {
-      success: false,
       error: "An unexpected error occurred. Please try again later",
     };
   }
