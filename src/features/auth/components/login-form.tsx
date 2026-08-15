@@ -119,8 +119,13 @@ export function LoginForm() {
                     )}
                   </button>
                 </div>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
+                {fieldState.invalid && fieldState.error?.message && (
+                  <FieldError
+                    errors={fieldState.error.message
+                      .split("\n")
+                      .filter(Boolean)
+                      .map((msg) => ({ message: msg.trim() }))}
+                  />
                 )}
               </Field>
             )}

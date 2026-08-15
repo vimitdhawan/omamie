@@ -17,8 +17,3 @@ export type Contact = {
   message: string;
   createdAt: string;
 };
-
-export type ContactResult = {
-  data: Contact | null;
-  error: { message: string } | null;
-};

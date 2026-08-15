@@ -9,22 +9,13 @@ export async function submitContactAction(
   _prev: ContactActionState,
   formData: FormData
 ): Promise<ContactActionState> {
-  const rawData = {
-    fullName: formData.get("fullName"),
-    email: formData.get("email"),
-    phone: formData.get("phone"),
-    subject: formData.get("subject"),
-    message: formData.get("message"),
-  };
-
-  const validationResult = contactSchema.safeParse(rawData);
-
+  const form = Object.fromEntries(formData);
+  const validationResult = contactSchema.safeParse(form);
   if (!validationResult.success) {
     return {
       errors: validationResult.error.flatten().fieldErrors,
     };
   }
-
   try {
     await submitContactMessage({
       fullName: validationResult.data.fullName,

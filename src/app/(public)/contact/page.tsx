@@ -21,42 +21,36 @@ export default function ContactPage() {
           </Link>
         </div>
 
-        <div className="grid sm:grid-cols-1 lg:grid-cols-[9fr_11fr] lg:gap-12">
-          {/* Left: Image Section (40%) - Matches card height */}
-          <div className="hidden lg:block">
-            <Card className="relative h-full min-h-[400px] overflow-hidden border-gray-200 p-0 shadow-lg">
-              <Image
-                src="/images/apartment-interior.jpg"
-                alt="Modern apartment interior"
-                fill
-                className="object-cover"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-              <div className="absolute top-10 right-8 left-8 text-white">
-                <h2 className="mb-3 text-3xl font-bold">
-                  Find Your Perfect Space
-                </h2>
-                <p className="text-lg opacity-90">
-                  Experience premium property management with Omamie&apos;s
-                  curated listings.
-                </p>
+        <div className="grid items-stretch sm:grid-cols-1 lg:grid-cols-[9fr_11fr] lg:gap-12">
+          {/* Left: Image Section - Same height as form */}
+          <div className="hidden flex-col lg:flex">
+            <Card className="relative flex-1 overflow-hidden border-gray-200 p-0 shadow-lg">
+              {/* Image with contain fit */}
+              <div className="relative flex h-full w-full items-center justify-center bg-gray-100">
+                <Image
+                  src="/images/apartment-interior.jpg"
+                  alt="Modern apartment interior"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute top-10 right-8 left-8 text-white">
+                  <h2 className="mb-3 text-3xl font-bold">
+                    Find Your Perfect Space
+                  </h2>
+                  <p className="text-lg opacity-90">
+                    Experience premium property management with Omamie&apos;s
+                    curated listings.
+                  </p>
+                </div>
               </div>
             </Card>
           </div>
 
-          {/* Right: Form Section (60%) in Card */}
-          <div>
-            <Card className="border-gray-200 bg-white p-8 shadow-lg sm:p-10">
-              <div className="mb-8">
-                <h1 className="text-4xl font-bold text-gray-900">Contact Us</h1>
-                <p className="mt-3 text-lg text-gray-600">
-                  We&apos;re here to help with any questions about listings,
-                  partnerships, or property management.
-                </p>
-              </div>
-              <ContactForm />
-            </Card>
+          {/* Right: Form Section - Stretches to match image height */}
+          <div className="flex flex-col">
+            <ContactForm />
           </div>
         </div>
       </main>

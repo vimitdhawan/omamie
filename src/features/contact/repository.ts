@@ -12,10 +12,37 @@ export async function create(input: ContactInput) {
   const { error } = await supabase
     .from("contact_messages")
     .insert(contactInsert);
+
   if (error) {
-    throw new AppError("INTERNAL_ERROR", "Failed to create contact message", {
-      cause: error,
-    });
+    const errorMessage = mapDatabaseErrorToUserMessage(error);
+    throw new AppError(
+      "INTERNAL_ERROR",
+      errorMessage || "Failed to create contact message",
+      { cause: error }
+    );
+  }
+}
+
+function mapDatabaseErrorToUserMessage(
+  error: { code?: string; message?: string } | null
+): string | null {
+  if (!error) return null;
+
+  const errorCode = error.code;
+  const message = error.message || "";
+
+  switch (errorCode) {
+    case "23505": // Unique constraint violation
+      return "This email has already contacted us recently. Please try again later.";
+    case "42P01": // Table doesn't exist
+      return "Service temporarily unavailable. Please try again later.";
+    case "HV000": // FDW error (foreign data wrapper)
+      return "Service temporarily unavailable. Please try again later.";
+    default:
+      if (message.includes("permission")) {
+        return "You don't have permission to submit this form.";
+      }
+      return null; // Return null to use generic message
   }
 }
 

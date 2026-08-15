@@ -22,7 +22,7 @@ export function Contact() {
           </div>
           <div className="pt-1">
             <Link href="/contact">
-              <Button size="default">Contact Us</Button>
+              <Button className="cursor-pointer">Contact Us</Button>
             </Link>
           </div>
         </CardContent>

@@ -16,8 +16,9 @@ test.describe("Contact page — smoke", () => {
     await page.goto("/contact");
     await expect(page).toHaveURL(/\/contact$/);
 
+    // Check for form heading
     await expect(
-      page.getByRole("heading", { name: /Contact Us/i })
+      page.getByRole("heading", { name: /Get in Touch/i })
     ).toBeVisible();
 
     await expect(page.getByLabel(/Full Name/i)).toBeVisible();
@@ -50,13 +51,35 @@ test.describe("Contact page — form validation", () => {
     page,
   }) => {
     await page.goto("/contact");
-    await page.getByRole("button", { name: /Send Message/i }).click();
 
-    await expect(page.getByText(/At least 2 characters/i)).toBeVisible();
-    await expect(page.getByText(/Enter a valid email address/i)).toBeVisible();
-    await expect(
-      page.getByText(/Message must be at least 10 characters/i)
-    ).toBeVisible();
+    // Focus on first field to trigger validation on blur
+    await page.getByLabel(/Full Name/i).focus();
+    await page.getByLabel(/Full Name/i).blur();
+    await page.waitForTimeout(500);
+
+    // Check for validation error for full name
+    const fullNameError = page.locator(
+      "text=/Name must be at least 2 characters|At least 2 characters/i"
+    );
+    await expect(fullNameError.first()).toBeVisible({ timeout: 5000 });
+
+    // Focus email field
+    await page.getByLabel(/Email/i).focus();
+    await page.getByLabel(/Email/i).blur();
+    await page.waitForTimeout(500);
+
+    // Check for email validation error
+    const emailError = page.locator("text=/valid email/i");
+    await expect(emailError.first()).toBeVisible({ timeout: 5000 });
+
+    // Focus message field
+    await page.getByLabel(/Message/i).focus();
+    await page.getByLabel(/Message/i).blur();
+    await page.waitForTimeout(500);
+
+    // Check for message validation error
+    const messageError = page.locator("text=/at least 10 characters/i");
+    await expect(messageError.first()).toBeVisible({ timeout: 5000 });
   });
 });
 

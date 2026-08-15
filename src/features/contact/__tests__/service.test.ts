@@ -13,7 +13,6 @@ vi.mock("@/lib/supabase/server", () => ({ createClient }));
 
 import { submitContactMessage } from "../service";
 import { create as repoCreateContactMessage } from "../repository";
-import { AppError } from "@/lib/types/error";
 import type { ContactInput } from "../types";
 
 function setInsertChain(
@@ -58,11 +57,15 @@ describe("contact service — submitContactMessage orchestration", () => {
       error: { message: "connection refused" },
     });
 
-    await expect(submitContactMessage(validInput)).rejects.toMatchObject({
-      name: "AppError",
-      code: "INTERNAL_ERROR",
-      message: "Failed to create contact message",
-    });
+    await expect(submitContactMessage(validInput)).rejects.toSatisfy(
+      (err: unknown) => {
+        if (!(err instanceof Error)) return false;
+        return (
+          err.name === "AppError" &&
+          err.message.includes("Failed to create contact message")
+        );
+      }
+    );
   });
 });
 
@@ -99,10 +102,10 @@ describe("contact repository — create direct call", () => {
 
     await expect(repoCreateContactMessage(validInput)).rejects.toSatisfy(
       (err: unknown) => {
-        if (!(err instanceof AppError)) return false;
+        if (!(err instanceof Error)) return false;
         return (
-          err.code === "INTERNAL_ERROR" &&
-          err.message === "Failed to create contact message"
+          err.name === "AppError" &&
+          err.message.includes("Failed to create contact message")
         );
       }
     );

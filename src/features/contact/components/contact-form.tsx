@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect } from "react";
 import { useActionState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { Loader2 } from "lucide-react";
 
 import {
@@ -13,15 +13,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -77,146 +78,170 @@ export function ContactForm() {
   }, [state, form]);
 
   return (
-    <Form {...form}>
-      <form action={formAction} className="space-y-6">
-        {/* Form Fields with Better Spacing */}
-        <div className="space-y-6">
-          {/* Name & Email Row */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="fullName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Full Name <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <FormControl>
+    <Card className="bg-surface-soft/50 border-gray-200">
+      <CardHeader>
+        <CardTitle className="text-2xl">Get in Touch</CardTitle>
+        <CardDescription className="text-base">
+          We&apos;re here to help. Send us a message and we&apos;ll respond as
+          soon as possible.
+        </CardDescription>
+      </CardHeader>
+      <form action={formAction}>
+        <CardContent className="space-y-6">
+          {/* Form Fields with Better Spacing */}
+          <div className="space-y-6">
+            {/* Name & Email Row */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Controller
+                name="fullName"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Full Name <span className="text-destructive">*</span>
+                    </FieldLabel>
                     <Input
                       {...field}
+                      id={field.name}
                       type="text"
                       placeholder="John Doe"
+                      aria-invalid={fieldState.invalid}
                       onChange={(e) => {
                         field.onChange(e);
                         form.clearErrors("fullName");
                       }}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Email <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <FormControl>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              <Controller
+                name="email"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Email <span className="text-destructive">*</span>
+                    </FieldLabel>
                     <Input
                       {...field}
+                      id={field.name}
                       type="email"
                       placeholder="john@example.com"
+                      aria-invalid={fieldState.invalid}
                       onChange={(e) => {
                         field.onChange(e);
                         form.clearErrors("email");
                       }}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+            </div>
 
-          {/* Phone & Subject Row */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone (optional)</FormLabel>
-                  <FormControl>
+            {/* Phone & Subject Row */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Controller
+                name="phone"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Phone (optional)
+                    </FieldLabel>
                     <Input
                       {...field}
+                      id={field.name}
                       type="tel"
                       placeholder="+1 (555) 000-0000"
+                      aria-invalid={fieldState.invalid}
                       onChange={(e) => {
                         field.onChange(e);
                         form.clearErrors("phone");
                       }}
                     />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
 
-            <FormField
-              control={form.control}
-              name="subject"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    Reason for Contact{" "}
-                    <span className="text-destructive">*</span>
-                  </FormLabel>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    name={field.name}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
+              <Controller
+                name="subject"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      Reason for Contact{" "}
+                      <span className="text-destructive">*</span>
+                    </FieldLabel>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger
+                        id={field.name}
+                        className="w-full"
+                        aria-invalid={fieldState.invalid}
+                      >
                         <SelectValue placeholder="Select an option" />
                       </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {CONTACT_SUBJECT_OPTIONS.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                      <SelectContent>
+                        {CONTACT_SUBJECT_OPTIONS.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+            </div>
 
-          {/* Message Field */}
-          <FormField
-            control={form.control}
-            name="message"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  Message <span className="text-destructive">*</span>
-                </FormLabel>
-                <FormControl>
+            {/* Message Field */}
+            <Controller
+              name="message"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    Message <span className="text-destructive">*</span>
+                  </FieldLabel>
                   <Textarea
                     {...field}
+                    id={field.name}
                     placeholder="How can we help you?"
-                    className="min-h-[120px] resize-none"
+                    className="h-[120px] resize-none overflow-y-auto break-all"
                     rows={5}
+                    aria-invalid={fieldState.invalid}
                     onChange={(e) => {
                       field.onChange(e);
                       form.clearErrors("message");
                     }}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
-        {/* Submit Button */}
-        <div className="pt-2">
+            {/* Hidden input for subject to ensure it's submitted */}
+            <input
+              type="hidden"
+              name="subject"
+              value={form.getValues("subject")}
+            />
+          </div>
+        </CardContent>
+        <CardFooter className="bg-surface-strong mt-8 flex flex-col">
           <Button
             type="submit"
             className="w-full cursor-pointer text-base"
@@ -231,13 +256,13 @@ export function ContactForm() {
               "Send Message"
             )}
           </Button>
-        </div>
 
-        {/* Helper Text */}
-        <p className="text-muted-foreground text-center text-sm">
-          We typically respond within 24 hours during business days.
-        </p>
+          {/* Helper Text */}
+          <p className="text-muted-foreground pt-4 text-center text-sm">
+            We typically respond within 24 hours during business days.
+          </p>
+        </CardFooter>
       </form>
-    </Form>
+    </Card>
   );
 }
