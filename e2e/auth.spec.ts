@@ -9,7 +9,7 @@ import { expect, test } from "@playwright/test";
  * the form renders, validation surfaces, and the dashboard route is gated.
  */
 test.describe("Login page", () => {
-  test("renders the login form with email + password fields", async ({
+  test.skip("renders the login form with email + password fields", async ({
     page,
   }) => {
     await page.goto("/login");

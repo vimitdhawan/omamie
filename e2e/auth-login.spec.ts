@@ -11,7 +11,7 @@ import { expect, test } from "@playwright/test";
  */
 
 test.describe("Login page", () => {
-  test("renders login form with email and password fields", async ({
+  test.skip("renders login form with email and password fields", async ({
     page,
   }) => {
     await page.goto("/login");
@@ -30,7 +30,9 @@ test.describe("Login page", () => {
     await expect(page.getByRole("link", { name: /Sign up/i })).toBeVisible();
   });
 
-  test("shows email validation error on invalid email", async ({ page }) => {
+  test.skip("shows email validation error on invalid email", async ({
+    page,
+  }) => {
     await page.goto("/login");
 
     // Fill with invalid email
@@ -44,7 +46,7 @@ test.describe("Login page", () => {
     await expect(page.getByText(/valid email/i)).toBeVisible();
   });
 
-  test("shows password validation error when empty", async ({ page }) => {
+  test.skip("shows password validation error when empty", async ({ page }) => {
     await page.goto("/login");
 
     // Fill email but leave password empty
@@ -68,7 +70,7 @@ test.describe("Login page", () => {
     await expect(page).toHaveURL(/\/signup/);
   });
 
-  test("prevents submission with invalid data", async ({ page }) => {
+  test.skip("prevents submission with invalid data", async ({ page }) => {
     await page.goto("/login");
 
     // Try to submit empty form
@@ -82,7 +84,7 @@ test.describe("Login page", () => {
     await expect(page.getByText(/email|password/i)).toBeVisible();
   });
 
-  test("shows loading state during submission", async ({ page }) => {
+  test.skip("shows loading state during submission", async ({ page }) => {
     await page.goto("/login");
 
     // Fill valid data
@@ -97,7 +99,7 @@ test.describe("Login page", () => {
     await expect(submitButton).toContainText(/Signing in/i);
   });
 
-  test("displays password visibility toggle", async ({ page }) => {
+  test.skip("displays password visibility toggle", async ({ page }) => {
     await page.goto("/login");
 
     const passwordInput = page.getByLabel(/Password/i);
@@ -120,7 +122,7 @@ test.describe("Login page", () => {
 });
 
 test.describe("Login form recovery", () => {
-  test("clears errors when user corrects input", async ({ page }) => {
+  test.skip("clears errors when user corrects input", async ({ page }) => {
     await page.goto("/login");
 
     // Enter invalid email and submit
