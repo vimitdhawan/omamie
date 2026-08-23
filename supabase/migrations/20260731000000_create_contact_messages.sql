@@ -18,8 +18,13 @@ create table public.contact_messages (
   created_at timestamptz not null default now()
 );
 
+-- Enable RLS
 alter table public.contact_messages enable row level security;
 
-create policy "Anyone can submit a contact message"
-  on public.contact_messages for insert
-  with check (true);
+-- Grant permissions to service_role only (all access via backend)
+grant select, insert, update, delete on public.contact_messages to service_role;
+
+-- RLS Policy: Service role manages all contact messages
+create policy "service_role_manages_contact_messages"
+  on public.contact_messages for all
+  using (auth.role() = 'service_role');

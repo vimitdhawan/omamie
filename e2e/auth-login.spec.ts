@@ -179,7 +179,7 @@ test.describe("Dashboard redirect", () => {
     // Try to access dashboard without authentication
     await page.goto("/dashboard");
 
-    // Should redirect to login
-    await expect(page).toHaveURL(/\/login$/);
+    // Should redirect to login (may have callback query param)
+    await expect(page).toHaveURL(/\/login(\?|$)/);
   });
 });

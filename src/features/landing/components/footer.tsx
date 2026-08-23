@@ -13,7 +13,7 @@ const footerLinks = {
     { label: "Neighborhoods", href: "#" },
   ],
   Hosting: [
-    { label: "List Your Property", href: "#" },
+    { label: "List Your Property", href: "/list-property" },
     { label: "Host Resources", href: "#" },
     { label: "Community Forum", href: "#" },
     { label: "Host Guarantee", href: "#" },

@@ -151,8 +151,8 @@ describe("Auth Actions", () => {
         await handleSignup(null, formData);
       } catch (error: unknown) {
         const err = error as Error;
-        expect(err.message).toContain("/dashboard");
-        expect(redirect).toHaveBeenCalledWith("/dashboard");
+        expect(err.message).toContain("/list-property");
+        expect(redirect).toHaveBeenCalledWith("/list-property");
       }
     });
   });

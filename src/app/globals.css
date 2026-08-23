@@ -20,6 +20,20 @@
   .bg-primary {
     background-color: var(--color-primary);
   }
+
+  /* Error color utilities */
+  .text-error {
+    color: var(--destructive);
+  }
+  .border-error {
+    border-color: var(--destructive);
+  }
+  .bg-error-container {
+    background-color: color-mix(in srgb, var(--destructive) 10%, transparent);
+  }
+  .ring-error\/20 {
+    --tw-ring-color: color-mix(in srgb, var(--destructive) 20%, transparent);
+  }
 }
 
 @custom-variant dark (&:is(.dark *));

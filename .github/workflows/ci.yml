@@ -36,7 +36,7 @@ jobs:
       - name: Run Next.js build
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://dummy.supabase.co' }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'dummy' }}
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || 'dummy-publishable-key' }}
         run: npm run build
 
   unit-tests:
@@ -110,13 +110,13 @@ jobs:
       - name: Build Next.js
         env:
           NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-anon-key-for-e2e
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: dummy-publishable-key-for-e2e
         run: npm run build
 
       - name: Run Playwright tests
         env:
           NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: dummy-anon-key-for-e2e
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: dummy-publishable-key-for-e2e
         run: npm run test:e2e
 
       - name: Upload Playwright report

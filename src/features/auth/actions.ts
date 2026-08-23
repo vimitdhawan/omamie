@@ -6,7 +6,7 @@ import {
   SignupActionState,
   LoginActionState,
 } from "./schema";
-import { login, signup, logout } from "./service";
+import { login, signup, logout, getCurrentUser } from "./service";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isAppError } from "@/lib/errors";
@@ -23,12 +23,13 @@ export async function loginAction(
     };
   }
   const { email, password } = validationResult.data;
+
   try {
     const result = await login({ email, password });
-    if (result.success) {
-      redirect("/dashboard");
+    if (!result.success) {
+      return result as LoginActionState;
     }
-    return result as LoginActionState;
+    await getCurrentUser();
   } catch (error) {
     if (isAppError(error)) {
       return { errorMessage: error.message };
@@ -38,6 +39,8 @@ export async function loginAction(
       errorMessage: "An unexpected error occurred. Please try again later",
     };
   }
+
+  redirect("/list-property");
 }
 
 export async function handleSignup(
@@ -56,7 +59,6 @@ export async function handleSignup(
 
   try {
     await signup({ email, password, fullName, role });
-    redirect("/dashboard");
   } catch (error) {
     if (isAppError(error)) {
       return {
@@ -67,6 +69,8 @@ export async function handleSignup(
       errorMessage: "An unexpected error occurred. Please try again later",
     };
   }
+
+  redirect("/list-property");
 }
 
 export async function logoutAction(): Promise<void> {
