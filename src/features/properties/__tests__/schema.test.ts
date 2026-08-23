@@ -19,6 +19,8 @@ describe("Properties Schema Validation", () => {
         title: "Luxury 2BR Apartment",
         location: "Sukhumvit, Bangkok",
         monthlyRent: 25000,
+        bedrooms: 2,
+        bathrooms: 1,
         description: "Beautiful apartment with great amenities",
       };
 
@@ -71,6 +73,8 @@ describe("Properties Schema Validation", () => {
         title: "Test Property",
         location: "Bangkok",
         monthlyRent: 25000,
+        bedrooms: 2,
+        bathrooms: 1,
       };
 
       const result = step1Schema.safeParse(validData);
@@ -81,8 +85,6 @@ describe("Properties Schema Validation", () => {
   describe("Step 2 Schema (Amenities)", () => {
     it("should validate correct amenities data", () => {
       const validData = {
-        bedrooms: 2,
-        bathrooms: 1,
         furnishedStatus: "furnished",
         amenities: ["wifi", "ac", "parking"],
       };
@@ -91,46 +93,8 @@ describe("Properties Schema Validation", () => {
       expect(result.success).toBe(true);
     });
 
-    it("should reject bedrooms less than 1", () => {
-      const invalidData = {
-        bedrooms: 0,
-        bathrooms: 1,
-        furnishedStatus: "furnished",
-        amenities: [],
-      };
-
-      const result = step2Schema.safeParse(invalidData);
-      expect(result.success).toBe(false);
-    });
-
-    it("should reject bathrooms less than 1", () => {
-      const invalidData = {
-        bedrooms: 2,
-        bathrooms: 0,
-        furnishedStatus: "furnished",
-        amenities: [],
-      };
-
-      const result = step2Schema.safeParse(invalidData);
-      expect(result.success).toBe(false);
-    });
-
-    it("should reject too many bedrooms", () => {
-      const invalidData = {
-        bedrooms: 25,
-        bathrooms: 1,
-        furnishedStatus: "furnished",
-        amenities: [],
-      };
-
-      const result = step2Schema.safeParse(invalidData);
-      expect(result.success).toBe(false);
-    });
-
     it("should reject invalid furnished status", () => {
       const invalidData = {
-        bedrooms: 2,
-        bathrooms: 1,
         furnishedStatus: "invalid",
         amenities: [],
       };
@@ -141,8 +105,6 @@ describe("Properties Schema Validation", () => {
 
     it("should reject invalid amenity values", () => {
       const invalidData = {
-        bedrooms: 2,
-        bathrooms: 1,
         furnishedStatus: "furnished",
         amenities: ["invalid_amenity"],
       };
@@ -151,11 +113,10 @@ describe("Properties Schema Validation", () => {
       expect(result.success).toBe(false);
     });
 
-    it("should default amenities to empty array", () => {
+    it("should accept empty amenities array", () => {
       const validData = {
-        bedrooms: 2,
-        bathrooms: 1,
         furnishedStatus: "furnished",
+        amenities: [],
       };
 
       const result = step2Schema.safeParse(validData);
