@@ -32,6 +32,6 @@ test.describe("Login page", () => {
 test.describe("Dashboard authorization gate", () => {
   test("redirects unauthenticated visits to /login", async ({ page }) => {
     await page.goto("/dashboard");
-    await expect(page).toHaveURL(/\/login$/);
+    await expect(page).toHaveURL(/\/login(\?|$)/);
   });
 });
