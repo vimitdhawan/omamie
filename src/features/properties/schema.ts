@@ -1,68 +1,58 @@
 import { z } from "zod";
+import {
+  PROPERTY_TYPE_VALUES,
+  FURNISHED_STATUS_VALUES,
+  AMENITY_VALUES,
+  PROPERTY_STATUS_VALUES,
+} from "./types";
 
-// Enums
-export const propertyTypeEnum = z.enum(
-  ["apartment", "condo", "house", "townhouse"],
-  {
-    message: "Please select a property type",
-  }
-);
+// Zod validation schemas using derived value tuples
+export const propertyTypeSchema = z.enum(PROPERTY_TYPE_VALUES, {
+  message: "Please select a property type",
+});
 
-export const furnishedStatusEnum = z.enum(
-  ["furnished", "partial", "unfurnished"],
-  {
-    message: "Please select a furnishing status",
-  }
-);
+export const furnishedStatusSchema = z.enum(FURNISHED_STATUS_VALUES, {
+  message: "Please select a furnishing status",
+});
 
-export const amenityEnum = z.enum([
-  "ac",
-  "microwave",
-  "wifi",
-  "pool",
-  "gym",
-  "parking",
-]);
+export const amenitySchema = z.enum(AMENITY_VALUES);
 
-export const propertyStatusEnum = z.enum([
-  "pending_review",
-  "approved",
-  "rejected",
-  "archived",
-]);
+export const propertyStatusSchema = z.enum(PROPERTY_STATUS_VALUES);
 
-// Type inference from enums
-export type PropertyType = z.infer<typeof propertyTypeEnum>;
-export type FurnishedStatus = z.infer<typeof furnishedStatusEnum>;
-export type Amenity = z.infer<typeof amenityEnum>;
-export type PropertyStatus = z.infer<typeof propertyStatusEnum>;
-
-// Constants for UI
-export const PROPERTY_TYPES: Record<PropertyType, string> = {
+// UI label mappings
+export const PROPERTY_TYPES: Record<string, string> = {
   apartment: "Apartment",
   condo: "Condo",
   house: "House",
   townhouse: "Townhouse",
 } as const;
 
-export const FURNISHED_STATUS: Record<FurnishedStatus, string> = {
+export const FURNISHED_STATUS: Record<string, string> = {
   furnished: "Fully Furnished",
   partial: "Partially Furnished",
   unfurnished: "Unfurnished",
 } as const;
 
-export const AMENITIES: Record<Amenity, string> = {
+export const AMENITIES: Record<string, string> = {
   ac: "Air Conditioning",
-  microwave: "Microwave",
   wifi: "Wi-Fi",
+  parking: "Parking",
   pool: "Swimming Pool",
   gym: "Gym",
-  parking: "Parking",
+  microwave: "Microwave",
+  washing_machine: "Washing Machine",
+  refrigerator: "Refrigerator",
+  tv: "TV",
+  balcony: "Balcony",
+  elevator: "Elevator",
+  security: "Security",
+  sofa: "Sofa",
 } as const;
 
-// Step 1: Property Details
-export const step1Schema = z.object({
-  propertyType: propertyTypeEnum,
+// Step 1: Basic Property Details (Type, Title, Location, Rent, Bedrooms, Bathrooms, Description)
+// Client-side schema (for React Hook Form zodResolver)
+export const basicDetailsSchema = z.object({
+  propertyType: propertyTypeSchema,
   title: z
     .string()
     .min(5, "Property title must be at least 5 characters")
@@ -74,11 +64,6 @@ export const step1Schema = z.object({
     })
     .int("Monthly rent must be a whole number")
     .positive("Monthly rent must be positive"),
-  description: z.string().max(1000, "Description is too long").optional(),
-});
-
-// Step 2: Amenities
-export const step2Schema = z.object({
   bedrooms: z
     .number()
     .int()
@@ -89,12 +74,44 @@ export const step2Schema = z.object({
     .int()
     .min(1, "At least 1 bathroom is required")
     .max(20, "Maximum 20 bathrooms allowed"),
-  furnishedStatus: furnishedStatusEnum,
-  amenities: z.array(amenityEnum).default([]),
+  description: z.string().max(1000, "Description is too long").optional(),
 });
 
-// Step 3: Review (just checkboxes, no data collection)
-export const step3Schema = z.object({
+// Server-side schema (for FormData validation with coerce)
+export const basicInfoSchema = z.object({
+  propertyType: propertyTypeSchema,
+  title: z
+    .string()
+    .min(5, "Property title must be at least 5 characters")
+    .max(100, "Property title must be less than 100 characters"),
+  location: z.string().min(3, "Location is required"),
+  monthlyRent: z.coerce
+    .number({
+      message: "Monthly rent must be a number",
+    })
+    .int("Monthly rent must be a whole number")
+    .positive("Monthly rent must be positive"),
+  bedrooms: z.coerce
+    .number()
+    .int()
+    .min(1, "At least 1 bedroom is required")
+    .max(20, "Maximum 20 bedrooms allowed"),
+  bathrooms: z.coerce
+    .number()
+    .int()
+    .min(1, "At least 1 bathroom is required")
+    .max(20, "Maximum 20 bathrooms allowed"),
+  description: z.string().max(1000, "Description is too long").optional(),
+});
+
+// Step 2: Amenities & Features (Furnished Status, Amenities)
+export const amenitiesSchema = z.object({
+  furnishedStatus: furnishedStatusSchema,
+  amenities: z.array(amenitySchema),
+});
+
+// Step 3: Review & Confirm (Terms & Accuracy)
+export const reviewSchema = z.object({
   acceptTerms: z.literal(true, {
     message: "You must accept the terms and conditions",
   }),
@@ -103,19 +120,20 @@ export const step3Schema = z.object({
   }),
 });
 
-// Combined schema for server-side validation
-export const listPropertySchema = step1Schema
-  .merge(step2Schema)
-  .merge(step3Schema);
+// Combined schema for server-side validation (backward compatibility)
+export const listPropertySchema = basicDetailsSchema
+  .merge(amenitiesSchema)
+  .merge(reviewSchema);
 
-// Type inference
-export type Step1Data = z.infer<typeof step1Schema>;
-export type Step2Data = z.infer<typeof step2Schema>;
-export type Step3Data = z.infer<typeof step3Schema>;
+// Type inference with purpose-based names
+export type BasicDetailsData = z.infer<typeof basicDetailsSchema>;
+export type AmenitiesData = z.infer<typeof amenitiesSchema>;
+export type ReviewData = z.infer<typeof reviewSchema>;
 export type ListPropertyFormData = z.infer<typeof listPropertySchema>;
 
-// Helper function to extract first error from Zod issues
-export function extractFirstError(issues: z.ZodIssue[]): string {
-  if (issues.length === 0) return "Validation failed";
-  return issues[0].message;
-}
+// Action state type for server actions
+export type PropertyActionState = {
+  errors?: Record<string, string[]>;
+  errorMessage?: string;
+  success?: boolean;
+};

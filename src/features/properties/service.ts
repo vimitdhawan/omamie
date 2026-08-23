@@ -1,68 +1,95 @@
-import type { ListPropertyFormData } from "./schema";
-import type { PropertyInsert, CreatePropertyResult } from "./types";
-import { createProperty, getPropertyById } from "./repository";
+import type { BasicDetailsData, AmenitiesData } from "./schema";
+import type { Property } from "./types";
+import {
+  createProperty,
+  getPropertyById,
+  updateProperty,
+  completePropertySubmission,
+  getPendingListing as repoPendingListing,
+  mapBasicDetailsToInsert,
+  mapAmenitiesDataToUpdate,
+} from "./repository";
 
 /**
  * Service layer for properties
  * Contains business logic and orchestration
+ * Works exclusively with domain models (camelCase)
  */
 
 /**
- * Create a new property listing
- * @param data - Validated form data from the listing form
- * @returns Property creation result
+ * Save basic property details
+ * Creates a new property in "pending" status or updates existing property
  */
-export async function createPropertyListing(
-  data: ListPropertyFormData
-): Promise<CreatePropertyResult> {
-  // Transform form data to database insert format
-  const propertyData: PropertyInsert = {
-    profile_id: "test", // Placeholder - will be actual user ID in future
-    title: data.title,
-    property_type: data.propertyType,
-    location: data.location,
-    monthly_rent: data.monthlyRent,
-    description: data.description ?? null,
-    bedrooms: data.bedrooms,
-    bathrooms: data.bathrooms,
-    furnished_status: data.furnishedStatus,
-    amenities: data.amenities,
-    status: "pending_review",
-  };
-
-  // Call repository to insert into database
-  const result = await createProperty(propertyData);
-
-  if (result.error) {
-    return {
-      property: null,
-      error: "Failed to create property listing. Please try again.",
+export async function saveBasicInfo(
+  data: BasicDetailsData,
+  profileId: string,
+  propertyId?: string
+): Promise<Property> {
+  if (propertyId) {
+    // Update existing property - save basic details and move to next step
+    const stepData = {
+      title: data.title,
+      property_type: data.propertyType,
+      location: data.location,
+      monthly_rent: data.monthlyRent,
+      description: data.description ?? null,
+      bedrooms: data.bedrooms,
+      bathrooms: data.bathrooms,
+      next_action: "amenities",
     };
+    return await updateProperty(propertyId, stepData);
   }
 
-  return {
-    property: result.property,
-    error: null,
-  };
+  // Create new property with basic details
+  const insertData = mapBasicDetailsToInsert(data, profileId);
+  return await createProperty(insertData);
+}
+
+/**
+ * Save amenities and features
+ * Updates property with amenities and sets next_action to "review"
+ */
+export async function saveAmenities(
+  data: AmenitiesData,
+  propertyId: string
+): Promise<Property> {
+  const stepData = mapAmenitiesDataToUpdate(data, "review");
+  return await updateProperty(propertyId, stepData);
+}
+
+/**
+ * Publish property
+ * Changes status from pending to review and sets next_action to completed
+ */
+export async function publishProperty(propertyId: string): Promise<Property> {
+  return await completePropertySubmission(propertyId);
 }
 
 /**
  * Get a property by ID
- * @param id - Property ID
- * @returns Property or error
  */
-export async function getProperty(id: string): Promise<CreatePropertyResult> {
-  const result = await getPropertyById(id);
-
-  if (result.error) {
-    return {
-      property: null,
-      error: "Property not found",
-    };
-  }
-
-  return {
-    property: result.property,
-    error: null,
-  };
+export async function getProperty(id: string): Promise<Property | null> {
+  return await getPropertyById(id);
 }
+
+/**
+ * Get pending (incomplete) property listing for a user
+ * Returns null if user has no pending listings
+ */
+export async function getPendingListing(
+  profileId: string
+): Promise<Property | null> {
+  return await repoPendingListing(profileId);
+}
+
+/**
+ * Server action to fetch property - can be called from client components
+ */
+export async function getPropertyAction(id: string): Promise<Property | null> {
+  return await getProperty(id);
+}
+
+// Backward compatibility aliases
+export const submitPropertyStep1 = saveBasicInfo;
+export const submitPropertyStep2 = saveAmenities;
+export const submitPropertyStep3 = publishProperty;

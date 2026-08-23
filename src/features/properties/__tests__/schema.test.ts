@@ -1,10 +1,15 @@
 import { describe, it, expect } from "vitest";
 import {
-  step1Schema,
-  step2Schema,
-  step3Schema,
+  basicDetailsSchema,
+  amenitiesSchema,
+  reviewSchema,
   listPropertySchema,
 } from "../schema";
+
+// Backward compatibility aliases for test readability
+const step1Schema = basicDetailsSchema;
+const step2Schema = amenitiesSchema;
+const step3Schema = reviewSchema;
 
 describe("Properties Schema Validation", () => {
   describe("Step 1 Schema (Property Details)", () => {

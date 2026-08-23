@@ -104,8 +104,10 @@ export type Database = {
           id: string;
           location: string;
           monthly_rent: number;
+          next_action: string;
           profile_id: string;
           property_type: string;
+          started_at: string;
           status: string;
           title: string;
           updated_at: string;
@@ -120,8 +122,10 @@ export type Database = {
           id?: string;
           location: string;
           monthly_rent: number;
+          next_action?: string;
           profile_id?: string;
           property_type: string;
+          started_at?: string;
           status?: string;
           title: string;
           updated_at?: string;
@@ -136,8 +140,10 @@ export type Database = {
           id?: string;
           location?: string;
           monthly_rent?: number;
+          next_action?: string;
           profile_id?: string;
           property_type?: string;
+          started_at?: string;
           status?: string;
           title?: string;
           updated_at?: string;
