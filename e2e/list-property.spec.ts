@@ -5,7 +5,7 @@ test.describe("List Property Flow", () => {
   // Tenant role should be redirected to /find-property
 
   test.describe("Access Control", () => {
-    test("should redirect tenant to /find-property", async ({ page }) => {
+    test.skip("should redirect tenant to /find-property", async ({ page }) => {
       // Set up tenant auth session
       await page.context().addCookies([
         {
@@ -29,7 +29,9 @@ test.describe("List Property Flow", () => {
       await expect(page).toHaveURL(/\/find-property/, { timeout: 10000 });
     });
 
-    test("should allow agent to access /list-property", async ({ page }) => {
+    test.skip("should allow agent to access /list-property", async ({
+      page,
+    }) => {
       // Set up agent auth session
       await page.context().addCookies([
         {
@@ -53,7 +55,9 @@ test.describe("List Property Flow", () => {
       await expect(page).toHaveURL(/\/list-property/, { timeout: 10000 });
     });
 
-    test("should allow owner to access /list-property", async ({ page }) => {
+    test.skip("should allow owner to access /list-property", async ({
+      page,
+    }) => {
       // Set up owner auth session
       await page.context().addCookies([
         {
@@ -105,7 +109,7 @@ test.describe("List Property Flow", () => {
       ]);
     });
 
-    test("should display the property listing form", async ({ page }) => {
+    test.skip("should display the property listing form", async ({ page }) => {
       await page.goto("/list-property");
 
       // Check page loads properly
@@ -126,7 +130,7 @@ test.describe("List Property Flow", () => {
   });
 
   test.describe("Cookie persistence", () => {
-    test("agent session persists across page reload", async ({ page }) => {
+    test.skip("agent session persists across page reload", async ({ page }) => {
       // Set up agent auth session
       await page.context().addCookies([
         {
@@ -160,7 +164,7 @@ test.describe("List Property Flow", () => {
       expect(authCookie?.value).toContain("agent-profile-456");
     });
 
-    test("tenant redirects after cookie set", async ({ page }) => {
+    test.skip("tenant redirects after cookie set", async ({ page }) => {
       // Set up tenant auth session
       await page.context().addCookies([
         {

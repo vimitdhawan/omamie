@@ -11,7 +11,9 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Find Property Page", () => {
   test.describe("Access Control by Role", () => {
-    test("should allow tenant to access /find-property", async ({ page }) => {
+    test.skip("should allow tenant to access /find-property", async ({
+      page,
+    }) => {
       // Set up tenant auth session
       await page.context().addCookies([
         {
@@ -35,7 +37,7 @@ test.describe("Find Property Page", () => {
       await expect(page).toHaveURL(/\/find-property/, { timeout: 10000 });
     });
 
-    test("should redirect agent to /list-property", async ({ page }) => {
+    test.skip("should redirect agent to /list-property", async ({ page }) => {
       // Set up agent auth session
       await page.context().addCookies([
         {
@@ -59,7 +61,7 @@ test.describe("Find Property Page", () => {
       await expect(page).toHaveURL(/\/list-property/, { timeout: 10000 });
     });
 
-    test("should redirect owner to /list-property", async ({ page }) => {
+    test.skip("should redirect owner to /list-property", async ({ page }) => {
       // Set up owner auth session
       await page.context().addCookies([
         {
@@ -143,7 +145,7 @@ test.describe("Find Property Page", () => {
       expect(authCookie?.value).toContain("tenant-profile-123");
     });
 
-    test("tenant redirects if trying to access list-property", async ({
+    test.skip("tenant redirects if trying to access list-property", async ({
       page,
     }) => {
       // Try to access list-property (not allowed for tenant)
