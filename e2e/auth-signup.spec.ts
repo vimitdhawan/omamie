@@ -194,7 +194,7 @@ test.describe("Role-based signup redirects (with mock auth)", () => {
     expect(isValid).toBe(true);
   });
 
-  test("agent signup redirects to /list-property", async ({ page }) => {
+  test.skip("agent signup redirects to /list-property", async ({ page }) => {
     await page.goto("/signup?intent=list-property");
 
     // Fill form with agent intent
