@@ -1,20 +1,19 @@
-import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/features/auth/service";
+import { getAuthSession } from "@/lib/auth-session";
 import { BasicDetailsForm } from "@/features/properties/components/basic-info-form";
 import type { Property } from "@/features/properties/types";
 import { PropertyNextAction } from "@/features/properties/types";
+import { redirect } from "next/navigation";
 
 export default async function CreatePropertyPage() {
-  const { user, profile } = await getCurrentUser();
-
-  if (!user || !profile) {
+  const session = await getAuthSession();
+  if (!session?.profileId) {
     redirect("/login");
   }
 
   const now = new Date().toISOString();
   const newProperty: Property = {
     id: "",
-    profileId: profile.id,
+    profileId: session.profileId,
     title: "",
     location: "",
     monthlyRent: 0,

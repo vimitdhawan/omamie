@@ -3,14 +3,9 @@ import {
   signIn as repoSignIn,
   signOut as repoSignOut,
   getUser as repoGetUser,
-  getProfile as repoGetProfile,
 } from "./repository";
-import type {
-  SignUpInput,
-  LoginInput,
-  AuthActionResult,
-  Profile,
-} from "./types";
+import { getProfile as profileServiceGetProfile } from "@/features/profile/service";
+import type { SignUpInput, LoginInput, AuthActionResult } from "./types";
 
 export async function signup(input: SignUpInput) {
   return await repoSignUp(input);
@@ -30,6 +25,6 @@ export async function getCurrentUser() {
   const { user, error } = await repoGetUser();
   if (error || !user) return { user: null, profile: null };
 
-  const { profile } = await repoGetProfile(user.id);
-  return { user, profile: profile as Profile | null };
+  const profile = await profileServiceGetProfile(user.id);
+  return { user, profile };
 }

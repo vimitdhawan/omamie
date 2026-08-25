@@ -20,16 +20,6 @@ export interface AuthError {
   field?: string;
 }
 
-export function isAuthError(error: unknown): error is AuthError {
-  return (
-    typeof error === "object" &&
-    error !== null &&
-    "category" in error &&
-    "code" in error &&
-    "message" in error
-  );
-}
-
 const errorMessages: Record<ErrorCode, string> = {
   EMAIL_INVALID: "Please enter a valid email address",
   EMAIL_EXISTS: "An account with this email already exists",
@@ -46,67 +36,4 @@ const errorMessages: Record<ErrorCode, string> = {
 
 export function getErrorMessage(code: ErrorCode): string {
   return errorMessages[code] || errorMessages.UNKNOWN_ERROR;
-}
-
-export function mapSupabaseError(error: {
-  message?: string;
-  status?: number;
-}): AuthError {
-  const message = error.message || "";
-  const status = error.status || 0;
-
-  if (
-    message.includes("duplicate key") ||
-    message.includes("already registered")
-  ) {
-    return {
-      category: "auth",
-      code: "EMAIL_EXISTS",
-      message: getErrorMessage("EMAIL_EXISTS"),
-      field: "email",
-    };
-  }
-
-  if (message.includes("Invalid login credentials")) {
-    return {
-      category: "auth",
-      code: "INVALID_CREDENTIALS",
-      message: getErrorMessage("INVALID_CREDENTIALS"),
-    };
-  }
-
-  if (message.includes("Email not confirmed")) {
-    return {
-      category: "auth",
-      code: "EMAIL_NOT_CONFIRMED",
-      message: getErrorMessage("EMAIL_NOT_CONFIRMED"),
-      field: "email",
-    };
-  }
-
-  if (status >= 500) {
-    return {
-      category: "server",
-      code: "SERVER_ERROR",
-      message: getErrorMessage("SERVER_ERROR"),
-    };
-  }
-
-  if (
-    status === 0 ||
-    message.includes("network") ||
-    message.includes("timeout")
-  ) {
-    return {
-      category: "network",
-      code: "NETWORK_ERROR",
-      message: getErrorMessage("NETWORK_ERROR"),
-    };
-  }
-
-  return {
-    category: "server",
-    code: "AUTH_FAILED",
-    message: getErrorMessage("AUTH_FAILED"),
-  };
 }

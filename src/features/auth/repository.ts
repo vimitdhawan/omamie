@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import type { SignUpInput, Profile } from "./types";
+import type { SignUpInput } from "./types";
 import { AppError } from "@/lib/errors";
 
 function mapSupabaseErrorToAppError(error: {
@@ -109,16 +109,4 @@ export async function getUser() {
   const { data, error } = await supabase.auth.getUser();
   if (error) return { user: null, error };
   return { user: data.user, error: null };
-}
-
-export async function getProfile(userId: string) {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", userId)
-    .single();
-
-  if (error) return { profile: null, error };
-  return { profile: data as Profile, error: null };
 }
