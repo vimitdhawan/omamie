@@ -29,7 +29,7 @@ export default async function CreatePropertyPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white px-4 pt-8 pb-12">
+    <main className="flex-1 bg-white px-4 pt-8 pb-12">
       <BasicDetailsForm property={newProperty} />
     </main>
   );

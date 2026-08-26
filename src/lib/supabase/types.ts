@@ -93,6 +93,51 @@ export type Database = {
         };
         Relationships: [];
       };
+      property_find_requests: {
+        Row: {
+          bathrooms: string;
+          bedrooms: string;
+          created_at: string;
+          furnishing: string;
+          id: string;
+          min_size_sqm: number | null;
+          monthly_budget: number;
+          move_in_date: string;
+          preferred_location: string;
+          profile_id: string;
+          property_type: string;
+          updated_at: string;
+        };
+        Insert: {
+          bathrooms: string;
+          bedrooms: string;
+          created_at?: string;
+          furnishing: string;
+          id?: string;
+          min_size_sqm?: number | null;
+          monthly_budget: number;
+          move_in_date: string;
+          preferred_location: string;
+          profile_id: string;
+          property_type: string;
+          updated_at?: string;
+        };
+        Update: {
+          bathrooms?: string;
+          bedrooms?: string;
+          created_at?: string;
+          furnishing?: string;
+          id?: string;
+          min_size_sqm?: number | null;
+          monthly_budget?: number;
+          move_in_date?: string;
+          preferred_location?: string;
+          profile_id?: string;
+          property_type?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       properties: {
         Row: {
           amenities: string[] | null;

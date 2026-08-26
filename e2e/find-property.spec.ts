@@ -297,4 +297,97 @@ test.describe("Find Property Page", () => {
       }
     });
   });
+
+  test.describe("Root path redirect for logged-in users", () => {
+    // The proxy decides this purely from the `auth_session` cookie (no
+    // Supabase call), so the *redirect itself* does not require the local
+    // Supabase stack. We assert on the immediate 3xx `location` header
+    // (maxRedirects: 0) rather than following the full chain with
+    // `page.goto` — a bare `auth_session` cookie has no matching real
+    // Supabase session, so a full follow would continue past the redirect
+    // into the target protected route's own middleware check and bounce to
+    // /login, which is a separate concern covered by the (skipped,
+    // backend-dependent) "Access Control by Role" tests above.
+    test("tenant visiting / is redirected to /find-property", async ({
+      page,
+    }) => {
+      await page.context().addCookies([
+        {
+          name: "auth_session",
+          value: JSON.stringify({
+            profileId: "tenant-profile-123",
+            role: "tenant",
+          }),
+          domain: "127.0.0.1",
+          path: "/",
+          httpOnly: true,
+          secure: false,
+          sameSite: "Lax",
+        },
+      ]);
+
+      const response = await page.context().request.get("/", {
+        maxRedirects: 0,
+      });
+      expect(response.status()).toBe(307);
+      expect(response.headers().location).toContain("/find-property");
+    });
+
+    test("agent visiting / is redirected to /list-property", async ({
+      page,
+    }) => {
+      await page.context().addCookies([
+        {
+          name: "auth_session",
+          value: JSON.stringify({
+            profileId: "agent-profile-456",
+            role: "agent",
+          }),
+          domain: "127.0.0.1",
+          path: "/",
+          httpOnly: true,
+          secure: false,
+          sameSite: "Lax",
+        },
+      ]);
+
+      const response = await page.context().request.get("/", {
+        maxRedirects: 0,
+      });
+      expect(response.status()).toBe(307);
+      expect(response.headers().location).toContain("/list-property");
+    });
+
+    test("owner visiting / is redirected to /list-property", async ({
+      page,
+    }) => {
+      await page.context().addCookies([
+        {
+          name: "auth_session",
+          value: JSON.stringify({
+            profileId: "owner-profile-789",
+            role: "owner",
+          }),
+          domain: "127.0.0.1",
+          path: "/",
+          httpOnly: true,
+          secure: false,
+          sameSite: "Lax",
+        },
+      ]);
+
+      const response = await page.context().request.get("/", {
+        maxRedirects: 0,
+      });
+      expect(response.status()).toBe(307);
+      expect(response.headers().location).toContain("/list-property");
+    });
+
+    test("logged-out visitor stays on the marketing home page", async ({
+      page,
+    }) => {
+      await page.goto("/");
+      await expect(page).toHaveURL(/\/$/, { timeout: 10000 });
+    });
+  });
 });

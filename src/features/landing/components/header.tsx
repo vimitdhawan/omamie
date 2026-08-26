@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/custom/logo";
+import { logoutAction } from "@/features/auth/actions";
+import { getAuthSession } from "@/lib/auth-session";
 
-export function Header() {
+export async function Header() {
+  const session = await getAuthSession();
+
   return (
     <>
       <header className="bg-surface-soft sticky top-0 z-50 w-full border-b border-gray-100 px-4 md:px-12">
@@ -17,9 +21,17 @@ export function Header() {
             </Link>
           </div>
           <div className="flex items-center gap-4 md:flex-col">
-            <Button size="default">
-              <Link href="/login">Login</Link>
-            </Button>
+            {session ? (
+              <form action={logoutAction}>
+                <Button size="default" type="submit" className="cursor-pointer">
+                  Logout
+                </Button>
+              </form>
+            ) : (
+              <Button size="default">
+                <Link href="/login">Login</Link>
+              </Button>
+            )}
           </div>
         </div>
       </header>

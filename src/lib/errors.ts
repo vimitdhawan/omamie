@@ -2,6 +2,7 @@ export type ErrorCode =
   | "VALIDATION_ERROR"
   | "NOT_FOUND"
   | "UNAUTHORIZED"
+  | "FORBIDDEN"
   | "CONFLICT"
   | "EXTERNAL_SERVICE_ERROR"
   | "INTERNAL_ERROR";
@@ -27,6 +28,7 @@ const errorMessages: Record<ErrorCode, string> = {
   VALIDATION_ERROR: "Please check your input and try again",
   NOT_FOUND: "The requested resource was not found",
   UNAUTHORIZED: "You are not authorized to perform this action",
+  FORBIDDEN: "You do not have permission to perform this action",
   CONFLICT: "This resource already exists",
   EXTERNAL_SERVICE_ERROR:
     "An external service error occurred. Please try again",

@@ -113,6 +113,15 @@ async function authMiddleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
   const response = NextResponse.next({ request });
 
+  if (pathname === "/") {
+    const session = getAuthSessionFromRequest(request);
+    if (session?.role) {
+      const url = request.nextUrl.clone();
+      url.pathname = getRoleBasedRedirectPath(session.role);
+      return NextResponse.redirect(url);
+    }
+  }
+
   if (isPublicRoutePath(pathname)) {
     return response;
   }
