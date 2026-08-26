@@ -1,15 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const { supabase, createClient } = vi.hoisted(() => {
+const { supabase, createServiceRoleClient } = vi.hoisted(() => {
   const fn = <T = unknown>() =>
     vi.fn() as unknown as ReturnType<typeof vi.fn> & T;
   const insert = fn();
   const from = fn().mockReturnValue({ insert });
   const client = { from };
-  return { supabase: client, createClient: vi.fn().mockResolvedValue(client) };
+  return {
+    supabase: client,
+    createServiceRoleClient: vi.fn().mockReturnValue(client),
+  };
 });
 
-vi.mock("@/lib/supabase/server", () => ({ createClient }));
+vi.mock("@/lib/supabase/server", () => ({ createServiceRoleClient }));
 
 import { submitContactMessage } from "../service";
 import { create as repoCreateContactMessage } from "../repository";
@@ -34,7 +37,7 @@ const validInput: ContactInput = {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  createClient.mockResolvedValue(supabase);
+  createServiceRoleClient.mockReturnValue(supabase);
   setInsertChain(supabase, { error: null });
 });
 
