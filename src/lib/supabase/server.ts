@@ -1,3 +1,5 @@
+import "server-only";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import type { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
@@ -18,8 +20,8 @@ export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient<Database>(
-    env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    env.SUPABASE_URL,
+    env.SUPABASE_PUBLISHABLE_KEY,
     {
       cookies: {
         getAll() {
@@ -34,6 +36,25 @@ export async function createClient() {
             // Silently handle cookie write errors
           }
         },
+      },
+    }
+  );
+}
+
+/**
+ * Service-role Supabase client that bypasses RLS.
+ * Server-only — never import this in client components or expose the key.
+ * Use for tables (e.g. contact_messages) whose RLS policy only grants
+ * access to the `service_role`.
+ */
+export function createServiceRoleClient() {
+  return createSupabaseClient<Database>(
+    env.SUPABASE_URL,
+    env.SUPABASE_SERVICE_ROLE_KEY,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
       },
     }
   );
@@ -58,8 +79,8 @@ export function createMiddlewareClient(
   response: NextResponse
 ) {
   return createServerClient<Database>(
-    env.NEXT_PUBLIC_SUPABASE_URL,
-    env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    env.SUPABASE_URL,
+    env.SUPABASE_PUBLISHABLE_KEY,
     {
       cookies: {
         getAll() {

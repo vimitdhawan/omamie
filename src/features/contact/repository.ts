@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@/lib/supabase/server";
 import type { ContactInput } from "./types";
 import type { Database } from "@/lib/supabase/types";
 import { AppError } from "@/lib/types/error";
@@ -6,7 +6,7 @@ import { AppError } from "@/lib/types/error";
 type ContactInsert = Database["public"]["Tables"]["contact_messages"]["Insert"];
 
 export async function create(input: ContactInput) {
-  const supabase = await createClient();
+  const supabase = createServiceRoleClient();
   const contactInsert = mapContactInputToInsert(input);
 
   const { error } = await supabase

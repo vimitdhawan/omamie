@@ -40,7 +40,7 @@ export default defineConfig({
     url: baseURL,
     timeout: 120_000,
     reuseExistingServer: false,
-    // NOTE: NEXT_PUBLIC_* env must be present at `next build` time (they're
-    // inlined into the client bundle). The webServer block does not re-build.
+    // NOTE: Supabase env vars are server-only now (no NEXT_PUBLIC_* prefix),
+    // so they must be present when `npm run start` boots the server, not at build time.
   },
 });
