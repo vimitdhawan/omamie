@@ -1,3 +1,5 @@
+"use server";
+
 import {
   signUp as repoSignUp,
   signIn as repoSignIn,

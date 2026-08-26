@@ -81,6 +81,36 @@ test.describe("Contact page — form validation", () => {
   });
 });
 
+test.describe("Contact page — header auth state", () => {
+  // The public Header reads the `auth_session` cookie directly (no Supabase
+  // call, and /contact bypasses the proxy's auth check entirely as a public
+  // route), so these do not require the local Supabase stack.
+  test("shows Login when no session cookie is present", async ({ page }) => {
+    await page.goto("/contact");
+    await expect(page.getByRole("link", { name: /^Login$/i })).toBeVisible();
+  });
+
+  test("shows Logout when a session cookie is present", async ({ page }) => {
+    await page.context().addCookies([
+      {
+        name: "auth_session",
+        value: JSON.stringify({
+          profileId: "tenant-profile-123",
+          role: "tenant",
+        }),
+        domain: "127.0.0.1",
+        path: "/",
+        httpOnly: true,
+        secure: false,
+        sameSite: "Lax",
+      },
+    ]);
+
+    await page.goto("/contact");
+    await expect(page.getByRole("button", { name: /^Logout$/i })).toBeVisible();
+  });
+});
+
 test.skip("Contact page — successful submission (local Supabase)", () => {
   test("submits a valid message and shows success banner", async ({ page }) => {
     // This test requires the local Supabase stack running with the

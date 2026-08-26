@@ -37,6 +37,7 @@ src/
 ├── features/                  # Feature modules
 │   ├── auth/                  # Authentication module
 │   ├── properties/            # Property listings, searches, and management
+│   ├── find-property/         # Tenant property find requests
 │   ├── requirements/          # Tenant room/search criteria requirements
 │   ├── users/                 # User profiles, agent/tenant management
 │   └── dashboard/             # Agent/Owner dashboards
