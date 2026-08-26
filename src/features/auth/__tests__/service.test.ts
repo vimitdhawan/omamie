@@ -22,12 +22,19 @@ const { supabase, createClient } = vi.hoisted(() => {
 
 vi.mock("@/lib/supabase/server", () => ({ createClient }));
 
+const { getProfile: mockGetProfile } = vi.hoisted(() => {
+  return { getProfile: vi.fn() };
+});
+
+vi.mock("@/features/profile/service", () => ({
+  getProfile: mockGetProfile,
+}));
+
 import {
   signUp as repoSignUp,
   signIn as repoSignIn,
   signOut as repoSignOut,
   getUser as repoGetUser,
-  getProfile as repoGetProfile,
 } from "../repository";
 import { signup, login, logout, getCurrentUser } from "../service";
 
@@ -236,7 +243,7 @@ describe("auth repository — direct Supabase calls", () => {
   });
 });
 
-describe("auth repository — getUser + getProfile", () => {
+describe("auth repository — getUser", () => {
   it("getUser returns the auth user on success", async () => {
     supabase.auth.getUser.mockResolvedValueOnce({
       data: { user: { id: "u1", email: "user@example.com" } },
@@ -256,37 +263,6 @@ describe("auth repository — getUser + getProfile", () => {
     expect(user).toBeNull();
     expect(error).toEqual({ message: "JWT expired" });
   });
-
-  it("getProfile queries the profiles table by id and returns the row", async () => {
-    const profile = {
-      id: "u1",
-      email: "user@example.com",
-      full_name: "Ada",
-      role: "tenant" as const,
-      created_at: "2026-01-01T00:00:00Z",
-    };
-    const single = setFromChain(supabase, { data: profile, error: null });
-
-    const { profile: result, error } = await repoGetProfile("u1");
-    expect(error).toBeNull();
-    expect(result).toEqual(profile);
-    expect(single).toHaveBeenCalledTimes(1);
-  });
-
-  it("getProfile forwards the error when the row is missing", async () => {
-    setFromChain(supabase, {
-      data: null,
-      error: {
-        message: "JSON object requested, multiple (or no) rows returned",
-      },
-    });
-
-    const { profile, error } = await repoGetProfile("missing-id");
-    expect(profile).toBeNull();
-    expect(error).toEqual({
-      message: "JSON object requested, multiple (or no) rows returned",
-    });
-  });
 });
 
 describe("auth service — getCurrentUser orchestration", () => {
@@ -295,28 +271,23 @@ describe("auth service — getCurrentUser orchestration", () => {
       data: { user: null },
       error: null,
     });
-    setFromChain(supabase, {
-      data: null,
-      error: { message: "no rows" },
-    });
 
     const result = await getCurrentUser();
     expect(result).toEqual({ user: null, profile: null });
+    expect(mockGetProfile).not.toHaveBeenCalled();
   });
 
-  it("returns just the user when getUser succeeds but getProfile finds no row", async () => {
+  it("returns null profile when getProfile service returns null", async () => {
     supabase.auth.getUser.mockResolvedValueOnce({
       data: { user: { id: "u1", email: "user@example.com" } },
       error: null,
     });
-    setFromChain(supabase, {
-      data: null,
-      error: { message: "Row not found" },
-    });
+    mockGetProfile.mockResolvedValueOnce(null);
 
     const result = await getCurrentUser();
     expect(result.user).toEqual({ id: "u1", email: "user@example.com" });
     expect(result.profile).toBeNull();
+    expect(mockGetProfile).toHaveBeenCalledWith("u1");
   });
 
   it("returns user + profile when both succeed", async () => {
@@ -331,11 +302,12 @@ describe("auth service — getCurrentUser orchestration", () => {
       role: "tenant" as const,
       created_at: "2026-01-01T00:00:00Z",
     };
-    setFromChain(supabase, { data: profile, error: null });
+    mockGetProfile.mockResolvedValueOnce(profile);
 
     const result = await getCurrentUser();
     expect(result.user).toEqual({ id: "u1", email: "user@example.com" });
     expect(result.profile).toEqual(profile);
+    expect(mockGetProfile).toHaveBeenCalledWith("u1");
   });
 
   it("returns null user + null profile when getUser errors", async () => {
@@ -346,6 +318,6 @@ describe("auth service — getCurrentUser orchestration", () => {
 
     const result = await getCurrentUser();
     expect(result).toEqual({ user: null, profile: null });
-    expect(supabase.from).not.toHaveBeenCalled();
+    expect(mockGetProfile).not.toHaveBeenCalled();
   });
 });

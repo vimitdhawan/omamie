@@ -6,9 +6,15 @@ import {
   SignupActionState,
   LoginActionState,
 } from "./schema";
-import { login, signup, logout, getCurrentUser } from "./service";
+import { login, signup } from "./service";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import {
+  setAuthSession,
+  deleteAuthSession,
+  getRoleBasedRedirectPath,
+} from "@/lib/auth-session";
+import { getUserWithProfile } from "@/features/profile/repository";
 import { isAppError } from "@/lib/errors";
 
 export async function loginAction(
@@ -23,24 +29,42 @@ export async function loginAction(
     };
   }
   const { email, password } = validationResult.data;
+  let redirectPath: string | null = null;
 
   try {
     const result = await login({ email, password });
     if (!result.success) {
       return result as LoginActionState;
     }
-    await getCurrentUser();
+
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return { errorMessage: "Authentication failed. Please try again." };
+    }
+
+    const profile = await getUserWithProfile(supabase, user.id);
+    if (!profile) {
+      return { errorMessage: "Failed to load profile. Please try again." };
+    }
+
+    await setAuthSession(profile.id, profile.role);
+    redirectPath = getRoleBasedRedirectPath(profile.role);
   } catch (error) {
     if (isAppError(error)) {
       return { errorMessage: error.message };
     }
-    console.error("Unexpected error during login:", error);
     return {
       errorMessage: "An unexpected error occurred. Please try again later",
     };
   }
 
-  redirect("/list-property");
+  if (redirectPath) redirect(redirectPath);
+  return {
+    errorMessage: "An unexpected error occurred. Please try again later",
+  };
 }
 
 export async function handleSignup(
@@ -56,9 +80,26 @@ export async function handleSignup(
   }
 
   const { email, password, fullName, role } = validationResult.data;
+  let redirectPath: string | null = null;
 
   try {
     await signup({ email, password, fullName, role });
+
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return { errorMessage: "Authentication failed. Please try again." };
+    }
+
+    const profile = await getUserWithProfile(supabase, user.id);
+    if (!profile) {
+      return { errorMessage: "Failed to load profile. Please try again." };
+    }
+
+    await setAuthSession(profile.id, profile.role);
+    redirectPath = getRoleBasedRedirectPath(profile.role);
   } catch (error) {
     if (isAppError(error)) {
       return {
@@ -70,20 +111,20 @@ export async function handleSignup(
     };
   }
 
-  redirect("/list-property");
+  if (redirectPath) redirect(redirectPath);
+  return {
+    errorMessage: "Signup failed. Please try again.",
+  };
 }
 
 export async function logoutAction(): Promise<void> {
   try {
-    await logout();
-  } catch (error) {
-    if (isAppError(error)) {
-      console.error("Logout failed:", error.message);
-    } else {
-      console.error("Unexpected error during logout:", error);
-    }
     const supabase = await createClient();
     await supabase.auth.signOut({ scope: "local" });
+  } catch {
+    // Silently handle logout errors
   }
+
+  await deleteAuthSession();
   redirect("/login");
 }

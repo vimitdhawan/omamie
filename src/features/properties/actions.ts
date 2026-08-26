@@ -14,7 +14,7 @@ import {
   publishProperty,
   getProperty,
 } from "./service";
-import { getCurrentUser } from "@/features/auth/service";
+import { getAuthSession } from "@/lib/auth-session";
 import { isAppError } from "@/lib/errors";
 
 /**
@@ -36,12 +36,14 @@ export async function submitBasicDetailsAction(
   }
 
   try {
-    const { user, profile } = await getCurrentUser();
-    if (!user || !profile) {
-      return { errorMessage: "Please log in to continue" };
+    const session = await getAuthSession();
+    if (!session?.profileId) {
+      return {
+        errorMessage: "Profile not found. Please log in again.",
+      };
     }
 
-    if (profile.role !== "agent" && profile.role !== "owner") {
+    if (session.role !== "agent" && session.role !== "owner") {
       return {
         errorMessage: "Only agents and owners can list properties",
       };
@@ -50,7 +52,7 @@ export async function submitBasicDetailsAction(
     const propertyId = formData.get("propertyId") as string | null;
     const property = await saveBasicInfo(
       validationResult.data,
-      profile.id,
+      session.profileId,
       propertyId || undefined
     );
 
@@ -71,7 +73,6 @@ export async function submitBasicDetailsAction(
     if (isAppError(error)) {
       return { errorMessage: error.message };
     }
-    console.error("Basic details submission error:", error);
     return {
       errorMessage: "Failed to save property details. Please try again.",
     };
@@ -104,11 +105,6 @@ export async function submitAmenitiesAction(
   }
 
   try {
-    const { user, profile } = await getCurrentUser();
-    if (!user || !profile) {
-      return { errorMessage: "Please log in to continue" };
-    }
-
     const propertyId = data.propertyId as string;
     if (!propertyId) {
       return { errorMessage: "Property ID is required" };
@@ -138,7 +134,6 @@ export async function submitAmenitiesAction(
     if (isAppError(error)) {
       return { errorMessage: error.message };
     }
-    console.error("Amenities submission error:", error);
     return {
       errorMessage: "Failed to save property amenities. Please try again.",
     };
@@ -167,11 +162,6 @@ export async function submitReviewAction(
   }
 
   try {
-    const { user, profile } = await getCurrentUser();
-    if (!user || !profile) {
-      return { errorMessage: "Please log in to continue" };
-    }
-
     const propertyId = formData.get("propertyId") as string;
     if (!propertyId) {
       return { errorMessage: "Property ID is required" };
@@ -189,7 +179,6 @@ export async function submitReviewAction(
     if (isAppError(error)) {
       return { errorMessage: error.message };
     }
-    console.error("Review submission error:", error);
     return {
       errorMessage: "Failed to submit property listing. Please try again.",
     };

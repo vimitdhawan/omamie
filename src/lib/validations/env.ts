@@ -18,17 +18,9 @@ const parsed = envSchema.safeParse({
 });
 
 if (!parsed.success) {
-  const errorDetails = parsed.error.flatten().fieldErrors;
   if (isProd) {
-    console.error("❌ Invalid environment variables:", errorDetails);
     throw new Error(
       "Invalid environment variables. Please check your production configuration."
-    );
-  } else {
-    console.warn(
-      "⚠️ Missing or invalid environment variables. Using development placeholders. " +
-        "Copy .env.example to .env to set up actual credentials.",
-      errorDetails
     );
   }
 }
