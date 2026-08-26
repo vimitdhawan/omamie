@@ -1,10 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import {
-  getAuthSession,
-  deleteAuthSession,
-  getRoleBasedRedirectPath,
-} from "@/lib/auth-session";
+import { getRoleBasedRedirectPath } from "@/lib/auth-session";
 import { createMiddlewareClient } from "@/lib/supabase/server";
+import type { UserRole } from "@/types/auth";
 
 const ROUTE_CONFIG = {
   public: ["/", "/contact"],
@@ -39,11 +36,22 @@ function getAllowedRolesForRoute(
 }
 
 function matchPattern(pathname: string, pattern: string): boolean {
-  const regexPattern = pattern
-    .replace(/\/:path\*$/, "(?:/.*)?")
-    .replace(/:[^/]+/g, "[^/]+")
-    .replace(/\//g, "\\/");
-  const regex = new RegExp(`^${regexPattern}$`);
+  // Step 1: Escape all regex special characters to prevent injection
+  let regexStr = pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+  // Step 2: Un-escape forward slashes since we use them as delimiters
+  regexStr = regexStr.replace(/\\\//g, "/");
+
+  // Step 3: Handle Next.js wildcard syntax (/:path* → match anything after /)
+  regexStr = regexStr.replace(/\/:path\\\*$/, "(?:/.*)?");
+
+  // Step 4: Handle route parameters like :id → [^/]+
+  regexStr = regexStr.replace(/:([^/]+)/g, "[^/]+");
+
+  // Step 5: Escape forward slashes for regex
+  regexStr = regexStr.replace(/\//g, "\\/");
+
+  const regex = new RegExp(`^${regexStr}$`);
   return regex.test(pathname);
 }
 
@@ -84,6 +92,23 @@ export async function proxy(request: NextRequest) {
   return authMiddleware(request);
 }
 
+function getAuthSessionFromRequest(
+  request: NextRequest
+): { profileId: string; role: UserRole } | null {
+  const sessionCookie = request.cookies.get("auth_session")?.value;
+  if (!sessionCookie) return null;
+
+  try {
+    const parsed = JSON.parse(sessionCookie);
+    if (parsed.profileId && parsed.role) {
+      return parsed as { profileId: string; role: UserRole };
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 async function authMiddleware(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
   const response = NextResponse.next({ request });
@@ -105,11 +130,11 @@ async function authMiddleware(request: NextRequest): Promise<NextResponse> {
     return redirectToLogin(request);
   }
 
-  const session = await getAuthSession();
+  const session = getAuthSessionFromRequest(request);
 
   if (!session?.role) {
     await supabase.auth.signOut({ scope: "local" });
-    await deleteAuthSession();
+    response.cookies.delete("auth_session");
     return redirectToLogin(request);
   }
 
