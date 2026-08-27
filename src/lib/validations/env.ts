@@ -1,20 +1,22 @@
+import "server-only";
 import { z } from "zod";
 
 const envSchema = z.object({
-  NEXT_PUBLIC_SUPABASE_URL: z
+  SUPABASE_URL: z.string().url("SUPABASE_URL must be a valid URL"),
+  SUPABASE_PUBLISHABLE_KEY: z
     .string()
-    .url("NEXT_PUBLIC_SUPABASE_URL must be a valid URL"),
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z
+    .min(1, "SUPABASE_PUBLISHABLE_KEY cannot be empty"),
+  SUPABASE_SERVICE_ROLE_KEY: z
     .string()
-    .min(1, "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY cannot be empty"),
+    .min(1, "SUPABASE_SERVICE_ROLE_KEY cannot be empty"),
 });
 
 const isProd = process.env.NODE_ENV === "production";
 
 const parsed = envSchema.safeParse({
-  NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+  SUPABASE_URL: process.env.SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY,
+  SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
 });
 
 if (!parsed.success) {
@@ -26,14 +28,17 @@ if (!parsed.success) {
 }
 
 export const env = {
-  NEXT_PUBLIC_SUPABASE_URL: parsed.success
-    ? parsed.data.NEXT_PUBLIC_SUPABASE_URL
-    : process.env.NEXT_PUBLIC_SUPABASE_URL ||
-      "https://your-project.supabase.co",
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: parsed.success
-    ? parsed.data.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
-    : process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+  SUPABASE_URL: parsed.success
+    ? parsed.data.SUPABASE_URL
+    : process.env.SUPABASE_URL || "https://your-project.supabase.co",
+  SUPABASE_PUBLISHABLE_KEY: parsed.success
+    ? parsed.data.SUPABASE_PUBLISHABLE_KEY
+    : process.env.SUPABASE_PUBLISHABLE_KEY ||
       "your-publishable-key-placeholder",
+  SUPABASE_SERVICE_ROLE_KEY: parsed.success
+    ? parsed.data.SUPABASE_SERVICE_ROLE_KEY
+    : process.env.SUPABASE_SERVICE_ROLE_KEY ||
+      "your-service-role-key-placeholder",
 };
 
 export type Env = typeof env;

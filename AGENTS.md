@@ -103,7 +103,7 @@ To prevent linting conflicts, compilation errors, and Git merge issues, all agen
    ```
 2. **Build Validation**: Verify Next.js routes compile cleanly under production conditions:
    ```bash
-   NEXT_PUBLIC_SUPABASE_URL=https://dummy.supabase.co NEXT_PUBLIC_SUPABASE_ANON_KEY=dummy npm run build
+   SUPABASE_URL=https://dummy.supabase.co SUPABASE_PUBLISHABLE_KEY=dummy SUPABASE_SERVICE_ROLE_KEY=dummy npm run build
    ```
 3. **Pre-commit Integrity**: Commit hooks are set up via Husky and lint-staged. When modifying files, make sure to format with Prettier to avoid hook failures.
 4. **Test Verification**: New features or bug fixes MUST be accompanied by tests (see §7). Run the relevant tests before declaring a task complete:
@@ -171,8 +171,9 @@ npm run test:e2e:ui         # playwright interactive UI mode for local debugging
 - **Smoke vs flow**: pure smoke tests (home page, login form rendering) live in `home.spec.ts` and `auth.spec.ts` and don't depend on Supabase being seeded. Full authenticated flows belong in their own specs and assume the seed is applied.
 - **Environment for build**: when running E2E locally, build with the local API URL inlined:
   ```bash
-  NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 \
-  NEXT_PUBLIC_SUPABASE_ANON_KEY=<local-anon-key> \
+  SUPABASE_URL=http://127.0.0.1:54321 \
+  SUPABASE_PUBLISHABLE_KEY=<local-anon-key> \
+  SUPABASE_SERVICE_ROLE_KEY=<local-service-role-key> \
   npm run build
   npm run test:e2e
   ```
