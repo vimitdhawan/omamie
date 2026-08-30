@@ -4,7 +4,7 @@ import { createMiddlewareClient } from "@/lib/supabase/server";
 import type { UserRole } from "@/types/auth";
 
 const ROUTE_CONFIG = {
-  public: ["/", "/contact"],
+  public: ["/", "/contact", "/about", "/help", "/privacy", "/terms"],
   auth: ["/login", "/signup"],
   protected: [
     {
