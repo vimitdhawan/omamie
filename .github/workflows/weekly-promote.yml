@@ -1,0 +1,72 @@
+name: Weekly Prod Promotion
+
+on:
+  schedule:
+    - cron: '0 2 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  promote:
+    name: Create develop → main PR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for changes between develop and main
+        id: check_diff
+        run: |
+          git fetch origin develop main
+          AHEAD=$(git rev-list --left-right --count origin/main...origin/develop | awk '{print $2}')
+          if [ "$AHEAD" -eq 0 ]; then
+            echo "no_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "no_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check for existing open PR
+        id: check_pr
+        if: steps.check_diff.outputs.no_changes == 'false'
+        run: |
+          OPEN_PR_COUNT=$(gh pr list --base main --head develop --state open --json number --jq 'length')
+          if [ "$OPEN_PR_COUNT" -gt 0 ]; then
+            echo "pr_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "pr_exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create promotion PR
+        if: steps.check_diff.outputs.no_changes == 'false' && steps.check_pr.outputs.pr_exists == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_BODY: |
+            Automated weekly promotion of staging (develop) into production (main).
+
+            This PR contains all changes merged into `develop` since the last weekly promotion. Please review the changes and merge to deploy to production.
+
+            **Note:** This is an automated PR created by the weekly promotion workflow. You can safely delete and recreate it if needed.
+        run: |
+          gh pr create \
+            --base main \
+            --head develop \
+            --title "Weekly prod promotion: develop → main" \
+            --body "$PR_BODY"
+
+      - name: Log result
+        run: |
+          if [ "${{ steps.check_diff.outputs.no_changes }}" = "true" ]; then
+            echo "✓ No changes between develop and main, skipping PR creation"
+          elif [ "${{ steps.check_pr.outputs.pr_exists }}" = "true" ]; then
+            echo "✓ Open promotion PR already exists, skipping duplicate creation"
+          else
+            echo "✓ Promotion PR created successfully"
+          fi

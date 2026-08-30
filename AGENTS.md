@@ -206,7 +206,15 @@ npm run test:e2e:ui         # playwright interactive UI mode for local debugging
 - **`quality-and-build`** → lint + type-check + `next build`.
 - **`unit-tests`** → `npm run test:coverage` and uploads the coverage report artifact.
 - **`e2e-tests`** → installs Supabase CLI, starts the local stack, resets the DB (loads migrations + dev placeholder seed), applies the E2E seed via `psql -f e2e/supabase/seed.sql`, builds Next.js with the local API URL, runs `npm run test:e2e`, uploads the Playwright report artifact, then tears down the stack.
-- All three jobs run on every PR and every push to `main`/`master`. Branch protection should require all three to pass before merge.
+- All three jobs run on every PR and every push to `main` or `develop`. Branch protection should require all three to pass before merge.
+
+### 7.6 Branching & Release
+
+- **Feature work** → branch from `develop`, open PR into `develop`.
+- **`develop` branch** → CI-gated; every merge is auto-deployed to staging (Vercel). This is the validation environment.
+- **Weekly promotion** → an automated workflow (`weekly-promote.yml`) runs Monday at 02:00 UTC, opening a PR to promote `develop` → `main` if there are changes and no open promotion PR exists.
+- **`main` branch** → production environment. Auto-deploys to prod via Vercel on push; human merges the weekly promotion PR to trigger the deploy.
+- **All other branches** → feature branches and open PRs get per-PR preview deployments via Vercel (default behavior); not gated by the `git.deploymentEnabled` config.
 
 <!-- OPENSPEC:START -->
 
