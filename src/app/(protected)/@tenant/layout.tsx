@@ -1,7 +1,7 @@
 import { Header } from "@/components/custom/app-header";
 import { Toaster } from "@/components/ui/sonner";
 
-export default async function DashboardLayout({
+export default async function TenantLayout({
   children,
 }: {
   children: React.ReactNode;

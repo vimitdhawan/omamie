@@ -31,7 +31,21 @@ The project uses a strict feature-based layout:
 
 ```text
 src/
-├── app/                       # Next.js App Router (Public and Dashboard route groups)
+├── app/                       # Next.js App Router (Public and Protected route groups)
+│   ├── (public)/               # Public routes (login, signup, home, contact)
+│   └── (protected)/            # Role-based authenticated routes (parallel routes)
+│       ├── layout.tsx           # Role-check layout: dispatches to @tenant or @agentOwner slot
+│       ├── @tenant/             # Tenant app (parallel route slot)
+│       │   ├── layout.tsx        # Tenant app shell (header, nav, toaster)
+│       │   ├── find-property/    # Tenant: find properties
+│       │   │   └── page.tsx
+│       │   └── default.tsx       # Sibling slot fallback
+│       └── @agentOwner/          # Agent/Owner app (parallel route slot)
+│           ├── layout.tsx        # Agent/Owner app shell (header, nav, toaster)
+│           ├── list-property/    # Agent/Owner: manage properties
+│           │   ├── page.tsx       # Create/list properties
+│           │   └── [id]/page.tsx  # Edit property
+│           └── default.tsx       # Sibling slot fallback
 ├── components/                # Shared global components
 │   └── ui/                    # shadcn/ui base elements
 ├── features/                  # Feature modules
@@ -90,6 +104,15 @@ Next.js 16 makes dynamic APIs asynchronous. Be sure to use:
 ### Proxying and Intercepting
 
 - Intercept logic belongs in `src/proxy.ts`. Do not use `middleware.ts` (deprecated in Next.js 16).
+
+### Parallel Routes (Role-Based Conditional Rendering)
+
+The `(protected)` route group uses [Next.js Parallel Routes](https://nextjs.org/docs/app/api-reference/file-conventions/parallel-routes#conditional-routes) to render different app trees based on the logged-in user's role:
+
+- `src/app/(protected)/layout.tsx` checks the session's `role` field (via `getAuthSession()`) and returns either the `@tenant` or `@agentOwner` slot.
+- Each slot (`@tenant`, `@agentOwner`) is a complete, independent app with its own `layout.tsx`, routes, and components.
+- Each slot's `default.tsx` returns `null` — this handles the case where a sibling slot is active and this one's URL segments don't match.
+- URL gating (ensuring a role-mismatched user can't access the wrong slot's routes) is handled in `src/proxy.ts`, not in the layout.
 
 ---
 
