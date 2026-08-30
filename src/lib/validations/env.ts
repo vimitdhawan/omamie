@@ -20,11 +20,15 @@ const parsed = envSchema.safeParse({
 });
 
 if (!parsed.success) {
+  const errorMsg = `Invalid environment variables: ${parsed.error.toString()}`;
+
   if (isProd) {
-    throw new Error(
-      "Invalid environment variables. Please check your production configuration."
-    );
+    throw new Error(errorMsg);
   }
+
+  console.error(
+    `[ENV VALIDATION ERROR] ${errorMsg}. Using placeholder values, which will cause network errors on Supabase calls.`
+  );
 }
 
 export const env = {
