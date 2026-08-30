@@ -37,14 +37,12 @@ test.describe("Home page", () => {
     ).toBeVisible();
 
     // Footer navigation columns
-    await expect(footer.getByText(/Support/i)).toBeVisible();
-    await expect(footer.getByText(/Hosting/i)).toBeVisible();
+    await expect(footer.getByText(/Get Started/i)).toBeVisible();
     await expect(footer.getByText(/Company/i)).toBeVisible();
+    await expect(footer.getByText(/Follow Us/i)).toBeVisible();
 
     // Footer links
-    await expect(
-      footer.getByRole("link", { name: /Help Center/i })
-    ).toBeVisible();
+    await expect(footer.getByRole("link", { name: /FAQ/i })).toBeVisible();
     await expect(
       footer.getByRole("link", { name: /List Your Property/i })
     ).toBeVisible();
@@ -56,6 +54,5 @@ test.describe("Home page", () => {
 
     await expect(page.getByRole("link", { name: /Privacy/i })).toBeVisible();
     await expect(page.getByRole("link", { name: /Terms/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /Sitemap/i })).toBeVisible();
   });
 });

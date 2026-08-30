@@ -31,7 +31,21 @@ The project uses a strict feature-based layout:
 
 ```text
 src/
-├── app/                       # Next.js App Router (Public and Dashboard route groups)
+├── app/                       # Next.js App Router (Public and Protected route groups)
+│   ├── (public)/               # Public routes (login, signup, home, contact)
+│   └── (protected)/            # Role-based authenticated routes (parallel routes)
+│       ├── layout.tsx           # Role-check layout: dispatches to @tenant or @agentOwner slot
+│       ├── @tenant/             # Tenant app (parallel route slot)
+│       │   ├── layout.tsx        # Tenant app shell (header, nav, toaster)
+│       │   ├── find-property/    # Tenant: find properties
+│       │   │   └── page.tsx
+│       │   └── default.tsx       # Sibling slot fallback
+│       └── @agentOwner/          # Agent/Owner app (parallel route slot)
+│           ├── layout.tsx        # Agent/Owner app shell (header, nav, toaster)
+│           ├── list-property/    # Agent/Owner: manage properties
+│           │   ├── page.tsx       # Create/list properties
+│           │   └── [id]/page.tsx  # Edit property
+│           └── default.tsx       # Sibling slot fallback
 ├── components/                # Shared global components
 │   └── ui/                    # shadcn/ui base elements
 ├── features/                  # Feature modules
@@ -90,6 +104,15 @@ Next.js 16 makes dynamic APIs asynchronous. Be sure to use:
 ### Proxying and Intercepting
 
 - Intercept logic belongs in `src/proxy.ts`. Do not use `middleware.ts` (deprecated in Next.js 16).
+
+### Parallel Routes (Role-Based Conditional Rendering)
+
+The `(protected)` route group uses [Next.js Parallel Routes](https://nextjs.org/docs/app/api-reference/file-conventions/parallel-routes#conditional-routes) to render different app trees based on the logged-in user's role:
+
+- `src/app/(protected)/layout.tsx` checks the session's `role` field (via `getAuthSession()`) and returns either the `@tenant` or `@agentOwner` slot.
+- Each slot (`@tenant`, `@agentOwner`) is a complete, independent app with its own `layout.tsx`, routes, and components.
+- Each slot's `default.tsx` returns `null` — this handles the case where a sibling slot is active and this one's URL segments don't match.
+- URL gating (ensuring a role-mismatched user can't access the wrong slot's routes) is handled in `src/proxy.ts`, not in the layout.
 
 ---
 
@@ -183,7 +206,15 @@ npm run test:e2e:ui         # playwright interactive UI mode for local debugging
 - **`quality-and-build`** → lint + type-check + `next build`.
 - **`unit-tests`** → `npm run test:coverage` and uploads the coverage report artifact.
 - **`e2e-tests`** → installs Supabase CLI, starts the local stack, resets the DB (loads migrations + dev placeholder seed), applies the E2E seed via `psql -f e2e/supabase/seed.sql`, builds Next.js with the local API URL, runs `npm run test:e2e`, uploads the Playwright report artifact, then tears down the stack.
-- All three jobs run on every PR and every push to `main`/`master`. Branch protection should require all three to pass before merge.
+- All three jobs run on every PR and every push to `main` or `develop`. Branch protection should require all three to pass before merge.
+
+### 7.6 Branching & Release
+
+- **Feature work** → branch from `develop`, open PR into `develop`.
+- **`develop` branch** → CI-gated; every merge is auto-deployed to staging (Vercel). This is the validation environment.
+- **Weekly promotion** → an automated workflow (`weekly-promote.yml`) runs Monday at 02:00 UTC, opening a PR to promote `develop` → `main` if there are changes and no open promotion PR exists.
+- **`main` branch** → production environment. Auto-deploys to prod via Vercel on push; human merges the weekly promotion PR to trigger the deploy.
+- **All other branches** → feature branches and open PRs get per-PR preview deployments via Vercel (default behavior); not gated by the `git.deploymentEnabled` config.
 
 <!-- OPENSPEC:START -->
 
@@ -206,3 +237,13 @@ Use `@/openspec/AGENTS.md` to learn:
 Keep this managed block so 'openspec update' can refresh the instructions.
 
 <!-- OPENSPEC:END -->
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
