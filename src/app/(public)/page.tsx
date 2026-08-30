@@ -9,19 +9,17 @@ import { Footer } from "@/features/landing/components/footer";
 
 export default function HomePage() {
   return (
-    <>
-      <div className="flex min-h-screen flex-col overflow-x-hidden font-sans antialiased">
-        <main>
-          <Hero />
-          <PainPoints />
-          <HowItWorks />
-          <Benefits />
-          <StatsSection />
-          <CTASection />
-          <Contact />
-        </main>
-      </div>
+    <div className="flex min-h-screen flex-col overflow-x-hidden font-sans antialiased">
+      <main>
+        <Hero />
+        <PainPoints />
+        <HowItWorks />
+        <Benefits />
+        <StatsSection />
+        <CTASection />
+        <Contact />
+      </main>
       <Footer />
-    </>
+    </div>
   );
 }
