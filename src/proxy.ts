@@ -8,7 +8,7 @@ const ROUTE_CONFIG = {
   auth: ["/login", "/signup"],
   protected: [
     {
-      pattern: "/list-property/*",
+      pattern: "/properties/*",
       roles: ["agent", "owner"] as const,
     },
     {

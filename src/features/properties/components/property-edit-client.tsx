@@ -26,7 +26,7 @@ export function PropertyEditClient({
   };
 
   return (
-    <main className="min-h-screen bg-white px-4 pt-8 pb-12">
+    <div className="bg-white px-4 pt-8 pb-12">
       {property.nextAction === PropertyNextAction.BASIC_DETAILS && (
         <BasicDetailsForm property={property} onSuccess={handleFormSuccess} />
       )}
@@ -51,6 +51,6 @@ export function PropertyEditClient({
       {property.nextAction === PropertyNextAction.COMPLETED && (
         <SuccessMessage property={property} />
       )}
-    </main>
+    </div>
   );
 }

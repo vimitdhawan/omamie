@@ -49,6 +49,14 @@ export const AMENITIES: Record<string, string> = {
   sofa: "Sofa",
 } as const;
 
+export const PROPERTY_STATUSES: Record<string, string> = {
+  pending: "Pending",
+  review: "In Review",
+  active: "Active",
+  inactive: "Inactive",
+  rented: "Rented",
+} as const;
+
 // Step 1: Basic Property Details (Type, Title, Location, Rent, Bedrooms, Bathrooms, Description)
 // Client-side schema (for React Hook Form zodResolver)
 export const basicDetailsSchema = z.object({
