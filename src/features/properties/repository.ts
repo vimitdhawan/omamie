@@ -256,4 +256,93 @@ export async function getPendingListing(
   return data ? mapTableToProperty(data) : null;
 }
 
+/**
+ * Get all properties for a user with optional filtering
+ */
+export async function getPropertiesList(
+  profileId: string,
+  filters?: {
+    status?: PropertyStatus;
+    search?: string;
+  }
+): Promise<Property[]> {
+  const supabase = await createClient();
+
+  let query = supabase
+    .from("properties")
+    .select("*")
+    .eq("profile_id", profileId)
+    .order("created_at", { ascending: false });
+
+  if (filters?.status) {
+    query = query.eq("status", filters.status);
+  }
+
+  if (filters?.search) {
+    query = query.or(
+      `title.ilike.%${filters.search}%,location.ilike.%${filters.search}%`
+    );
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw new AppError("Failed to fetch properties", "FETCH_FAILED", {
+      originalError: error,
+    });
+  }
+
+  return data ? data.map(mapTableToProperty) : [];
+}
+
+/**
+ * Get properties count by status
+ */
+export async function getPropertiesCountByStatus(profileId: string): Promise<{
+  all: number;
+  active: number;
+  pending: number;
+  draft: number;
+  rented: number;
+}> {
+  const supabase = await createClient();
+
+  const { count: all } = await supabase
+    .from("properties")
+    .select("*", { count: "exact", head: true })
+    .eq("profile_id", profileId);
+
+  const { count: active } = await supabase
+    .from("properties")
+    .select("*", { count: "exact", head: true })
+    .eq("profile_id", profileId)
+    .eq("status", "active");
+
+  const { count: pending } = await supabase
+    .from("properties")
+    .select("*", { count: "exact", head: true })
+    .eq("profile_id", profileId)
+    .eq("status", "pending");
+
+  const { count: draft } = await supabase
+    .from("properties")
+    .select("*", { count: "exact", head: true })
+    .eq("profile_id", profileId)
+    .in("next_action", ["basic_details", "amenities", "review"]);
+
+  const { count: rented } = await supabase
+    .from("properties")
+    .select("*", { count: "exact", head: true })
+    .eq("profile_id", profileId)
+    .eq("status", "rented");
+
+  return {
+    all: all ?? 0,
+    active: active ?? 0,
+    pending: pending ?? 0,
+    draft: draft ?? 0,
+    rented: rented ?? 0,
+  };
+}
+
 export { mapBasicDetailsToInsert, mapAmenitiesDataToUpdate };
