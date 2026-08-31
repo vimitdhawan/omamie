@@ -256,4 +256,25 @@ export async function getPendingListing(
   return data ? mapTableToProperty(data) : null;
 }
 
+/**
+ * Get all properties owned by a specific profile
+ */
+export async function getPropertiesByProfileId(
+  profileId: string
+): Promise<Property[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("properties")
+    .select("*")
+    .eq("profile_id", profileId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return [];
+  }
+
+  return (data as PropertyTable[]).map(mapTableToProperty);
+}
+
 export { mapBasicDetailsToInsert, mapAmenitiesDataToUpdate };

@@ -8,7 +8,7 @@ import { FooterSocialLinks } from "@/features/landing/components/footer-social-l
 const footerLinks = {
   "Get Started": [
     { label: "Find a Property", href: "/find-property" },
-    { label: "List Your Property", href: "/list-property" },
+    { label: "List Your Property", href: "/properties/new" },
     { label: "FAQ", href: "/help" },
   ],
   Company: [

@@ -117,17 +117,17 @@ export function SuccessMessage({ property }: SuccessMessageProps) {
             {/* CTAs */}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Link
-                href="/list-property"
+                href="/properties/new"
                 className="border-primary text-primary hover:bg-primary/5 inline-flex h-12 items-center justify-center rounded-full border px-6 font-semibold transition-all"
               >
                 List Another Property
               </Link>
-              <button
-                disabled
-                className="border-outline-variant bg-surface-container-high text-on-surface-variant inline-flex h-12 cursor-not-allowed items-center justify-center rounded-full border px-6 font-semibold"
+              <Link
+                href="/properties"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex h-12 items-center justify-center rounded-full px-6 font-semibold transition-all"
               >
-                Dashboard Coming Soon
-              </button>
+                Go to Dashboard
+              </Link>
             </div>
           </div>
         </div>
