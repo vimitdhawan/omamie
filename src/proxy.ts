@@ -15,6 +15,10 @@ const ROUTE_CONFIG = {
       pattern: "/find-property/*",
       roles: ["tenant"] as const,
     },
+    {
+      pattern: "/admin/*",
+      roles: ["admin"] as const,
+    },
   ],
 } as const;
 

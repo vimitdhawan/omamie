@@ -55,3 +55,34 @@ function mapContactInputToInsert(input: ContactInput): ContactInsert {
     message: input.message,
   };
 }
+
+/**
+ * Get all contact messages (admin only)
+ * Returns all contact messages ordered by creation date (newest first)
+ */
+export async function getAll() {
+  const supabase = createServiceRoleClient();
+
+  const { data, error } = await supabase
+    .from("contact_messages")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new AppError("INTERNAL_ERROR", "Failed to fetch contact messages", {
+      cause: error,
+    });
+  }
+
+  return (
+    data?.map((row) => ({
+      id: row.id,
+      fullName: row.full_name,
+      email: row.email,
+      phone: row.phone,
+      subject: row.subject,
+      message: row.message,
+      createdAt: row.created_at,
+    })) || []
+  );
+}
