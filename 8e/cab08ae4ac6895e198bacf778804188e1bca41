@@ -1,0 +1,102 @@
+src/features/admin/components/user-table.tsx
+  s_219d2ed1f80427::t_1cdafa1aeb40c6 1-75
+src/features/admin/service.ts
+  s_219d2ed1f80427::t_38ad5e3bd106cb 1-74
+src/components/ui/avatar.tsx
+  s_219d2ed1f80427::t_9bb370dc5ad9f4 1-109
+src/features/admin/utils.ts
+  s_219d2ed1f80427::t_0575bb47faa9bd 1-85
+.env.example
+  s_219d2ed1f80427::t_dd5e03a42a42df 5-7
+src/features/admin/types.ts
+  s_219d2ed1f80427::t_223d794403cd10 1-63
+src/features/auth/schema.ts
+  s_219d2ed1f80427::t_fc20f1f31f6027 24-27,35,46
+src/components/ui/dropdown-menu.tsx
+  s_219d2ed1f80427::t_9bb370dc5ad9f4 1-268
+  s_219d2ed1f80427::t_d754f3e5dab384 269-271
+src/components/ui/dialog.tsx
+  s_219d2ed1f80427::t_43593b49d00cba 1-159
+src/features/admin/components/contact-message-list.tsx
+  s_219d2ed1f80427::t_1381669b72d8d2 1-86
+ADMIN_FEATURE.md
+  s_219d2ed1f80427::t_9be3040063a5a7 1-373
+  s_219d2ed1f80427::t_3675138aa9167a 374-376
+src/features/admin/email.ts
+  s_219d2ed1f80427::t_a02be6de088ff8 1-49
+src/components/ui/table.tsx
+  s_219d2ed1f80427::t_6aef3bfe1b7cc9 1-116
+src/lib/auth-session.ts
+  s_219d2ed1f80427::t_711ce2a737cc20 8
+src/proxy.ts
+  s_219d2ed1f80427::t_722e6d7d8caf5c 18-21
+src/features/admin/components/admin-sidebar.tsx
+  s_219d2ed1f80427::t_6aedaa926561d1 1-88
+src/app/(protected)/@admin/default.tsx
+  s_219d2ed1f80427::t_9eeebb5a21eff1 1-3
+src/features/admin/components/reply-dialog.tsx
+  s_219d2ed1f80427::t_e786d8ff8599a7 1-13,19-65,68,70-75,79-81,84,86-91,95-97,100,102-106,110-134
+  s_219d2ed1f80427::t_2b43c95bc8f32b 14-18
+  s_219d2ed1f80427::t_7fb22af277bed0 66-67,69,76-78,82-83,85,92-94,98-99,101,107-109
+src/app/(protected)/@admin/layout.tsx
+  s_219d2ed1f80427::t_ed7e994b8e7692 1-18
+supabase/migrations/20260901000000_add_admin_role.sql
+  s_219d2ed1f80427::t_0514af37e6aa30 1-133
+src/app/(protected)/@admin/dashboard/page.tsx
+  s_219d2ed1f80427::t_1e2d9190d06ffa 1-163
+src/app/(protected)/@admin/messages/page.tsx
+  s_219d2ed1f80427::t_b6c1dd6fe07969 1-21
+src/features/admin/components/stat-card.tsx
+  s_219d2ed1f80427::t_6bbf2c153b6f45 1-31
+  s_219d2ed1f80427::t_8c91b581e82f79 32-34
+package.json
+  s_219d2ed1f80427::t_7be5f6a806023f 34
+src/features/contact/repository.ts
+  s_219d2ed1f80427::t_8cc6eafef05901 58-88
+src/app/(protected)/layout.tsx
+  s_219d2ed1f80427::t_e842b08ea7b96d 7,11,18-20
+src/features/admin/repository.ts
+  s_219d2ed1f80427::t_9571cba3b1725c 180,183,190-193
+  s_219d2ed1f80427::t_e72a54538f04e7 3
+  s_219d2ed1f80427::t_098441e37de1fe 323
+  s_219d2ed1f80427::t_cfdc3dd8aef7f2 10-16
+  s_219d2ed1f80427::t_bb8eba55382426 337
+  s_219d2ed1f80427::t_f8da705bd62b6e 361
+  s_219d2ed1f80427::t_ce8e44202c4428 1-2,4-9,17-178,181-182,184-189,194-322,324-336,339-359,362-387,390-404
+  s_219d2ed1f80427::t_2926cbfbcc457f 179
+  s_219d2ed1f80427::t_a41858e30ec53b 360
+  s_219d2ed1f80427::t_26a6b9dd529eeb 388
+  s_219d2ed1f80427::t_ea02365f5b9bdc 389
+  s_219d2ed1f80427::t_94343b3f4e1622 338
+  s_219d2ed1f80427::t_72dae56acc352d 405-406
+src/features/admin/components/property-review-table.tsx
+  s_219d2ed1f80427::t_7591f38eceed0b 1-127
+src/features/admin/actions.ts
+  s_219d2ed1f80427::t_be0ac359512436 71-72
+  s_219d2ed1f80427::t_99377d72c02d5e 1-70,73-144
+src/app/(protected)/@admin/users/page.tsx
+  s_219d2ed1f80427::t_f14b29b4ac351d 1-21
+src/features/admin/schema.ts
+  s_219d2ed1f80427::t_48fb838d832d35 1-53
+src/app/(protected)/@admin/properties/page.tsx
+  s_219d2ed1f80427::t_60e742d33cfa78 1-42
+  s_219d2ed1f80427::t_7d6b1edcc8775a 43-45
+src/components/ui/badge.tsx
+  s_219d2ed1f80427::t_9bb370dc5ad9f4 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.15",
+  "base_commit_sha": "8ecab08ae4ac6895e198bacf778804188e1bca41",
+  "prompts": {},
+  "sessions": {
+    "s_219d2ed1f80427": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_fa73b03ddffe6zEXOPOKha9M8R",
+        "model": "claude-opus-4-5-20251101"
+      },
+      "human_author": "Vimit Dhawan <vimit.dhawan@foodpanda.com>"
+    }
+  }
+}
