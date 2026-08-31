@@ -18,18 +18,18 @@ export type PendingRequest = {
   id: string;
   type: "viewing" | "maintenance" | "application";
   title: string;
-  description: string;
-  propertyAddress?: string;
-  requesterName?: string;
+  requester: string;
+  date: string;
+  time: string;
   createdAt: string;
 };
 
 export type UpcomingViewing = {
   id: string;
-  propertyAddress: string;
+  propertyTitle: string;
+  requesterName: string;
   date: string;
   time: string;
-  attendeeCount: number;
 };
 
 export type RecentActivity = {

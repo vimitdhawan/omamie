@@ -15,7 +15,11 @@ import {
 } from "@/components/ui/sidebar";
 import { logoutAction } from "@/features/auth/actions";
 
-const navigation = [
+interface AppSidebarProps {
+  pendingRequestsCount?: number;
+}
+
+const getNavigation = (pendingCount: number = 0) => [
   {
     label: "Dashboard",
     href: "/dashboard",
@@ -30,7 +34,7 @@ const navigation = [
     label: "Viewing Requests",
     href: "/viewing-requests",
     icon: "calendar_today",
-    badge: 0, // Will be dynamic
+    badge: pendingCount,
   },
   {
     label: "Availability",
@@ -54,8 +58,9 @@ const navigation = [
   },
 ];
 
-export function AppSidebar() {
+export function AppSidebar({ pendingRequestsCount = 0 }: AppSidebarProps) {
   const pathname = usePathname();
+  const navigation = getNavigation(pendingRequestsCount);
 
   return (
     <Sidebar collapsible="icon">

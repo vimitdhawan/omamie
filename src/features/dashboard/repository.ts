@@ -6,6 +6,10 @@ import type {
   UpcomingViewing,
   RecentActivity,
 } from "./types";
+import {
+  getPendingRequestsCount,
+  getUpcomingViewings as getViewingRequestsUpcoming,
+} from "@/features/viewing-requests/repository";
 
 export async function getDashboardMetrics(
   profileId: string
@@ -25,14 +29,22 @@ export async function getDashboardMetrics(
     .eq("profile_id", profileId)
     .eq("status", "active");
 
-  // For now, return static data for metrics we'll implement later
+  // Get pending viewing requests count
+  const pendingRequestsCount = await getPendingRequestsCount(profileId);
+
+  // Get upcoming viewings
+  const upcomingViewings = await getViewingRequestsUpcoming(profileId, 1);
+  const nextViewing = upcomingViewings.length > 0 ? upcomingViewings[0] : null;
+
   return {
     activeListings: activeListings ?? 0,
     activeListingsChange: 0,
-    pendingRequests: 0,
-    pendingRequestsUrgent: 0,
-    upcomingViewings: 0,
-    nextViewing: null,
+    pendingRequests: pendingRequestsCount,
+    pendingRequestsUrgent: 0, // TODO: Calculate urgent requests (e.g., within 24 hours)
+    upcomingViewings: upcomingViewings.length,
+    nextViewing: nextViewing
+      ? `${nextViewing.requestedDate} ${nextViewing.requestedTimeStart}`
+      : null,
     totalProperties: totalProperties ?? 0,
     totalPropertiesActive: activeListings ?? 0,
   };
@@ -50,17 +62,58 @@ export async function getDashboardOverview(
 }
 
 export async function getPendingRequests(
-  _profileId: string
+  profileId: string
 ): Promise<PendingRequest[]> {
-  // Placeholder - will query viewing_requests and maintenance_requests tables
-  return [];
+  const supabase = await createClient();
+
+  // Get pending viewing requests
+  const { data: viewingRequests, error } = await supabase
+    .from("viewing_requests")
+    .select(
+      `
+      id,
+      requester_name,
+      requested_date,
+      requested_time_start,
+      created_at,
+      property:properties!inner (
+        title,
+        profile_id
+      )
+    `
+    )
+    .eq("property.profile_id", profileId)
+    .eq("status", "pending")
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  if (error) {
+    throw error;
+  }
+
+  return (viewingRequests || []).map((request) => ({
+    id: request.id,
+    type: "viewing",
+    title: `Viewing Request: ${request.property.title}`,
+    requester: request.requester_name,
+    date: request.requested_date,
+    time: request.requested_time_start,
+    createdAt: request.created_at,
+  }));
 }
 
 export async function getUpcomingViewings(
-  _profileId: string
+  profileId: string
 ): Promise<UpcomingViewing[]> {
-  // Placeholder - will query viewing_requests table
-  return [];
+  const viewings = await getViewingRequestsUpcoming(profileId, 5);
+
+  return viewings.map((viewing) => ({
+    id: viewing.id,
+    propertyTitle: viewing.propertyTitle,
+    requesterName: viewing.requesterName,
+    date: viewing.requestedDate,
+    time: `${viewing.requestedTimeStart} - ${viewing.requestedTimeEnd}`,
+  }));
 }
 
 export async function getRecentActivity(

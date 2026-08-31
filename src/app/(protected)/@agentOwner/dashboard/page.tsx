@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getAuthSession } from "@/lib/auth-session";
 import { redirect } from "next/navigation";
 import { getDashboardData } from "@/features/dashboard/service";
@@ -69,28 +70,32 @@ export default async function DashboardPage() {
               <h3 className="text-foreground text-[21px] font-bold">
                 Pending Requests
               </h3>
-              <button className="text-primary text-[16px] font-semibold hover:underline">
+              <Link
+                href="/viewing-requests?status=pending"
+                className="text-primary text-[16px] font-semibold hover:underline"
+              >
                 View All
-              </button>
+              </Link>
             </div>
             {data.pendingRequests.length === 0 ? (
               <EmptyState message="No pending requests at the moment." />
             ) : (
               <div className="space-y-2">
                 {data.pendingRequests.map((request) => (
-                  <div
+                  <a
                     key={request.id}
-                    className="border-border hover:bg-muted/50 flex items-start justify-between rounded-lg border p-4"
+                    href={`/viewing-requests/${request.id}`}
+                    className="border-border hover:bg-muted/50 block flex items-start justify-between rounded-lg border p-4"
                   >
                     <div>
                       <p className="text-foreground text-[16px] font-semibold">
                         {request.title}
                       </p>
                       <p className="text-muted-foreground text-[14px]">
-                        {request.description}
+                        {request.requester} • {request.date} at {request.time}
                       </p>
                     </div>
-                  </div>
+                  </a>
                 ))}
               </div>
             )}
@@ -102,18 +107,22 @@ export default async function DashboardPage() {
               <h3 className="text-foreground text-[21px] font-bold">
                 Upcoming Viewings
               </h3>
-              <button className="text-primary text-[16px] font-semibold hover:underline">
-                Calendar
-              </button>
+              <Link
+                href="/viewing-requests?status=accepted"
+                className="text-primary text-[16px] font-semibold hover:underline"
+              >
+                View All
+              </Link>
             </div>
             {data.upcomingViewings.length === 0 ? (
               <EmptyState message="No viewings scheduled." />
             ) : (
               <div className="space-y-2">
                 {data.upcomingViewings.map((viewing) => (
-                  <div
+                  <a
                     key={viewing.id}
-                    className="border-border hover:bg-muted/50 flex items-center gap-4 rounded-lg border p-4"
+                    href={`/viewing-requests/${viewing.id}`}
+                    className="border-border hover:bg-muted/50 block flex items-center gap-4 rounded-lg border p-4"
                   >
                     <div className="bg-primary/10 text-primary flex h-12 w-12 flex-col items-center justify-center rounded-lg">
                       <span className="text-sm font-bold">
@@ -127,13 +136,13 @@ export default async function DashboardPage() {
                     </div>
                     <div className="flex-1">
                       <p className="text-foreground text-[16px] font-semibold">
-                        {viewing.propertyAddress}
+                        {viewing.propertyTitle}
                       </p>
                       <p className="text-muted-foreground text-[14px]">
-                        {viewing.time} • {viewing.attendeeCount} Attendees
+                        {viewing.time} • {viewing.requesterName}
                       </p>
                     </div>
-                  </div>
+                  </a>
                 ))}
               </div>
             )}
