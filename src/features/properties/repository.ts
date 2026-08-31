@@ -9,6 +9,7 @@ import type {
   PropertyStatus,
   Amenity,
   PropertyNextAction,
+  PropertySearchFilters,
 } from "./types";
 import { AppError } from "@/lib/errors";
 
@@ -254,6 +255,85 @@ export async function getPendingListing(
   }
 
   return data ? mapTableToProperty(data) : null;
+}
+
+/**
+ * Search active properties with filters (for tenant browsing)
+ * Only returns properties with status = 'active'
+ */
+export async function searchActiveProperties(
+  filters: PropertySearchFilters
+): Promise<Property[]> {
+  const supabase = await createClient();
+
+  let query = supabase
+    .from("properties")
+    .select("*")
+    .eq("status", "active")
+    .order("created_at", { ascending: false });
+
+  // Apply location filter (partial match)
+  if (filters.location) {
+    query = query.ilike("location", `%${filters.location}%`);
+  }
+
+  // Apply property type filter
+  if (filters.propertyTypes && filters.propertyTypes.length > 0) {
+    query = query.in("property_type", filters.propertyTypes);
+  }
+
+  // Apply rent range filters
+  if (filters.minRent !== undefined) {
+    query = query.gte("monthly_rent", filters.minRent);
+  }
+  if (filters.maxRent !== undefined) {
+    query = query.lte("monthly_rent", filters.maxRent);
+  }
+
+  // Apply bedrooms filter
+  if (filters.bedrooms !== undefined) {
+    query = query.gte("bedrooms", filters.bedrooms);
+  }
+
+  // Apply furnished status filter
+  if (filters.furnishedStatus && filters.furnishedStatus.length > 0) {
+    query = query.in("furnished_status", filters.furnishedStatus);
+  }
+
+  // Apply amenities filter (property must have all requested amenities)
+  if (filters.amenities && filters.amenities.length > 0) {
+    query = query.contains("amenities", filters.amenities);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    return [];
+  }
+
+  return (data as PropertyTable[]).map(mapTableToProperty);
+}
+
+/**
+ * Get a single active property by ID (for public viewing by tenants)
+ */
+export async function getActivePropertyById(
+  id: string
+): Promise<Property | null> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("properties")
+    .select("*")
+    .eq("id", id)
+    .eq("status", "active")
+    .single();
+
+  if (error) {
+    return null;
+  }
+
+  return mapTableToProperty(data as PropertyTable);
 }
 
 export { mapBasicDetailsToInsert, mapAmenitiesDataToUpdate };

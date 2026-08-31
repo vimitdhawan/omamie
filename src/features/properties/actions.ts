@@ -6,13 +6,18 @@ import {
   basicInfoSchema,
   amenitiesSchema,
   reviewSchema,
+  searchFiltersSchema,
   type PropertyActionState,
 } from "./schema";
+import type { Property, PropertyWithMeta } from "./types";
+import type { ActionResult } from "@/types/actions";
 import {
   saveBasicInfo,
   saveAmenities,
   publishProperty,
   getProperty,
+  searchProperties,
+  getPropertyDetailForTenant,
 } from "./service";
 import { getAuthSession } from "@/lib/auth-session";
 import { isAppError } from "@/lib/errors";
@@ -181,6 +186,78 @@ export async function submitReviewAction(
     }
     return {
       errorMessage: "Failed to submit property listing. Please try again.",
+    };
+  }
+}
+
+/**
+ * Search active properties with filters (for tenant browsing)
+ * Returns active properties matching the search criteria
+ */
+export async function searchPropertiesAction(
+  filters: unknown
+): Promise<ActionResult<Property[]>> {
+  try {
+    const validationResult = searchFiltersSchema.safeParse(filters);
+
+    if (!validationResult.success) {
+      return {
+        success: false,
+        error: "Invalid search filters",
+      };
+    }
+
+    const properties = await searchProperties(validationResult.data);
+
+    return {
+      success: true,
+      data: properties,
+    };
+  } catch (error) {
+    if (isAppError(error)) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+    return {
+      success: false,
+      error: "Failed to search properties. Please try again.",
+    };
+  }
+}
+
+/**
+ * Get property detail with metadata for tenant viewing
+ * Includes saved status and viewing request status
+ */
+export async function getPropertyDetailAction(
+  id: string
+): Promise<ActionResult<PropertyWithMeta>> {
+  try {
+    const property = await getPropertyDetailForTenant(id);
+
+    if (!property) {
+      return {
+        success: false,
+        error: "Property not found or not available",
+      };
+    }
+
+    return {
+      success: true,
+      data: property,
+    };
+  } catch (error) {
+    if (isAppError(error)) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+    return {
+      success: false,
+      error: "Failed to load property details. Please try again.",
     };
   }
 }

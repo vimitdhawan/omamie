@@ -93,3 +93,20 @@ export type Property = {
   updatedAt?: string;
   listedAt?: string;
 };
+
+// Search and filter types for tenant property browsing
+export type PropertySearchFilters = {
+  location?: string;
+  propertyTypes?: PropertyType[];
+  minRent?: number;
+  maxRent?: number;
+  bedrooms?: number;
+  amenities?: Amenity[];
+  furnishedStatus?: FurnishedStatus[];
+};
+
+// Property with metadata for tenant viewing
+export type PropertyWithMeta = Property & {
+  hasRequested?: boolean; // Whether current user has a viewing request
+  isSaved?: boolean; // Whether current user saved this property
+};

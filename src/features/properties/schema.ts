@@ -137,3 +137,16 @@ export type PropertyActionState = {
   errorMessage?: string;
   success?: boolean;
 };
+
+// Search filters schema for tenant property browsing
+export const searchFiltersSchema = z.object({
+  location: z.string().optional(),
+  propertyTypes: z.array(propertyTypeSchema).optional(),
+  minRent: z.number().int().positive().optional(),
+  maxRent: z.number().int().positive().optional(),
+  bedrooms: z.number().int().min(0).max(20).optional(),
+  amenities: z.array(amenitySchema).optional(),
+  furnishedStatus: z.array(furnishedStatusSchema).optional(),
+});
+
+export type SearchFiltersData = z.infer<typeof searchFiltersSchema>;

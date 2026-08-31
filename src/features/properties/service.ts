@@ -1,5 +1,9 @@
 import type { BasicDetailsData, AmenitiesData } from "./schema";
-import type { Property } from "./types";
+import type {
+  Property,
+  PropertySearchFilters,
+  PropertyWithMeta,
+} from "./types";
 import {
   createProperty,
   getPropertyById,
@@ -8,7 +12,10 @@ import {
   getPendingListing as repoPendingListing,
   mapBasicDetailsToInsert,
   mapAmenitiesDataToUpdate,
+  searchActiveProperties,
+  getActivePropertyById,
 } from "./repository";
+import { getAuthSession } from "@/lib/auth-session";
 
 /**
  * Service layer for properties
@@ -87,6 +94,53 @@ export async function getPendingListing(
  */
 export async function getPropertyAction(id: string): Promise<Property | null> {
   return await getProperty(id);
+}
+
+/**
+ * Search active properties with filters
+ * Used by tenants to browse available properties
+ */
+export async function searchProperties(
+  filters: PropertySearchFilters
+): Promise<Property[]> {
+  return await searchActiveProperties(filters);
+}
+
+/**
+ * Get property detail for tenant viewing with metadata
+ * Includes whether the property is saved and if there's an active viewing request
+ */
+export async function getPropertyDetailForTenant(
+  id: string
+): Promise<PropertyWithMeta | null> {
+  const property = await getActivePropertyById(id);
+
+  if (!property) {
+    return null;
+  }
+
+  // Get current user session
+  const session = await getAuthSession();
+
+  if (!session?.profileId) {
+    // Not logged in - return property without metadata
+    return {
+      ...property,
+      hasRequested: false,
+      isSaved: false,
+    };
+  }
+
+  // TODO: Check if property is saved and if there's a viewing request
+  // This will be implemented once saved-properties and viewing-requests features are complete
+  const hasRequested = false; // await checkViewingRequestExists(id, session.profileId);
+  const isSaved = false; // await checkPropertySaved(id, session.profileId);
+
+  return {
+    ...property,
+    hasRequested,
+    isSaved,
+  };
 }
 
 // Backward compatibility aliases
