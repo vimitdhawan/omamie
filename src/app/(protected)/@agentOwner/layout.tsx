@@ -1,24 +1,20 @@
-import { AppSidebar } from "@/components/custom/app-sidebar";
-import { AppTopbar } from "@/components/custom/app-topbar";
+import { AppSidebar } from "@/features/agents/sidebar/components/app-sidebar";
+import { SiteHeader } from "@/features/agents/sidebar/components/site-header";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
-import { getPendingRequestsCountAction } from "@/features/viewing-requests/actions";
 
 export default async function AgentOwnerLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Fetch pending requests count for badge
-  const pendingCount = await getPendingRequestsCountAction();
-
   return (
-    <SidebarProvider defaultOpen>
+    <SidebarProvider>
       <div className="flex min-h-screen w-full">
-        <AppSidebar pendingRequestsCount={pendingCount} />
+        <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <AppTopbar />
-          <main className="flex-1">{children}</main>
+          <SiteHeader />
+          <main className="flex-1 overflow-auto">{children}</main>
         </div>
       </div>
       <Toaster />

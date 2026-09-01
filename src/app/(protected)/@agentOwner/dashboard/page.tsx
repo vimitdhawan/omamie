@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getDashboardData } from "@/features/dashboard/service";
 import { MetricCard } from "@/features/dashboard/components/metric-card";
 import { EmptyState } from "@/features/dashboard/components/empty-state";
+import { Button } from "@/components/ui/button";
 
 export default async function DashboardPage() {
   const session = await getAuthSession();
@@ -15,13 +16,21 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex-1 space-y-8 p-8">
-      <div>
-        <h1 className="text-foreground text-[28px] leading-tight font-bold">
-          Good morning.
-        </h1>
-        <p className="text-muted-foreground mt-2 text-[16px] leading-relaxed">
-          Here&apos;s what&apos;s happening with your properties today.
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-foreground text-[28px] leading-tight font-bold">
+            Good morning.
+          </h1>
+          <p className="text-muted-foreground mt-2 text-[16px] leading-relaxed">
+            Here&apos;s what&apos;s happening with your properties today.
+          </p>
+        </div>
+        <Link href="/properties/create">
+          <Button className="gap-2">
+            <span className="material-symbols-outlined text-[20px]">add</span>
+            Quick Listing
+          </Button>
+        </Link>
       </div>
 
       {/* Stats Grid */}
