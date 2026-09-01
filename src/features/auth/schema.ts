@@ -21,7 +21,10 @@ export type LoginActionState = {
 };
 
 // signup
-export const roleEnum = z.enum(["agent", "owner", "tenant"]);
+export const roleEnum = z.enum(["agent", "owner", "tenant", "admin"]);
+
+// Separate signup role enum - admin cannot self-register
+export const signupRoleEnum = z.enum(["agent", "owner", "tenant"]);
 
 export type UserRole = z.infer<typeof roleEnum>;
 
@@ -29,6 +32,7 @@ export const USER_ROLES = {
   agent: "Agent",
   owner: "Owner",
   tenant: "Tenant",
+  admin: "Admin",
 } as const;
 
 export const signupFormBaseSchema = z.object({
@@ -39,7 +43,7 @@ export const signupFormBaseSchema = z.object({
   password: PasswordInputValidation,
   confirmPassword: z.string(),
   fullName: z.string().min(1, "Full name is required"),
-  role: roleEnum,
+  role: signupRoleEnum,
 });
 
 // Add multiple refinements
