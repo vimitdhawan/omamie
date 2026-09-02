@@ -58,7 +58,7 @@ export async function submitBasicDetailsAction(
 
     // If creating new property, redirect to edit page
     if (!propertyId) {
-      redirect(`/list-property/${property.id}`);
+      redirect(`/properties/${property.id}/edit`);
     }
 
     return {
@@ -169,7 +169,7 @@ export async function submitReviewAction(
 
     await publishProperty(propertyId);
 
-    revalidatePath("/list-property");
+    revalidatePath("/properties");
 
     return {
       success: true,

@@ -12,7 +12,6 @@ const routeTitleMap: Record<string, string> = {
   "/tenants": "Tenants",
   "/maintenance": "Maintenance",
   "/settings": "Settings",
-  "/list-property": "Quick Listing",
 };
 
 export function SiteHeader() {

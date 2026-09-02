@@ -117,10 +117,10 @@ export function SuccessMessage({ property }: SuccessMessageProps) {
             {/* CTAs */}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Link
-                href="/list-property"
+                href="/properties"
                 className="border-primary text-primary hover:bg-primary/5 inline-flex h-12 items-center justify-center rounded-full border px-6 font-semibold transition-all"
               >
-                List Another Property
+                View All Properties
               </Link>
               <button
                 disabled
