@@ -263,6 +263,7 @@ export async function getPropertiesList(
   profileId: string,
   filters?: {
     status?: PropertyStatus;
+    propertyType?: PropertyType;
     search?: string;
   }
 ): Promise<Property[]> {
@@ -278,6 +279,10 @@ export async function getPropertiesList(
     query = query.eq("status", filters.status);
   }
 
+  if (filters?.propertyType) {
+    query = query.eq("property_type", filters.propertyType);
+  }
+
   if (filters?.search) {
     query = query.or(
       `title.ilike.%${filters.search}%,location.ilike.%${filters.search}%`
@@ -287,9 +292,7 @@ export async function getPropertiesList(
   const { data, error } = await query;
 
   if (error) {
-    throw new AppError("Failed to fetch properties", "FETCH_FAILED", {
-      originalError: error,
-    });
+    throw new AppError("INTERNAL_ERROR", "Failed to fetch properties");
   }
 
   return data ? data.map(mapTableToProperty) : [];
