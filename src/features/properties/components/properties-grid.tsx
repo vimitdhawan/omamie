@@ -46,7 +46,7 @@ export function PropertiesGrid({ properties }: PropertiesGridProps) {
       {properties.map((property) => (
         <Card
           key={property.id}
-          className="group cursor-pointer overflow-hidden transition-shadow hover:shadow-md"
+          className="group bg-primary/10 hover:bg-primary/20 cursor-pointer overflow-hidden transition-all hover:shadow-md"
           onClick={() => router.push(`/properties/${property.id}/edit`)}
         >
           {/* Image area */}

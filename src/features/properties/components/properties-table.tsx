@@ -1,135 +1,125 @@
-import Link from "next/link";
-import { BedDouble, Bath, MapPin } from "lucide-react";
+"use client";
+
+import * as React from "react";
+import { Table } from "@/components/ui/table";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+  DataTableHeader,
+  DataTableBody,
+  DataTablePagination,
+} from "@/components/custom/data-table";
+import { propertyColumns } from "./properties-columns";
 import type { Property } from "../types";
-
-const STATUS_BADGE_VARIANT: Record<
-  string,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
-  active: "default",
-  pending: "secondary",
-  review: "secondary",
-  rented: "outline",
-  inactive: "outline",
-};
-
-function getStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    active: "Published",
-    pending: "Draft",
-    review: "Review",
-    rented: "Rented",
-    inactive: "Inactive",
-  };
-  return labels[status] || status;
-}
-
-function derivePropertyCode(id: string): string {
-  return `PROP-${id.slice(-4).toUpperCase()}`;
-}
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) return "Today";
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-
-  return date.toLocaleDateString();
-}
 
 interface PropertiesTableProps {
   properties: Property[];
 }
 
+interface ColumnSort {
+  id: string;
+  desc: boolean;
+}
+
 export function PropertiesTable({ properties }: PropertiesTableProps) {
+  const [sorting, setSorting] = React.useState<ColumnSort[]>([]);
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  const sortedData = React.useMemo(() => {
+    const data = [...properties];
+    if (sorting.length > 0) {
+      const { id, desc } = sorting[0];
+      data.sort((a: Property, b: Property) => {
+        const aVal = (a as Record<string, unknown>)[id] as unknown;
+        const bVal = (b as Record<string, unknown>)[id] as unknown;
+        if (aVal === bVal) return 0;
+        if (aVal == null || bVal == null) return 0;
+        const result = String(aVal) > String(bVal) ? 1 : -1;
+        return desc ? -result : result;
+      });
+    }
+    return data;
+  }, [properties, sorting]);
+
+  const paginatedData = React.useMemo(() => {
+    const start = pagination.pageIndex * pagination.pageSize;
+    return sortedData.slice(start, start + pagination.pageSize);
+  }, [sortedData, pagination]);
+
+  const table: Record<string, unknown> = {
+    getAllColumns: () => propertyColumns,
+    getHeaderGroups: () => [
+      {
+        id: "header",
+        headers: propertyColumns.map((col, idx) => ({
+          id: col.id || `col-${idx}`,
+          column: {
+            columnDef: col,
+            getCanSort: () => col.enableSorting !== false,
+            getIsSorted: () => {
+              const s = sorting.find((s) => s.id === (col.id || `col-${idx}`));
+              return s ? (s.desc ? "desc" : "asc") : false;
+            },
+            getToggleSortingHandler: () => () => {
+              setSorting((old) => {
+                const sorted = old.find(
+                  (s) => s.id === (col.id || `col-${idx}`)
+                );
+                if (sorted) {
+                  if (sorted.desc) {
+                    return old.filter((s) => s.id !== (col.id || `col-${idx}`));
+                  }
+                  return old.map((s) =>
+                    s.id === (col.id || `col-${idx}`) ? { ...s, desc: true } : s
+                  );
+                }
+                return [{ id: col.id || `col-${idx}`, desc: false }, ...old];
+              });
+            },
+          },
+          getContext: () => ({}),
+        })),
+      },
+    ],
+    getRowModel: () => ({
+      rows: paginatedData.map((data, idx) => ({
+        id: data.id,
+        original: data,
+        getVisibleCells: () =>
+          propertyColumns.map((col, cidx) => ({
+            id: `${data.id}-${cidx}`,
+            column: { columnDef: col },
+            getContext: () => ({ row: { original: data, index: idx } }),
+          })),
+      })),
+    }),
+    getFilteredRowModel: () => ({ rows: sortedData }),
+    getState: () => ({ pagination, sorting }),
+    getPageCount: () => Math.ceil(sortedData.length / pagination.pageSize),
+    getCanPreviousPage: () => pagination.pageIndex > 0,
+    getCanNextPage: () =>
+      pagination.pageIndex <
+      Math.ceil(sortedData.length / pagination.pageSize) - 1,
+    previousPage: () =>
+      setPagination((old) => ({ ...old, pageIndex: old.pageIndex - 1 })),
+    nextPage: () =>
+      setPagination((old) => ({ ...old, pageIndex: old.pageIndex + 1 })),
+    setPageIndex: (index: number) =>
+      setPagination((old) => ({ ...old, pageIndex: index })),
+    setPageSize: (size: number) =>
+      setPagination((old) => ({ ...old, pageIndex: 0, pageSize: size })),
+  };
+
   return (
-    <div className="border-border overflow-hidden rounded-lg border">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Property</TableHead>
-            <TableHead>Location</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Rent / mo</TableHead>
-            <TableHead>Details</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Updated</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {properties.map((property) => (
-            <TableRow
-              key={property.id}
-              className="hover:bg-muted/50 cursor-pointer transition-colors"
-            >
-              <TableCell>
-                <Link
-                  href={`/properties/${property.id}/edit`}
-                  className="hover:underline"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="bg-muted flex h-12 w-12 flex-shrink-0 items-center justify-center rounded">
-                      <div className="text-muted-foreground text-sm">📷</div>
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold">{property.title}</p>
-                      <p className="text-muted-foreground text-xs">
-                        {derivePropertyCode(property.id)}
-                      </p>
-                    </div>
-                  </div>
-                </Link>
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-1 text-sm">
-                  <MapPin className="text-muted-foreground size-4" />
-                  {property.location}
-                </div>
-              </TableCell>
-              <TableCell className="text-sm">{property.propertyType}</TableCell>
-              <TableCell className="text-sm font-medium">
-                ₹{property.monthlyRent.toLocaleString()}
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-3 text-sm">
-                  <div className="flex items-center gap-1">
-                    <BedDouble className="text-muted-foreground size-4" />
-                    {property.bedrooms}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Bath className="text-muted-foreground size-4" />
-                    {property.bathrooms}
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                <Badge
-                  variant={STATUS_BADGE_VARIANT[property.status] || "default"}
-                >
-                  {getStatusLabel(property.status)}
-                </Badge>
-              </TableCell>
-              <TableCell className="text-muted-foreground text-sm">
-                {formatDate(property.updatedAt || property.createdAt)}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+    <div className="space-y-4">
+      <div className="border-border overflow-hidden rounded-lg border">
+        <Table>
+          <DataTableHeader table={table} />
+          <DataTableBody table={table} emptyMessage="No properties found" />
+        </Table>
+      </div>
+      <DataTablePagination table={table} />
     </div>
   );
 }

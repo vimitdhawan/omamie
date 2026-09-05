@@ -41,17 +41,18 @@ export function ReviewForm({ property, onSuccess, onBack }: ReviewFormProps) {
       toast.error(state.errorMessage);
     }
     if (state?.success) {
-      toast.success("Property published!");
       if (onSuccess) {
+        toast.success("Property published!");
+        // Don't change the status here - keep original so success page can determine
+        // if this was a first-time create (status: pending) or an update (status: review/active/etc)
         const updatedProperty = {
           ...property,
           nextAction: PropertyNextAction.COMPLETED,
-          status: "review" as const,
         };
         onSuccess(updatedProperty);
       }
     }
-  }, [state]);
+  }, [state, property, onSuccess]);
 
   return (
     <div className="mx-auto max-w-[720px]">

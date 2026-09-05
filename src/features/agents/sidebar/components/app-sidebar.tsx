@@ -25,7 +25,7 @@ const navigationItems = [
     icon: <LayoutDashboard className="size-4" />,
   },
   {
-    label: "Manage Properties",
+    label: "Properties",
     href: "/properties",
     icon: <Files className="size-4" />,
   },

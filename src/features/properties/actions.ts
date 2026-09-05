@@ -16,6 +16,23 @@ import {
 } from "./service";
 import { getAuthSession } from "@/lib/auth-session";
 import { isAppError } from "@/lib/errors";
+import { getPropertiesList } from "./repository";
+import type { PropertyStatus, PropertyType } from "./types";
+
+/**
+ * Fetch filtered properties list for client-side instant filtering
+ * Called from properties-client.tsx via useTransition for instant table updates
+ */
+export async function getPropertiesListAction(
+  profileId: string,
+  filters?: {
+    status?: PropertyStatus;
+    propertyType?: PropertyType;
+    search?: string;
+  }
+) {
+  return getPropertiesList(profileId, filters);
+}
 
 /**
  * Submit basic property details (Step 1)
