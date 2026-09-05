@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MapPin, Edit2, Eye, Share2, Trash2, TrendingUp } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ShowInterestButton } from "@/features/property-matches/components/show-interest-button";
 
 function getStatusLabel(status: string): string {
   const labels: Record<string, string> = {
@@ -43,7 +44,6 @@ export default async function PropertyDetailPage({
 
   return (
     <div className="flex-1 space-y-8 p-8">
-      {/* Header */}
       <div className="rounded-lg bg-blue-50 p-6">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -72,9 +72,7 @@ export default async function PropertyDetailPage({
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        {/* Main Content */}
         <div className="space-y-8 lg:col-span-2">
-          {/* Property Details */}
           <div>
             <h3 className="mb-4 text-[20px] font-bold">Property Details</h3>
             <div className="grid grid-cols-2 gap-4">
@@ -105,7 +103,6 @@ export default async function PropertyDetailPage({
             </div>
           </div>
 
-          {/* Description */}
           {property.description && (
             <div>
               <h3 className="mb-3 text-[20px] font-bold">Description</h3>
@@ -115,7 +112,6 @@ export default async function PropertyDetailPage({
             </div>
           )}
 
-          {/* Amenities */}
           {property.amenities.length > 0 && (
             <div>
               <h3 className="mb-3 text-[20px] font-bold">Amenities</h3>
@@ -129,7 +125,6 @@ export default async function PropertyDetailPage({
             </div>
           )}
 
-          {/* Performance & Analytics */}
           <div>
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-[20px] font-bold">Performance & Analytics</h3>
@@ -172,9 +167,7 @@ export default async function PropertyDetailPage({
           </div>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6 lg:col-span-1">
-          {/* Actions */}
           <div className="space-y-3 rounded-lg border p-6">
             <h3 className="mb-4 text-[20px] font-bold">Actions</h3>
             <Link href={`/properties/${property.id}/edit`} className="block">
@@ -213,7 +206,6 @@ export default async function PropertyDetailPage({
             </Button>
           </div>
 
-          {/* Photos */}
           <div className="rounded-lg border p-6">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="text-[16px] font-bold">Photos</h3>
@@ -239,6 +231,8 @@ export default async function PropertyDetailPage({
               ))}
             </div>
           </div>
+
+          <ShowInterestButton propertyId={property.id} />
         </div>
       </div>
     </div>

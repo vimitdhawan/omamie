@@ -7,10 +7,8 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 const routeTitleMap: Record<string, string> = {
   "/dashboard": "Dashboard",
   "/properties": "Manage Properties",
-  "/viewing-requests": "Viewing Requests",
-  "/availability": "Availability",
+  "/matches": "Matches",
   "/tenants": "Tenants",
-  "/maintenance": "Maintenance",
   "/settings": "Settings",
 };
 

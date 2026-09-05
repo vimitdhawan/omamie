@@ -12,9 +12,7 @@ import {
   LayoutDashboard,
   Files,
   Calendar,
-  Clock,
   Users,
-  Wrench,
   Settings,
   Plus,
 } from "lucide-react";
@@ -32,24 +30,14 @@ const navigationItems = [
     icon: <Files className="size-4" />,
   },
   {
-    label: "Viewing Requests",
-    href: "/viewing-requests",
+    label: "Matches",
+    href: "/matches",
     icon: <Calendar className="size-4" />,
-  },
-  {
-    label: "Availability",
-    href: "/availability",
-    icon: <Clock className="size-4" />,
   },
   {
     label: "Tenants",
     href: "/tenants",
     icon: <Users className="size-4" />,
-  },
-  {
-    label: "Maintenance",
-    href: "/maintenance",
-    icon: <Wrench className="size-4" />,
   },
   {
     label: "Settings",
