@@ -16,6 +16,23 @@ import {
 } from "./service";
 import { getAuthSession } from "@/lib/auth-session";
 import { isAppError } from "@/lib/errors";
+import { getPropertiesList } from "./repository";
+import type { PropertyStatus, PropertyType } from "./types";
+
+/**
+ * Fetch filtered properties list for client-side instant filtering
+ * Called from properties-client.tsx via useTransition for instant table updates
+ */
+export async function getPropertiesListAction(
+  profileId: string,
+  filters?: {
+    status?: PropertyStatus;
+    propertyType?: PropertyType;
+    search?: string;
+  }
+) {
+  return getPropertiesList(profileId, filters);
+}
 
 /**
  * Submit basic property details (Step 1)
@@ -58,7 +75,7 @@ export async function submitBasicDetailsAction(
 
     // If creating new property, redirect to edit page
     if (!propertyId) {
-      redirect(`/list-property/${property.id}`);
+      redirect(`/properties/${property.id}/edit`);
     }
 
     return {
@@ -169,7 +186,7 @@ export async function submitReviewAction(
 
     await publishProperty(propertyId);
 
-    revalidatePath("/list-property");
+    revalidatePath("/properties");
 
     return {
       success: true,
