@@ -29,7 +29,7 @@ const STATUS_OPTIONS: { label: string; value: MatchStatus | "all" }[] = [
 
 export function MatchesClient({
   initialMatches,
-  _profileId,
+  profileId: _profileId,
 }: MatchesClientProps) {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 

@@ -5,6 +5,8 @@ import type {
   CreateMatchInput,
   MatchCounts,
   MatchFilter,
+  InitiatedBy,
+  MatchStatus,
 } from "./types";
 import { AppError } from "@/lib/errors";
 
@@ -40,7 +42,8 @@ export async function getMatchesByProfileId(
 ): Promise<PropertyMatchWithProperty[]> {
   const supabase = await createClient();
 
-  let query = supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let query: any = (supabase as any)
     .from("property_matches")
     .select(
       `
@@ -49,7 +52,7 @@ export async function getMatchesByProfileId(
     `
     )
     .eq("property_owner_id", profileId)
-    .order("created_at", { ascending: false }) as unknown;
+    .order("created_at", { ascending: false });
 
   if (filters?.status) {
     query = query.eq("status", filters.status);
@@ -99,7 +102,8 @@ export async function getMatchById(
 ): Promise<PropertyMatchWithProperty | null> {
   const supabase = await createClient();
 
-  const { data, error } = await (supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const query: any = (supabase as any)
     .from("property_matches")
     .select(
       `
@@ -108,8 +112,9 @@ export async function getMatchById(
     `
     )
     .eq("id", matchId)
-    .eq("property_owner_id", profileId)
-    .single() as unknown);
+    .eq("property_owner_id", profileId);
+
+  const { data, error } = await query.single();
 
   if (error) {
     return null;
@@ -135,13 +140,15 @@ export async function getMatchById(
 }
 
 export async function getMatchCounts(profileId: string): Promise<MatchCounts> {
-  // Fetch all matches for the user's properties
   const supabase = await createClient();
 
-  const { data: allMatches, error } = await (supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const query: any = (supabase as any)
     .from("property_matches")
     .select(`id, status`)
-    .eq("property_owner_id", profileId) as unknown);
+    .eq("property_owner_id", profileId);
+
+  const { data: allMatches, error } = await query;
 
   if (error || !allMatches) {
     return { all: 0, interested: 0, approved: 0, rejected: 0 };
@@ -163,11 +170,14 @@ export async function getPendingMatchesCount(
 ): Promise<number> {
   const supabase = await createClient();
 
-  const { data, error } = await (supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const query: any = (supabase as any)
     .from("property_matches")
     .select(`id, status`)
     .eq("property_owner_id", profileId)
-    .eq("status", "interested") as unknown);
+    .eq("status", "interested");
+
+  const { data, error } = await query;
 
   if (error || !data) {
     return 0;
@@ -183,17 +193,21 @@ export async function createMatch(
   const supabase = await createServiceRoleClient();
 
   // Fetch property to get owner_id
-  const { data: property, error: propertyError } = await supabase
-    .from("properties")
-    .select("profile_id")
-    .eq("id", input.propertyId)
-    .single();
+  const { data: property, error: propertyError } =
+    await // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((supabase as any)
+      .from("properties")
+      .select("profile_id")
+      .eq("id", input.propertyId)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .single() as any);
 
   if (propertyError || !property) {
     throw new AppError("INTERNAL_ERROR", "Failed to fetch property");
   }
 
-  const { data, error } = await (supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const query: any = (supabase as any)
     .from("property_matches")
     .insert({
       property_id: input.propertyId,
@@ -203,8 +217,9 @@ export async function createMatch(
       initiated_by: "tenant",
       status: "interested",
     })
-    .select()
-    .single() as unknown);
+    .select();
+
+  const { data, error } = await query.single();
 
   if (error) {
     throw new AppError("INTERNAL_ERROR", "Failed to create match");
@@ -220,7 +235,8 @@ export async function updateMatchStatus(
 ): Promise<PropertyMatch> {
   const supabase = await createClient();
 
-  const { data, error } = await (supabase
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const query: any = (supabase as any)
     .from("property_matches")
     .update({
       status: newStatus,
@@ -228,8 +244,9 @@ export async function updateMatchStatus(
       updated_at: new Date().toISOString(),
     })
     .eq("id", matchId)
-    .select()
-    .single() as unknown);
+    .select();
+
+  const { data, error } = await query.single();
 
   if (error) {
     throw new AppError("INTERNAL_ERROR", "Failed to update match status");

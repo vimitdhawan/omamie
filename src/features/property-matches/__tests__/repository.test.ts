@@ -32,7 +32,8 @@ describe("Property Matches Repository", () => {
       };
 
       vi.mocked(supabaseServer.createClient).mockResolvedValue(
-        mockClient as unknown
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockClient as any
       );
 
       const result = await repository.getMatchCounts("owner-1");
@@ -54,7 +55,8 @@ describe("Property Matches Repository", () => {
       };
 
       vi.mocked(supabaseServer.createClient).mockResolvedValue(
-        mockClient as unknown
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockClient as any
       );
 
       const result = await repository.getMatchCounts("owner-1");
@@ -78,7 +80,8 @@ describe("Property Matches Repository", () => {
       };
 
       vi.mocked(supabaseServer.createClient).mockResolvedValue(
-        mockClient as unknown
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockClient as any
       );
 
       const result = await repository.getMatchCounts("owner-1");
@@ -109,7 +112,8 @@ describe("Property Matches Repository", () => {
       };
 
       vi.mocked(supabaseServer.createClient).mockResolvedValue(
-        mockClient as unknown
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockClient as any
       );
 
       const result = await repository.getPendingMatchesCount("owner-1");
@@ -134,7 +138,8 @@ describe("Property Matches Repository", () => {
       };
 
       vi.mocked(supabaseServer.createClient).mockResolvedValue(
-        mockClient as unknown
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockClient as any
       );
 
       const result = await repository.getPendingMatchesCount("owner-1");
@@ -176,7 +181,8 @@ describe("Property Matches Repository", () => {
       };
 
       vi.mocked(supabaseServer.createClient).mockResolvedValue(
-        mockClient as unknown
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockClient as any
       );
 
       const result = await repository.getMatchesByProfileId("owner-1");
@@ -217,7 +223,8 @@ describe("Property Matches Repository", () => {
       };
 
       vi.mocked(supabaseServer.createClient).mockResolvedValue(
-        mockClient as unknown
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockClient as any
       );
 
       await expect(repository.getMatchesByProfileId("owner-1")).rejects.toThrow(
@@ -238,7 +245,8 @@ describe("Property Matches Repository", () => {
       };
 
       vi.mocked(supabaseServer.createClient).mockResolvedValue(
-        mockClient as unknown
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        mockClient as any
       );
 
       const result = await repository.getMatchesByProfileId("owner-1", {

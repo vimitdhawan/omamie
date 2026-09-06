@@ -67,7 +67,8 @@ export function MatchesTable({ matches }: MatchesTableProps) {
     return sortedData.slice(start, start + pagination.pageSize);
   }, [sortedData, pagination]);
 
-  const table: Record<string, unknown> = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const table: any = {
     getAllColumns: () => matchColumns,
     getHeaderGroups: () => [
       {
