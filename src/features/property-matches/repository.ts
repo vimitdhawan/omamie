@@ -23,11 +23,11 @@ interface DatabasePropertyMatch {
 function mapDatabaseMatch(row: DatabasePropertyMatch): PropertyMatch {
   return {
     id: row.id,
-    propertyId: row.property_id,
-    tenantId: row.tenant_id,
-    propertyOwnerId: row.property_owner_id,
-    initiatedBy: row.initiated_by,
-    status: row.status,
+    propertyId: row.property_id as string,
+    tenantId: row.tenant_id as string,
+    propertyOwnerId: row.property_owner_id as string,
+    initiatedBy: row.initiated_by as unknown as InitiatedBy,
+    status: row.status as unknown as MatchStatus,
     notes: row.notes,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -49,7 +49,7 @@ export async function getMatchesByProfileId(
     `
     )
     .eq("property_owner_id", profileId)
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false }) as unknown;
 
   if (filters?.status) {
     query = query.eq("status", filters.status);
@@ -68,16 +68,8 @@ export async function getMatchesByProfileId(
   const { data, error } = await query;
 
   if (error) {
-    console.error("[getMatchesByProfileId] Query error:", error);
     throw new AppError("INTERNAL_ERROR", "Failed to fetch property matches");
   }
-
-  console.log(
-    "[getMatchesByProfileId] Found matches:",
-    data?.length || 0,
-    "for profileId:",
-    profileId
-  );
 
   return (data || []).map(
     (
@@ -107,7 +99,7 @@ export async function getMatchById(
 ): Promise<PropertyMatchWithProperty | null> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase
     .from("property_matches")
     .select(
       `
@@ -117,7 +109,7 @@ export async function getMatchById(
     )
     .eq("id", matchId)
     .eq("property_owner_id", profileId)
-    .single();
+    .single() as unknown);
 
   if (error) {
     return null;
@@ -146,27 +138,14 @@ export async function getMatchCounts(profileId: string): Promise<MatchCounts> {
   // Fetch all matches for the user's properties
   const supabase = await createClient();
 
-  const { data: allMatches, error } = await supabase
+  const { data: allMatches, error } = await (supabase
     .from("property_matches")
     .select(`id, status`)
-    .eq("property_owner_id", profileId);
+    .eq("property_owner_id", profileId) as unknown);
 
-  if (error) {
-    console.error("[getMatchCounts] Query error:", error);
+  if (error || !allMatches) {
     return { all: 0, interested: 0, approved: 0, rejected: 0 };
   }
-
-  if (!allMatches) {
-    console.warn("[getMatchCounts] No data returned but no error");
-    return { all: 0, interested: 0, approved: 0, rejected: 0 };
-  }
-
-  console.log(
-    "[getMatchCounts] Found matches:",
-    allMatches.length,
-    "for profileId:",
-    profileId
-  );
 
   const matches = allMatches as Array<{ id: string; status: string }>;
   const counts = {
@@ -184,11 +163,11 @@ export async function getPendingMatchesCount(
 ): Promise<number> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase
     .from("property_matches")
     .select(`id, status`)
     .eq("property_owner_id", profileId)
-    .eq("status", "interested");
+    .eq("status", "interested") as unknown);
 
   if (error || !data) {
     return 0;
@@ -211,18 +190,10 @@ export async function createMatch(
     .single();
 
   if (propertyError || !property) {
-    console.error("[createMatch] Property fetch error:", propertyError);
     throw new AppError("INTERNAL_ERROR", "Failed to fetch property");
   }
 
-  console.log(
-    "[createMatch] Creating match for property:",
-    input.propertyId,
-    "owner_id:",
-    property.profile_id
-  );
-
-  const { data, error } = await supabase
+  const { data, error } = await (supabase
     .from("property_matches")
     .insert({
       property_id: input.propertyId,
@@ -233,14 +204,11 @@ export async function createMatch(
       status: "interested",
     })
     .select()
-    .single();
+    .single() as unknown);
 
   if (error) {
-    console.error("[createMatch] Insert error:", error);
     throw new AppError("INTERNAL_ERROR", "Failed to create match");
   }
-
-  console.log("[createMatch] Successfully created match:", data.id);
 
   return mapDatabaseMatch(data as DatabasePropertyMatch);
 }
@@ -252,7 +220,7 @@ export async function updateMatchStatus(
 ): Promise<PropertyMatch> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase
     .from("property_matches")
     .update({
       status: newStatus,
@@ -261,7 +229,7 @@ export async function updateMatchStatus(
     })
     .eq("id", matchId)
     .select()
-    .single();
+    .single() as unknown);
 
   if (error) {
     throw new AppError("INTERNAL_ERROR", "Failed to update match status");
