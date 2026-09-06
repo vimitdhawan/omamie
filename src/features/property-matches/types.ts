@@ -1,10 +1,11 @@
 export type MatchStatus = "interested" | "approved" | "rejected";
-export type InitiatedBy = "tenant" | "agent";
+export type InitiatedBy = "tenant" | "agent" | "owner";
 
 export interface PropertyMatch {
   id: string;
   propertyId: string;
   tenantId: string;
+  propertyOwnerId: string;
   initiatedBy: InitiatedBy;
   status: MatchStatus;
   notes: string | null;
