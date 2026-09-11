@@ -3,8 +3,8 @@ import type { AuthSession, UserRole } from "@/types/auth";
 
 const ROLE_BASED_DEFAULTS: Record<UserRole, string> = {
   tenant: "/find-property",
-  agent: "/list-property",
-  owner: "/list-property",
+  agent: "/properties/create",
+  owner: "/properties/create",
 };
 
 export function getRoleBasedRedirectPath(role: UserRole): string {

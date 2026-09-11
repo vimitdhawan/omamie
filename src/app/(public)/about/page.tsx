@@ -122,7 +122,7 @@ export default function AboutPage() {
               Find a Property
             </Link>
             <Link
-              href="/list-property"
+              href="/properties/create"
               className="border-hairline bg-canvas text-ink hover:bg-surface-soft inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors"
             >
               List Your Property

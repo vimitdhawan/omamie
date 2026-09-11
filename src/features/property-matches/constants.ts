@@ -1,0 +1,1 @@
+export const HARDCODED_TENANT_ID = "1c7488dd-b9fa-4986-96d1-f8d3a4736181";

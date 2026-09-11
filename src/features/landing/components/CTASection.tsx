@@ -21,7 +21,7 @@ export default function CTASection() {
           Find Property
           <ArrowRight className="h-4 w-4" />
         </Button>
-        <Link href="/list-property">
+        <Link href="/properties/create">
           <Button variant="outline" size="default">
             List Your Property
           </Button>

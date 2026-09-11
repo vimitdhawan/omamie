@@ -333,7 +333,7 @@ test.describe("Find Property Page", () => {
       expect(response.headers().location).toContain("/find-property");
     });
 
-    test("agent visiting / is redirected to /list-property", async ({
+    test("agent visiting / is redirected to /properties/create", async ({
       page,
     }) => {
       await page.context().addCookies([
@@ -355,10 +355,10 @@ test.describe("Find Property Page", () => {
         maxRedirects: 0,
       });
       expect(response.status()).toBe(307);
-      expect(response.headers().location).toContain("/list-property");
+      expect(response.headers().location).toContain("/properties/create");
     });
 
-    test("owner visiting / is redirected to /list-property", async ({
+    test("owner visiting / is redirected to /properties/create", async ({
       page,
     }) => {
       await page.context().addCookies([
@@ -380,14 +380,14 @@ test.describe("Find Property Page", () => {
         maxRedirects: 0,
       });
       expect(response.status()).toBe(307);
-      expect(response.headers().location).toContain("/list-property");
+      expect(response.headers().location).toContain("/properties/create");
     });
 
-    test("logged-out visitor stays on the marketing home page", async ({
+    test("logged-out visitor is redirected to login from root", async ({
       page,
     }) => {
       await page.goto("/");
-      await expect(page).toHaveURL(/\/$/, { timeout: 10000 });
+      await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
     });
   });
 });

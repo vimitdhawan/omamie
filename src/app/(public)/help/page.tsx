@@ -46,7 +46,10 @@ const faqs: FAQItem[] = [
     answer: (
       <p>
         Visit our{" "}
-        <Link href="/list-property" className="text-primary hover:underline">
+        <Link
+          href="/properties/create"
+          className="text-primary hover:underline"
+        >
           List Your Property
         </Link>{" "}
         page to get started. You&apos;ll provide detailed information about your
