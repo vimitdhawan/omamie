@@ -383,11 +383,11 @@ test.describe("Find Property Page", () => {
       expect(response.headers().location).toContain("/properties/create");
     });
 
-    test("logged-out visitor stays on the marketing home page", async ({
+    test("logged-out visitor is redirected to login from root", async ({
       page,
     }) => {
       await page.goto("/");
-      await expect(page).toHaveURL(/\/$/, { timeout: 10000 });
+      await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
     });
   });
 });
