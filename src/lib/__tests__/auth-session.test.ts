@@ -139,14 +139,14 @@ describe("Auth Session Helpers", () => {
       expect(path).toBe("/find-property");
     });
 
-    it("should return /list-property for agent", () => {
+    it("should return /properties/create for agent", () => {
       const path = getRoleBasedRedirectPath("agent");
-      expect(path).toBe("/list-property");
+      expect(path).toBe("/properties/create");
     });
 
-    it("should return /list-property for owner", () => {
+    it("should return /properties/create for owner", () => {
       const path = getRoleBasedRedirectPath("owner");
-      expect(path).toBe("/list-property");
+      expect(path).toBe("/properties/create");
     });
 
     it("should have consistent mapping for all roles", () => {
