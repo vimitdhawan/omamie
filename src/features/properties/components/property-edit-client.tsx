@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import { BasicDetailsForm } from "./basic-info-form";
 import { AmenitiesForm } from "./amenities-form";
+import { ImagesForm } from "./images-form";
 import { ReviewForm } from "./review-form";
 import { SuccessMessage } from "./success-message";
 import type { Property } from "../types";
@@ -49,6 +50,19 @@ export function PropertyEditClient({
         <AmenitiesForm property={property} onSuccess={handleFormSuccess} />
       )}
 
+      {resolvedNextAction === PropertyNextAction.PHOTOS && (
+        <ImagesForm
+          property={property}
+          onSuccess={handleFormSuccess}
+          onBack={() =>
+            handleFormBack({
+              ...property,
+              nextAction: PropertyNextAction.AMENITIES,
+            })
+          }
+        />
+      )}
+
       {resolvedNextAction === PropertyNextAction.REVIEW && (
         <ReviewForm
           property={property}
@@ -56,7 +70,7 @@ export function PropertyEditClient({
           onBack={() =>
             handleFormBack({
               ...property,
-              nextAction: PropertyNextAction.AMENITIES,
+              nextAction: PropertyNextAction.PHOTOS,
             })
           }
         />

@@ -88,7 +88,7 @@ export function AmenitiesForm({ property, onSuccess }: AmenitiesFormProps) {
         ...property,
         furnishedStatus,
         amenities,
-        nextAction: PropertyNextAction.REVIEW,
+        nextAction: PropertyNextAction.PHOTOS,
       };
 
       onSuccess(updatedProperty);

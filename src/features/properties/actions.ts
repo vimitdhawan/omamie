@@ -11,9 +11,11 @@ import {
 import {
   saveBasicInfo,
   saveAmenities,
+  saveImages,
   publishProperty,
   getProperty,
 } from "./service";
+import { uploadPropertyImage, deleteImagePaths } from "./storage";
 import { getAuthSession } from "@/lib/auth-session";
 import { isAppError } from "@/lib/errors";
 import { getPropertiesList } from "./repository";
@@ -158,7 +160,111 @@ export async function submitAmenitiesAction(
 }
 
 /**
- * Submit review & confirm (Step 3)
+ * Submit images (Step 3)
+ * Uploads new images, saves paths to property, cleans up removed images from storage
+ * Sets next_action to "review"
+ */
+export async function submitImagesAction(
+  _prev: PropertyActionState | null,
+  formData: FormData
+): Promise<PropertyActionState> {
+  const propertyId = formData.get("propertyId") as string | null;
+  if (!propertyId) {
+    return { errorMessage: "Property ID is required" };
+  }
+
+  try {
+    const session = await getAuthSession();
+    if (!session?.profileId) {
+      return {
+        errorMessage: "Profile not found. Please log in again.",
+      };
+    }
+
+    // Role check
+    if (session.role !== "agent" && session.role !== "owner") {
+      return {
+        errorMessage: "Only agents and owners can upload property images",
+      };
+    }
+
+    // Ownership check
+    const property = await getProperty(propertyId);
+    if (!property) {
+      return { errorMessage: "Property not found" };
+    }
+    if (property.profileId !== session.profileId) {
+      return {
+        errorMessage: "You do not have permission to edit this property",
+      };
+    }
+
+    // Parse inputs
+    const keepImagePathsJson = formData.get("keepImagePaths") as string | null;
+    const keepImagePaths = keepImagePathsJson
+      ? JSON.parse(keepImagePathsJson)
+      : [];
+    const newFiles = formData.getAll("images") as File[];
+
+    // Validate count
+    if (keepImagePaths.length + newFiles.length > 10) {
+      return {
+        errorMessage: "Maximum 10 images allowed",
+      };
+    }
+
+    // Step 1: Upload new files to storage
+    const newPaths: string[] = [];
+    for (const file of newFiles) {
+      try {
+        const path = await uploadPropertyImage(
+          session.profileId,
+          propertyId,
+          file
+        );
+        newPaths.push(path);
+      } catch (err) {
+        return {
+          errorMessage: `Failed to upload image: ${err instanceof Error ? err.message : "Unknown error"}`,
+        };
+      }
+    }
+
+    // Step 2: Compute final list and persist to DB (source of truth)
+    const finalPaths = [...keepImagePaths, ...newPaths];
+    await saveImages({ images: finalPaths }, propertyId);
+
+    // Step 3: Compute removed paths and delete from storage
+    const currentPaths = property.images || [];
+    const removedPaths = currentPaths.filter(
+      (p) => !keepImagePaths.includes(p)
+    );
+
+    if (removedPaths.length > 0) {
+      try {
+        await deleteImagePaths(removedPaths);
+      } catch (err) {
+        // Log but don't fail the whole action if storage cleanup fails
+        console.error("Failed to delete orphaned images:", err);
+      }
+    }
+
+    return {
+      success: true,
+      errorMessage: undefined,
+    };
+  } catch (error) {
+    if (isAppError(error)) {
+      return { errorMessage: error.message };
+    }
+    return {
+      errorMessage: "Failed to save images. Please try again.",
+    };
+  }
+}
+
+/**
+ * Submit review & confirm (Step 4)
  * Verifies terms acceptance and accuracy confirmation
  * Changes property status to "active" and next_action to "completed"
  * Redirects to success page

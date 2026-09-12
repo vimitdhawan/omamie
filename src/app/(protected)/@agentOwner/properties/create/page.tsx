@@ -23,6 +23,7 @@ export default async function CreatePropertyPage() {
     description: null,
     furnishedStatus: "unfurnished",
     amenities: [],
+    images: [],
     status: "pending",
     nextAction: PropertyNextAction.BASIC_DETAILS,
     createdAt: now,
