@@ -4,6 +4,7 @@ import type {
   Property,
   BasicDetailsInput,
   AmenitiesInput,
+  ImagesInput,
   PropertyType,
   FurnishedStatus,
   PropertyStatus,
@@ -55,7 +56,19 @@ function mapAmenitiesDataToUpdate(
   };
 }
 
+function mapImagesDataToUpdate(
+  data: ImagesInput,
+  nextAction: string
+): Partial<PropertyUpdateTable> {
+  return {
+    images: data.images,
+    next_action: nextAction,
+    updated_at: new Date().toISOString(),
+  } as Partial<PropertyUpdateTable>;
+}
+
 function mapTableToProperty(table: PropertyTable): Property {
+  const tableWithImages = table as PropertyTable & { images?: string[] | null };
   return {
     id: table.id,
     profileId: table.profile_id,
@@ -68,6 +81,7 @@ function mapTableToProperty(table: PropertyTable): Property {
     bathrooms: table.bathrooms,
     furnishedStatus: table.furnished_status as FurnishedStatus,
     amenities: (table.amenities || []) as Amenity[],
+    images: (tableWithImages.images || []) as string[],
     status: table.status as PropertyStatus,
     nextAction: table.next_action as PropertyNextAction,
     createdAt: table.created_at,
@@ -348,4 +362,8 @@ export async function getPropertiesCountByStatus(profileId: string): Promise<{
   };
 }
 
-export { mapBasicDetailsToInsert, mapAmenitiesDataToUpdate };
+export {
+  mapBasicDetailsToInsert,
+  mapAmenitiesDataToUpdate,
+  mapImagesDataToUpdate,
+};

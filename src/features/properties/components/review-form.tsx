@@ -5,6 +5,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
+import { getPublicImageUrl } from "@/lib/storage-url";
 import {
   Card,
   CardContent,
@@ -56,7 +57,7 @@ export function ReviewForm({ property, onSuccess, onBack }: ReviewFormProps) {
 
   return (
     <div className="mx-auto max-w-[720px]">
-      <PropertyStepper currentStep={3} />
+      <PropertyStepper currentStep={4} />
 
       <Card className="bg-surface-soft/50 border-gray-200">
         <CardHeader>
@@ -84,6 +85,26 @@ export function ReviewForm({ property, onSuccess, onBack }: ReviewFormProps) {
                 <h3 className="text-on-surface text-lg font-semibold">
                   Review Summary
                 </h3>
+
+                {/* Images */}
+                {property.images && property.images.length > 0 && (
+                  <div className="bg-surface-container-low rounded-lg p-4">
+                    <p className="text-on-surface-variant mb-3 text-xs font-bold tracking-wider uppercase">
+                      Images ({property.images.length})
+                    </p>
+                    <div className="grid grid-cols-4 gap-2 md:grid-cols-6">
+                      {property.images.map((imagePath, index) => (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          key={index}
+                          src={getPublicImageUrl(imagePath)}
+                          alt={`Image ${index + 1}`}
+                          className="bg-surface-container-highest h-16 w-full rounded object-cover"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <div className="bg-surface-container-low grid grid-cols-1 gap-6 rounded-lg p-4 md:grid-cols-2">
                   {/* Listing Details */}

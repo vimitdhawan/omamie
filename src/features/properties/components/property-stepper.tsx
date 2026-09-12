@@ -10,12 +10,13 @@ import {
 } from "@/components/reui/stepper";
 
 interface PropertyStepperProps {
-  currentStep: 1 | 2 | 3;
+  currentStep: 1 | 2 | 3 | 4;
 }
 
 const STEPS = [
   { label: "Basic Details" },
   { label: "Amenities" },
+  { label: "Photos" },
   { label: "Review" },
 ];
 

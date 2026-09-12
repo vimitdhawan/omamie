@@ -39,6 +39,7 @@ export const PropertyStatus = {
 export const PropertyNextAction = {
   BASIC_DETAILS: "basic_details",
   AMENITIES: "amenities",
+  PHOTOS: "photos",
   REVIEW: "review",
   COMPLETED: "completed",
 } as const;
@@ -75,6 +76,10 @@ export type AmenitiesInput = {
   amenities: Amenity[];
 };
 
+export type ImagesInput = {
+  images: string[];
+};
+
 export type Property = {
   id: string;
   profileId: string;
@@ -87,6 +92,7 @@ export type Property = {
   bathrooms: number;
   furnishedStatus: FurnishedStatus;
   amenities: Amenity[];
+  images: string[];
   status: PropertyStatus;
   nextAction: PropertyNextAction;
   createdAt: string;

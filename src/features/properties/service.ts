@@ -1,4 +1,4 @@
-import type { BasicDetailsData, AmenitiesData } from "./schema";
+import type { BasicDetailsData, AmenitiesData, ImagesData } from "./schema";
 import type { Property } from "./types";
 import {
   createProperty,
@@ -8,6 +8,7 @@ import {
   getPendingListing as repoPendingListing,
   mapBasicDetailsToInsert,
   mapAmenitiesDataToUpdate,
+  mapImagesDataToUpdate,
 } from "./repository";
 
 /**
@@ -54,6 +55,18 @@ export async function saveAmenities(
   propertyId: string
 ): Promise<Property> {
   const stepData = mapAmenitiesDataToUpdate(data, "review");
+  return await updateProperty(propertyId, stepData);
+}
+
+/**
+ * Save images
+ * Updates property with images and sets next_action to "review"
+ */
+export async function saveImages(
+  data: ImagesData,
+  propertyId: string
+): Promise<Property> {
+  const stepData = mapImagesDataToUpdate(data, "review");
   return await updateProperty(propertyId, stepData);
 }
 

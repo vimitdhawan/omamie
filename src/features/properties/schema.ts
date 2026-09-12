@@ -110,7 +110,14 @@ export const amenitiesSchema = z.object({
   amenities: z.array(amenitySchema),
 });
 
-// Step 3: Review & Confirm (Terms & Accuracy)
+// Step 3: Images Upload (0-10 images)
+export const imagesSchema = z.object({
+  images: z
+    .array(z.string().min(1, "Image path required"))
+    .max(10, "Maximum 10 images allowed"),
+});
+
+// Step 4: Review & Confirm (Terms & Accuracy)
 export const reviewSchema = z.object({
   acceptTerms: z.literal(true, {
     message: "You must accept the terms and conditions",
@@ -128,6 +135,7 @@ export const listPropertySchema = basicDetailsSchema
 // Type inference with purpose-based names
 export type BasicDetailsData = z.infer<typeof basicDetailsSchema>;
 export type AmenitiesData = z.infer<typeof amenitiesSchema>;
+export type ImagesData = z.infer<typeof imagesSchema>;
 export type ReviewData = z.infer<typeof reviewSchema>;
 export type ListPropertyFormData = z.infer<typeof listPropertySchema>;
 
