@@ -58,6 +58,18 @@ export const basicDetailsSchema = z.object({
     .min(5, "Property title must be at least 5 characters")
     .max(100, "Property title must be less than 100 characters"),
   location: z.string().min(3, "Location is required"),
+  latitude: z
+    .number({
+      message: "Latitude must be a number",
+    })
+    .min(-90, "Invalid latitude")
+    .max(90, "Invalid latitude"),
+  longitude: z
+    .number({
+      message: "Longitude must be a number",
+    })
+    .min(-180, "Invalid longitude")
+    .max(180, "Invalid longitude"),
   monthlyRent: z
     .number({
       message: "Monthly rent must be a number",
@@ -75,6 +87,10 @@ export const basicDetailsSchema = z.object({
     .min(1, "At least 1 bathroom is required")
     .max(20, "Maximum 20 bathrooms allowed"),
   description: z.string().max(1000, "Description is too long").optional(),
+  buildingName: z
+    .string()
+    .max(200, "Building name must be less than 200 characters")
+    .optional(),
 });
 
 // Server-side schema (for FormData validation with coerce)
@@ -85,6 +101,21 @@ export const basicInfoSchema = z.object({
     .min(5, "Property title must be at least 5 characters")
     .max(100, "Property title must be less than 100 characters"),
   location: z.string().min(3, "Location is required"),
+  locationSelected: z.literal("true", {
+    message: "Please select a neighbourhood from the suggestions",
+  }),
+  latitude: z.coerce
+    .number({
+      message: "Latitude must be a number",
+    })
+    .min(-90, "Invalid latitude")
+    .max(90, "Invalid latitude"),
+  longitude: z.coerce
+    .number({
+      message: "Longitude must be a number",
+    })
+    .min(-180, "Invalid longitude")
+    .max(180, "Invalid longitude"),
   monthlyRent: z.coerce
     .number({
       message: "Monthly rent must be a number",
@@ -102,6 +133,11 @@ export const basicInfoSchema = z.object({
     .min(1, "At least 1 bathroom is required")
     .max(20, "Maximum 20 bathrooms allowed"),
   description: z.string().max(1000, "Description is too long").optional(),
+  buildingName: z
+    .string()
+    .max(200, "Building name must be less than 200 characters")
+    .optional(),
+  locationContext: z.string().optional(),
 });
 
 // Step 2: Amenities & Features (Furnished Status, Amenities)

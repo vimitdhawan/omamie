@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -19,10 +19,11 @@ import {
 } from "@/components/ui/card";
 
 import { PropertyStepper } from "./property-stepper";
+import { LocationAutocomplete } from "./location-autocomplete";
 import { submitBasicDetailsAction } from "../actions";
 import { basicDetailsSchema, type BasicDetailsData } from "../schema";
 import { PROPERTY_TYPES } from "../schema";
-import type { Property, PropertyType } from "../types";
+import type { Property, PropertyType, Location } from "../types";
 import { PropertyNextAction } from "../types";
 import { cn } from "@/lib/utils";
 import { hasBasicDetailsChanged } from "../utils/change-detection";
@@ -47,6 +48,13 @@ export function BasicDetailsForm({
     submitBasicDetailsAction,
     null
   );
+  const [locationDetails, setLocationDetails] = useState<Location | undefined>(
+    property.locationDetails || undefined
+  );
+  const [hasSelectedLocation, setHasSelectedLocation] = useState(
+    !!property.locationDetails
+  );
+  const [locationTouched, setLocationTouched] = useState(false);
 
   const form = useForm<BasicDetailsData>({
     resolver: zodResolver(basicDetailsSchema),
@@ -55,12 +63,37 @@ export function BasicDetailsForm({
       propertyType: property.propertyType || "apartment",
       title: property.title || "",
       location: property.location || "",
+      latitude: property.locationDetails?.latitude ?? undefined,
+      longitude: property.locationDetails?.longitude ?? undefined,
       monthlyRent: property.monthlyRent || undefined,
       bedrooms: property.bedrooms || 1,
       bathrooms: property.bathrooms || 1,
       description: property.description || "",
+      buildingName: property.locationDetails?.addressLine2 || "",
     },
   });
+
+  const handleLocationChange = (displayText: string, details?: Location) => {
+    form.setValue("location", displayText);
+    form.clearErrors("location");
+
+    if (details) {
+      form.setValue("latitude", details.latitude);
+      form.setValue("longitude", details.longitude);
+      form.clearErrors("latitude");
+      form.clearErrors("longitude");
+      setLocationDetails(details);
+      setHasSelectedLocation(true);
+      setLocationTouched(false);
+    } else {
+      // User is typing without a fresh selection — invalidate any previous selection
+      setHasSelectedLocation(false);
+    }
+  };
+
+  const handleLocationBlur = () => {
+    setLocationTouched(true);
+  };
 
   useEffect(() => {
     if (state?.errors) {
@@ -118,11 +151,55 @@ export function BasicDetailsForm({
         </CardHeader>
         <form action={formAction}>
           <input type="hidden" name="propertyId" value={property.id} />
+          {}
+          <input
+            type="hidden"
+            name="location"
+            value={form.watch("location") || ""}
+          />
+          <input
+            type="hidden"
+            name="locationSelected"
+            value={hasSelectedLocation ? "true" : "false"}
+          />
           <input type="hidden" name="bedrooms" value={form.watch("bedrooms")} />
           <input
             type="hidden"
             name="bathrooms"
             value={form.watch("bathrooms")}
+          />
+          <input
+            type="hidden"
+            name="latitude"
+            value={form.watch("latitude") ?? ""}
+          />
+          <input
+            type="hidden"
+            name="longitude"
+            value={form.watch("longitude") ?? ""}
+          />
+          <input
+            type="hidden"
+            name="buildingName"
+            value={form.watch("buildingName") || ""}
+          />
+          <input
+            type="hidden"
+            name="locationContext"
+            value={
+              locationDetails
+                ? JSON.stringify({
+                    city: locationDetails.city,
+                    district: locationDetails.district,
+                    state: locationDetails.state,
+                    postalCode: locationDetails.postalCode,
+                    country: locationDetails.country,
+                    countryCode: locationDetails.countryCode,
+                    provider: locationDetails.provider,
+                    providerPlaceId: locationDetails.providerPlaceId,
+                  })
+                : ""
+            }
           />
           <CardContent className="space-y-6">
             {/* Property Type Box Selector */}
@@ -364,31 +441,64 @@ export function BasicDetailsForm({
             <Controller
               name="location"
               control={form.control}
+              render={({ field, fieldState }) => {
+                const hasLocationValue = field.value && field.value.trim();
+                const showSelectionError =
+                  hasLocationValue && !hasSelectedLocation && locationTouched;
+
+                return (
+                  <Field
+                    data-invalid={fieldState.invalid || showSelectionError}
+                  >
+                    <FieldLabel htmlFor={field.name}>
+                      Neighbourhood <span className="text-destructive">*</span>
+                    </FieldLabel>
+                    <LocationAutocomplete
+                      value={field.value}
+                      onChange={handleLocationChange}
+                      onBlur={handleLocationBlur}
+                      placeholder="e.g., Khlong Toei"
+                      disabled={isPending}
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                    {showSelectionError && (
+                      <FieldError
+                        errors={[
+                          {
+                            message:
+                              "Please select a neighbourhood from the suggestions",
+                          },
+                        ]}
+                      />
+                    )}
+                  </Field>
+                );
+              }}
+            />
+
+            {/* Building / Condo Name */}
+            <Controller
+              name="buildingName"
+              control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor={field.name}>
-                    Location <span className="text-destructive">*</span>
+                    Building / Condo Name (Optional)
                   </FieldLabel>
-                  <div className="relative">
-                    <div className="text-on-surface-variant pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-                      <span className="material-symbols-outlined">
-                        location_on
-                      </span>
-                    </div>
-                    <Input
-                      {...field}
-                      id={field.name}
-                      type="text"
-                      className="pl-12"
-                      placeholder="e.g., Sukhumvit, Bangkok"
-                      aria-invalid={fieldState.invalid}
-                      disabled={isPending}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        form.clearErrors("location");
-                      }}
-                    />
-                  </div>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="text"
+                    placeholder="e.g., Kawa Haus, Unit 12B"
+                    aria-invalid={fieldState.invalid}
+                    disabled={isPending}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.clearErrors("buildingName");
+                    }}
+                  />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}

@@ -12,31 +12,6 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "14.5";
   };
-  graphql_public: {
-    Tables: {
-      [_ in never]: never;
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      graphql: {
-        Args: {
-          extensions?: Json;
-          operationName?: string;
-          query?: string;
-          variables?: Json;
-        };
-        Returns: Json;
-      };
-    };
-    Enums: {
-      [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
   public: {
     Tables: {
       contact_messages: {
@@ -69,6 +44,57 @@ export type Database = {
         };
         Relationships: [];
       };
+      locations: {
+        Row: {
+          address_line_1: string | null;
+          address_line_2: string | null;
+          city: string | null;
+          country: string | null;
+          country_code: string | null;
+          created_at: string;
+          district: string | null;
+          id: string;
+          location: unknown;
+          postal_code: string | null;
+          provider: string | null;
+          provider_place_id: string | null;
+          state: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          address_line_1?: string | null;
+          address_line_2?: string | null;
+          city?: string | null;
+          country?: string | null;
+          country_code?: string | null;
+          created_at?: string;
+          district?: string | null;
+          id?: string;
+          location: unknown;
+          postal_code?: string | null;
+          provider?: string | null;
+          provider_place_id?: string | null;
+          state?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          address_line_1?: string | null;
+          address_line_2?: string | null;
+          city?: string | null;
+          country?: string | null;
+          country_code?: string | null;
+          created_at?: string;
+          district?: string | null;
+          id?: string;
+          location?: unknown;
+          postal_code?: string | null;
+          provider?: string | null;
+          provider_place_id?: string | null;
+          state?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           created_at: string;
@@ -92,6 +118,87 @@ export type Database = {
           role?: string;
         };
         Relationships: [];
+      };
+      properties: {
+        Row: {
+          amenities: string[] | null;
+          bathrooms: number;
+          bedrooms: number;
+          completed_steps: string[] | null;
+          created_at: string;
+          description: string | null;
+          furnished_status: string;
+          id: string;
+          images: string[] | null;
+          location: string;
+          location_id: string | null;
+          monthly_rent: number;
+          next_action: string;
+          profile_id: string;
+          property_type: string;
+          started_at: string;
+          status: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          amenities?: string[] | null;
+          bathrooms?: number;
+          bedrooms?: number;
+          completed_steps?: string[] | null;
+          created_at?: string;
+          description?: string | null;
+          furnished_status: string;
+          id?: string;
+          images?: string[] | null;
+          location: string;
+          location_id?: string | null;
+          monthly_rent: number;
+          next_action?: string;
+          profile_id: string;
+          property_type: string;
+          started_at?: string;
+          status?: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          amenities?: string[] | null;
+          bathrooms?: number;
+          bedrooms?: number;
+          completed_steps?: string[] | null;
+          created_at?: string;
+          description?: string | null;
+          furnished_status?: string;
+          id?: string;
+          images?: string[] | null;
+          location?: string;
+          location_id?: string | null;
+          monthly_rent?: number;
+          next_action?: string;
+          profile_id?: string;
+          property_type?: string;
+          started_at?: string;
+          status?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "properties_location_id_fkey";
+            columns: ["location_id"];
+            isOneToOne: false;
+            referencedRelation: "locations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "properties_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       property_find_requests: {
         Row: {
@@ -136,72 +243,144 @@ export type Database = {
           property_type?: string;
           updated_at?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "property_find_requests_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
-      properties: {
+      property_matches: {
         Row: {
-          amenities: string[] | null;
-          bathrooms: number;
-          bedrooms: number;
           created_at: string;
-          description: string | null;
-          furnished_status: string;
           id: string;
-          location: string;
-          monthly_rent: number;
-          next_action: string;
-          profile_id: string;
-          property_type: string;
-          started_at: string;
+          initiated_by: string;
+          notes: string | null;
+          property_id: string;
+          property_owner_id: string;
           status: string;
-          title: string;
+          tenant_id: string;
           updated_at: string;
         };
         Insert: {
-          amenities?: string[] | null;
-          bathrooms?: number;
-          bedrooms?: number;
           created_at?: string;
-          description?: string | null;
-          furnished_status: string;
           id?: string;
-          location: string;
-          monthly_rent: number;
-          next_action?: string;
-          profile_id?: string;
-          property_type: string;
-          started_at?: string;
+          initiated_by?: string;
+          notes?: string | null;
+          property_id: string;
+          property_owner_id: string;
           status?: string;
-          title: string;
+          tenant_id: string;
           updated_at?: string;
         };
         Update: {
-          amenities?: string[] | null;
-          bathrooms?: number;
-          bedrooms?: number;
           created_at?: string;
-          description?: string | null;
-          furnished_status?: string;
           id?: string;
-          location?: string;
-          monthly_rent?: number;
-          next_action?: string;
-          profile_id?: string;
-          property_type?: string;
-          started_at?: string;
+          initiated_by?: string;
+          notes?: string | null;
+          property_id?: string;
+          property_owner_id?: string;
           status?: string;
-          title?: string;
+          tenant_id?: string;
           updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "property_matches_property_id_fkey";
+            columns: ["property_id"];
+            isOneToOne: false;
+            referencedRelation: "properties";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "property_matches_property_owner_id_fkey";
+            columns: ["property_owner_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "property_matches_tenant_id_fkey";
+            columns: ["tenant_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      spatial_ref_sys: {
+        Row: {
+          auth_name: string | null;
+          auth_srid: number | null;
+          proj4text: string | null;
+          srid: number;
+          srtext: string | null;
+        };
+        Insert: {
+          auth_name?: string | null;
+          auth_srid?: number | null;
+          proj4text?: string | null;
+          srid: number;
+          srtext?: string | null;
+        };
+        Update: {
+          auth_name?: string | null;
+          auth_srid?: number | null;
+          proj4text?: string | null;
+          srid?: number;
+          srtext?: string | null;
         };
         Relationships: [];
       };
     };
     Views: {
-      [_ in never]: never;
+      geography_columns: {
+        Row: {
+          coord_dimension: number | null;
+          f_geography_column: unknown;
+          f_table_catalog: unknown;
+          f_table_name: unknown;
+          f_table_schema: unknown;
+          srid: number | null;
+          type: string | null;
+        };
+        Relationships: [];
+      };
+      geometry_columns: {
+        Row: {
+          coord_dimension: number | null;
+          f_geometry_column: unknown;
+          f_table_catalog: string | null;
+          f_table_name: unknown;
+          f_table_schema: unknown;
+          srid: number | null;
+          type: string | null;
+        };
+        Insert: {
+          coord_dimension?: number | null;
+          f_geometry_column?: unknown;
+          f_table_catalog?: string | null;
+          f_table_name?: unknown;
+          f_table_schema?: unknown;
+          srid?: number | null;
+          type?: string | null;
+        };
+        Update: {
+          coord_dimension?: number | null;
+          f_geometry_column?: unknown;
+          f_table_catalog?: string | null;
+          f_table_name?: unknown;
+          f_table_schema?: unknown;
+          srid?: number | null;
+          type?: string | null;
+        };
+        Relationships: [];
+      };
     };
-    Functions: {
-      [_ in never]: never;
-    };
+    Functions: Record<string, never>;
     Enums: {
       contact_subject:
         | "listing"
@@ -213,7 +392,15 @@ export type Database = {
         | "other";
     };
     CompositeTypes: {
-      [_ in never]: never;
+      geometry_dump: {
+        path: number[] | null;
+        geom: unknown;
+      };
+      valid_detail: {
+        valid: boolean | null;
+        reason: string | null;
+        location: unknown;
+      };
     };
   };
 };
@@ -336,9 +523,6 @@ export type CompositeTypes<
     : never;
 
 export const Constants = {
-  graphql_public: {
-    Enums: {},
-  },
   public: {
     Enums: {
       contact_subject: [

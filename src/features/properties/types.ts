@@ -60,6 +60,35 @@ export const FURNISHED_STATUS_VALUES = Object.values(FurnishedStatus);
 export const AMENITY_VALUES = Object.values(Amenity);
 export const PROPERTY_STATUS_VALUES = Object.values(PropertyStatus);
 
+// Location domain model
+export type Location = {
+  id?: string;
+  addressLine1?: string | null;
+  addressLine2?: string | null;
+  city?: string | null;
+  district?: string | null;
+  state?: string | null;
+  postalCode?: string | null;
+  country?: string | null;
+  countryCode?: string | null;
+  latitude: number;
+  longitude: number;
+  provider?: string | null;
+  providerPlaceId?: string | null;
+};
+
+// Location context from geocoding enrichment
+export type LocationContext = {
+  city?: string;
+  district?: string;
+  state?: string;
+  postalCode?: string;
+  country?: string;
+  countryCode?: string;
+  provider?: string;
+  providerPlaceId?: string;
+};
+
 // Domain Models (business logic layer - camelCase)
 export type BasicDetailsInput = {
   propertyType: PropertyType;
@@ -69,6 +98,10 @@ export type BasicDetailsInput = {
   bedrooms: number;
   bathrooms: number;
   description?: string;
+  latitude?: number;
+  longitude?: number;
+  locationDetails?: Location;
+  buildingName?: string;
 };
 
 export type AmenitiesInput = {
@@ -86,6 +119,8 @@ export type Property = {
   propertyType: PropertyType;
   title: string;
   location: string;
+  locationId?: string | null;
+  locationDetails?: Location | null;
   monthlyRent: number;
   description: string | null;
   bedrooms: number;
