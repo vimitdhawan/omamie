@@ -1,5 +1,5 @@
 import type { BasicDetailsData, AmenitiesData, ImagesData } from "./schema";
-import type { Property } from "./types";
+import type { Property, Location, LocationContext } from "./types";
 import {
   createProperty,
   getPropertyById,
@@ -9,6 +9,9 @@ import {
   mapBasicDetailsToInsert,
   mapAmenitiesDataToUpdate,
   mapImagesDataToUpdate,
+  createLocation,
+  updateLocation,
+  PropertyUpdateTable,
 } from "./repository";
 
 /**
@@ -20,15 +23,50 @@ import {
 /**
  * Save basic property details
  * Creates a new property in "pending" status or updates existing property
+ * Handles location geocoding via Mapbox
  */
 export async function saveBasicInfo(
-  data: BasicDetailsData,
+  data: BasicDetailsData & { locationContext?: LocationContext },
   profileId: string,
-  propertyId?: string
+  propertyId?: string,
+  existingProperty?: Property
 ): Promise<Property> {
-  if (propertyId) {
+  // Build location data from form with full context
+  const locationData: Location | undefined =
+    data.latitude && data.longitude
+      ? {
+          addressLine1: data.location,
+          addressLine2: data.buildingName || undefined,
+          city: data.locationContext?.city || undefined,
+          district: data.locationContext?.district || undefined,
+          state: data.locationContext?.state || undefined,
+          postalCode: data.locationContext?.postalCode || undefined,
+          country: data.locationContext?.country || undefined,
+          countryCode: data.locationContext?.countryCode || undefined,
+          provider: data.locationContext?.provider || undefined,
+          providerPlaceId: data.locationContext?.providerPlaceId || undefined,
+          latitude: data.latitude,
+          longitude: data.longitude,
+        }
+      : undefined;
+
+  if (propertyId && existingProperty) {
     // Update existing property - save basic details and move to next step
-    const stepData = {
+    let locationId = existingProperty.locationId;
+
+    // Create or update location if coordinates provided
+    if (locationData) {
+      if (locationId) {
+        // Update existing location
+        await updateLocation(locationId, locationData);
+      } else {
+        // Create new location
+        const newLocation = await createLocation(locationData);
+        locationId = newLocation.id;
+      }
+    }
+
+    const stepData: Partial<PropertyUpdateTable> = {
       title: data.title,
       property_type: data.propertyType,
       location: data.location,
@@ -38,11 +76,26 @@ export async function saveBasicInfo(
       bathrooms: data.bathrooms,
       next_action: "amenities",
     };
+
+    if (locationId) {
+      stepData.location_id = locationId;
+    }
+
     return await updateProperty(propertyId, stepData);
   }
 
+  // Create new location first if coordinates provided
+  let locationId: string | undefined;
+  if (locationData) {
+    const newLocation = await createLocation(locationData);
+    locationId = newLocation.id;
+  }
+
   // Create new property with basic details
-  const insertData = mapBasicDetailsToInsert(data, profileId);
+  const insertData = {
+    ...mapBasicDetailsToInsert(data, profileId),
+    location_id: locationId,
+  };
   return await createProperty(insertData);
 }
 

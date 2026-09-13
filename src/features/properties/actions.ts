@@ -7,6 +7,7 @@ import {
   amenitiesSchema,
   reviewSchema,
   type PropertyActionState,
+  type BasicDetailsData,
 } from "./schema";
 import {
   saveBasicInfo,
@@ -19,7 +20,114 @@ import { uploadPropertyImage, deleteImagePaths } from "./storage";
 import { getAuthSession } from "@/lib/auth-session";
 import { isAppError } from "@/lib/errors";
 import { getPropertiesList } from "./repository";
-import type { PropertyStatus, PropertyType } from "./types";
+import type {
+  PropertyStatus,
+  PropertyType,
+  Property,
+  LocationContext,
+} from "./types";
+import type { LocationSuggestion } from "./components/location-autocomplete";
+
+const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
+
+/**
+ * Enrich location with postal code and district via reverse geocoding
+ */
+export async function fetchLocationEnrichmentAction(
+  longitude: number,
+  latitude: number
+): Promise<{ postalCode?: string; district?: string }> {
+  if (!MAPBOX_TOKEN) {
+    return {};
+  }
+
+  try {
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${MAPBOX_TOKEN}&types=postcode,district&country=TH`;
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      return {};
+    }
+
+    interface MapboxFeature {
+      id: string;
+      text: string;
+    }
+
+    interface MapboxReverseResponse {
+      features?: MapboxFeature[];
+    }
+
+    const data: MapboxReverseResponse = await response.json();
+    const features = data.features || [];
+
+    const enrichment: { postalCode?: string; district?: string } = {};
+    for (const feature of features) {
+      const [key] = feature.id.split(".");
+      if (key === "postcode") {
+        enrichment.postalCode = feature.text;
+      } else if (key === "district") {
+        enrichment.district = feature.text;
+      }
+    }
+
+    return enrichment;
+  } catch (error) {
+    console.error("Failed to enrich location:", error);
+    return {};
+  }
+}
+
+/**
+ * Fetch location suggestions from Mapbox API (server-side, secure)
+ */
+export async function fetchLocationSuggestionsAction(
+  query: string
+): Promise<LocationSuggestion[]> {
+  if (!query.trim()) {
+    return [];
+  }
+
+  if (!MAPBOX_TOKEN) {
+    console.error("MAPBOX_TOKEN not configured");
+    return [];
+  }
+
+  if (!MAPBOX_TOKEN.startsWith("pk_") && !MAPBOX_TOKEN.startsWith("pk.")) {
+    console.error(
+      "MAPBOX_TOKEN format invalid. Token should start with 'pk_' or 'pk.'. Length:",
+      MAPBOX_TOKEN.length
+    );
+    return [];
+  }
+
+  try {
+    // Restrict to neighborhood,locality to avoid broad city/province results that crowd out actual neighbourhoods.
+    // Mapbox has no "find neighbourhood for this building" endpoint — exact condo/building identification
+    // is intentionally left to the manual "Building/Condo Name" field rather than attempted via geocoding.
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
+      query
+    )}.json?access_token=${MAPBOX_TOKEN}&bbox=100.32,13.49,100.94,13.96&types=neighborhood,locality&proximity=100.55,13.7&country=TH`;
+
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(
+        `Mapbox API error [${response.status}]:`,
+        response.statusText,
+        errorText
+      );
+      return [];
+    }
+
+    const data = await response.json();
+    return data.features || [];
+  } catch (error) {
+    console.error("Failed to fetch location suggestions:", error);
+    return [];
+  }
+}
 
 /**
  * Fetch filtered properties list for client-side instant filtering
@@ -45,9 +153,8 @@ export async function submitBasicDetailsAction(
   _prev: PropertyActionState | null,
   formData: FormData
 ): Promise<PropertyActionState> {
-  const validationResult = basicInfoSchema.safeParse(
-    Object.fromEntries(formData)
-  );
+  const formDataObj = Object.fromEntries(formData);
+  const validationResult = basicInfoSchema.safeParse(formDataObj);
   if (!validationResult.success) {
     return {
       errors: validationResult.error.flatten().fieldErrors,
@@ -69,10 +176,44 @@ export async function submitBasicDetailsAction(
     }
 
     const propertyId = formData.get("propertyId") as string | null;
+    let existingProperty: Property | undefined;
+    if (propertyId) {
+      existingProperty = (await getProperty(propertyId)) ?? undefined;
+    }
+
+    // Parse locationContext JSON if present
+    let locationContext: LocationContext = {};
+    if (validationResult.data.locationContext) {
+      try {
+        locationContext = JSON.parse(
+          validationResult.data.locationContext
+        ) as LocationContext;
+      } catch {
+        // Ignore JSON parse errors, use empty object
+      }
+    }
+
+    // Thread full location context into saveBasicInfo
+    const dataToSave: BasicDetailsData & { locationContext: LocationContext } =
+      {
+        propertyType: validationResult.data.propertyType,
+        title: validationResult.data.title,
+        location: validationResult.data.location,
+        latitude: validationResult.data.latitude,
+        longitude: validationResult.data.longitude,
+        monthlyRent: validationResult.data.monthlyRent,
+        bedrooms: validationResult.data.bedrooms,
+        bathrooms: validationResult.data.bathrooms,
+        description: validationResult.data.description,
+        buildingName: validationResult.data.buildingName,
+        locationContext,
+      };
+
     const property = await saveBasicInfo(
-      validationResult.data,
+      dataToSave,
       session.profileId,
-      propertyId || undefined
+      propertyId || undefined,
+      existingProperty
     );
 
     // If creating new property, redirect to edit page

@@ -10,6 +10,7 @@ import type {
   PropertyStatus,
   Amenity,
   PropertyNextAction,
+  Location,
 } from "./types";
 import { AppError } from "@/lib/errors";
 
@@ -17,6 +18,12 @@ import { AppError } from "@/lib/errors";
 export type PropertyTable = Tables<"properties">;
 export type PropertyInsertTable = TablesInsert<"properties">;
 export type PropertyUpdateTable = TablesUpdate<"properties">;
+
+export type LocationTable = Tables<"locations">;
+export type LocationInsertTable = TablesInsert<"locations">;
+export type LocationUpdateTable = TablesUpdate<"locations">;
+
+type GeoJsonPoint = { coordinates?: [number, number] };
 
 /**
  * Repository layer for properties
@@ -27,12 +34,13 @@ export type PropertyUpdateTable = TablesUpdate<"properties">;
 function mapBasicDetailsToInsert(
   data: BasicDetailsInput,
   profileId: string
-): PropertyInsertTable {
+): PropertyInsertTable & { location_id?: string } {
   return {
     profile_id: profileId,
     property_type: data.propertyType,
     title: data.title,
     location: data.location,
+    location_id: data.locationDetails?.id,
     monthly_rent: data.monthlyRent,
     description: data.description ?? null,
     bedrooms: data.bedrooms,
@@ -67,21 +75,44 @@ function mapImagesDataToUpdate(
   } as Partial<PropertyUpdateTable>;
 }
 
-function mapTableToProperty(table: PropertyTable): Property {
-  const tableWithImages = table as PropertyTable & { images?: string[] | null };
+function mapLocationToLocationDomain(table: LocationTable): Location {
+  return {
+    id: table.id,
+    addressLine1: table.address_line_1,
+    addressLine2: table.address_line_2,
+    city: table.city,
+    district: table.district,
+    state: table.state,
+    postalCode: table.postal_code,
+    country: table.country,
+    countryCode: table.country_code,
+    latitude: (table.location as GeoJsonPoint | null)?.coordinates?.[1] ?? 0,
+    longitude: (table.location as GeoJsonPoint | null)?.coordinates?.[0] ?? 0,
+    provider: table.provider,
+    providerPlaceId: table.provider_place_id,
+  };
+}
+
+function mapTableToProperty(
+  table: PropertyTable & { locations?: LocationTable | null }
+): Property {
   return {
     id: table.id,
     profileId: table.profile_id,
     propertyType: table.property_type as PropertyType,
     title: table.title,
     location: table.location,
+    locationId: table.location_id ?? undefined,
+    locationDetails: table.locations
+      ? mapLocationToLocationDomain(table.locations)
+      : undefined,
     monthlyRent: table.monthly_rent,
     description: table.description,
     bedrooms: table.bedrooms,
     bathrooms: table.bathrooms,
     furnishedStatus: table.furnished_status as FurnishedStatus,
     amenities: (table.amenities || []) as Amenity[],
-    images: (tableWithImages.images || []) as string[],
+    images: (table.images || []) as string[],
     status: table.status as PropertyStatus,
     nextAction: table.next_action as PropertyNextAction,
     createdAt: table.created_at,
@@ -117,6 +148,91 @@ function mapDatabaseErrorToUserMessage(
 }
 
 /**
+ * Create a new location
+ */
+export async function createLocation(
+  location: Location
+): Promise<LocationTable> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("locations")
+    .insert({
+      address_line_1: location.addressLine1,
+      address_line_2: location.addressLine2,
+      city: location.city,
+      district: location.district,
+      state: location.state,
+      postal_code: location.postalCode,
+      country: location.country,
+      country_code: location.countryCode,
+      location: `SRID=4326;POINT(${location.longitude} ${location.latitude})`,
+      provider: location.provider,
+      provider_place_id: location.providerPlaceId,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    const userMessage = mapDatabaseErrorToUserMessage(error);
+    throw new AppError(
+      "INTERNAL_ERROR",
+      userMessage || "Failed to create location"
+    );
+  }
+
+  return data;
+}
+
+/**
+ * Update an existing location
+ */
+export async function updateLocation(
+  locationId: string,
+  location: Partial<Location>
+): Promise<LocationTable> {
+  const supabase = await createClient();
+
+  const updateData: Partial<LocationUpdateTable> = {};
+  if (location.addressLine1 !== undefined)
+    updateData.address_line_1 = location.addressLine1;
+  if (location.addressLine2 !== undefined)
+    updateData.address_line_2 = location.addressLine2;
+  if (location.city !== undefined) updateData.city = location.city;
+  if (location.district !== undefined) updateData.district = location.district;
+  if (location.state !== undefined) updateData.state = location.state;
+  if (location.postalCode !== undefined)
+    updateData.postal_code = location.postalCode;
+  if (location.country !== undefined) updateData.country = location.country;
+  if (location.countryCode !== undefined)
+    updateData.country_code = location.countryCode;
+  if (location.provider !== undefined) updateData.provider = location.provider;
+  if (location.providerPlaceId !== undefined)
+    updateData.provider_place_id = location.providerPlaceId;
+
+  if (location.latitude !== undefined && location.longitude !== undefined) {
+    updateData.location = `SRID=4326;POINT(${location.longitude} ${location.latitude})`;
+  }
+
+  const { data, error } = await supabase
+    .from("locations")
+    .update(updateData)
+    .eq("id", locationId)
+    .select()
+    .single();
+
+  if (error) {
+    const userMessage = mapDatabaseErrorToUserMessage(error);
+    throw new AppError(
+      "INTERNAL_ERROR",
+      userMessage || "Failed to update location"
+    );
+  }
+
+  return data;
+}
+
+/**
  * Create a new property listing in the database
  */
 export async function createProperty(
@@ -127,7 +243,7 @@ export async function createProperty(
   const { data, error } = await supabase
     .from("properties")
     .insert(property)
-    .select()
+    .select("*, locations(*)")
     .single();
 
   if (error) {
@@ -138,7 +254,9 @@ export async function createProperty(
     );
   }
 
-  return mapTableToProperty(data as PropertyTable);
+  return mapTableToProperty(
+    data as PropertyTable & { locations: LocationTable | null }
+  );
 }
 
 /**
@@ -149,7 +267,7 @@ export async function getPropertyById(id: string): Promise<Property | null> {
 
   const { data, error } = await supabase
     .from("properties")
-    .select("*")
+    .select("*, locations(*)")
     .eq("id", id)
     .single();
 
@@ -157,7 +275,9 @@ export async function getPropertyById(id: string): Promise<Property | null> {
     return null;
   }
 
-  return mapTableToProperty(data as PropertyTable);
+  return mapTableToProperty(
+    data as PropertyTable & { locations: LocationTable | null }
+  );
 }
 
 /**
@@ -168,14 +288,16 @@ export async function getAllProperties(): Promise<Property[]> {
 
   const { data, error } = await supabase
     .from("properties")
-    .select("*")
+    .select("*, locations(*)")
     .order("created_at", { ascending: false });
 
   if (error) {
     return [];
   }
 
-  return (data as PropertyTable[]).map(mapTableToProperty);
+  return (
+    data as Array<PropertyTable & { locations: LocationTable | null }>
+  ).map(mapTableToProperty);
 }
 
 /**
@@ -194,7 +316,7 @@ export async function updateProperty(
       updated_at: new Date().toISOString(),
     })
     .eq("id", propertyId)
-    .select()
+    .select("*, locations(*)")
     .single();
 
   if (error) {
@@ -205,7 +327,9 @@ export async function updateProperty(
     );
   }
 
-  return mapTableToProperty(data as PropertyTable);
+  return mapTableToProperty(
+    data as PropertyTable & { locations: LocationTable | null }
+  );
 }
 
 // Backward compatibility alias
@@ -228,7 +352,7 @@ export async function completePropertySubmission(
       updated_at: new Date().toISOString(),
     })
     .eq("id", propertyId)
-    .select()
+    .select("*, locations(*)")
     .single();
 
   if (error) {
@@ -239,7 +363,9 @@ export async function completePropertySubmission(
     );
   }
 
-  return mapTableToProperty(data as PropertyTable);
+  return mapTableToProperty(
+    data as PropertyTable & { locations: LocationTable | null }
+  );
 }
 
 /**
@@ -253,13 +379,13 @@ export async function getPendingListing(
 
   const { data, error } = (await supabase
     .from("properties")
-    .select("*")
+    .select("*, locations(*)")
     .eq("profile_id", profileId)
     .eq("status", "pending")
     .order("created_at", { ascending: false })
     .limit(1)
     .single()) as {
-    data: PropertyTable | null;
+    data: (PropertyTable & { locations: LocationTable | null }) | null;
     error: { code?: string; message?: string } | null;
   };
 
@@ -285,7 +411,7 @@ export async function getPropertiesList(
 
   let query = supabase
     .from("properties")
-    .select("*")
+    .select("*, locations(*)")
     .eq("profile_id", profileId)
     .order("created_at", { ascending: false });
 
@@ -309,7 +435,11 @@ export async function getPropertiesList(
     throw new AppError("INTERNAL_ERROR", "Failed to fetch properties");
   }
 
-  return data ? data.map(mapTableToProperty) : [];
+  return data
+    ? (data as Array<PropertyTable & { locations: LocationTable | null }>).map(
+        mapTableToProperty
+      )
+    : [];
 }
 
 /**
