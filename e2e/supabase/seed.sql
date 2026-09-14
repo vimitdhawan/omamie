@@ -34,7 +34,17 @@ insert into auth.users (
   created_at,
   updated_at,
   raw_user_meta_data,
-  raw_app_meta_data
+  raw_app_meta_data,
+  -- GoTrue scans these into non-nullable Go strings, so NULL makes every login
+  -- fail with "Database error querying schema". They must be empty strings.
+  confirmation_token,
+  recovery_token,
+  email_change_token_new,
+  email_change_token_current,
+  email_change,
+  phone_change,
+  phone_change_token,
+  reauthentication_token
 )
 values (
   '00000000-0000-0000-0000-000000000000',
@@ -42,15 +52,33 @@ values (
   'authenticated',
   'authenticated',
   'e2e-tenant@omamie.test',
-  -- bcrypt hash for "Test1234!" (cost 10). Safe to commit; only valid locally.
-  '$2a$10$1nqCQOOZRTuv3w1qz2qX3uV4cRZxXGXcOWd3xqOQe/pXv9vqqqJK',
+  -- Hashed in-database so the value cannot drift from the password above.
+  crypt('Test1234!', gen_salt('bf')),
   now(),
   now(),
   now(),
   jsonb_build_object('full_name', 'E2E Tenant', 'role', 'tenant'),
-  jsonb_build_object('provider', 'email', 'providers', array['email'])
+  jsonb_build_object('provider', 'email', 'providers', array['email']),
+  '', '', '', '', '', '', '', ''
 )
-on conflict (email) do nothing;
+-- Keyed on id, not email: auth.users has no unique constraint on email, so
+-- `on conflict (email)` raises 42P10 and aborts the seed.
+on conflict (id) do nothing;
+
+insert into auth.identities (
+  id, user_id, provider_id, provider, identity_data,
+  created_at, updated_at, last_sign_in_at
+)
+select
+  gen_random_uuid(), u.id, u.id::text, 'email',
+  jsonb_build_object('sub', u.id::text, 'email', u.email, 'email_verified', true),
+  now(), now(), now()
+from auth.users u
+where u.email = 'e2e-tenant@omamie.test'
+  and not exists (
+    select 1 from auth.identities i
+    where i.user_id = u.id and i.provider = 'email'
+  );
 
 -- The `on_auth_user_created` trigger only fires on INSERTs; since the INSERT
 -- above predates the trigger declaration order is irrelevant, but the profile
@@ -61,5 +89,76 @@ values (
   'e2e-tenant@omamie.test',
   'E2E Tenant',
   'tenant'
+)
+on conflict (id) do nothing;
+
+-- ---------------------------------------------------------------------------
+-- Owner user, for the property listing flow.
+--
+-- Same deterministic credentials as the tenant above (`Test1234!`). An
+-- `auth.identities` row is required as well: GoTrue resolves a password
+-- sign-in through the email identity, and without it the login fails with
+-- "Database error querying schema" rather than an invalid-credentials error.
+-- ---------------------------------------------------------------------------
+insert into auth.users (
+  instance_id,
+  id,
+  aud,
+  role,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  created_at,
+  updated_at,
+  raw_user_meta_data,
+  raw_app_meta_data,
+  -- GoTrue scans these into non-nullable Go strings, so NULL makes every login
+  -- fail with "Database error querying schema". They must be empty strings.
+  confirmation_token,
+  recovery_token,
+  email_change_token_new,
+  email_change_token_current,
+  email_change,
+  phone_change,
+  phone_change_token,
+  reauthentication_token
+)
+values (
+  '00000000-0000-0000-0000-000000000000',
+  '22222222-2222-2222-2222-222222222222',
+  'authenticated',
+  'authenticated',
+  'e2e-owner@omamie.test',
+  crypt('Test1234!', gen_salt('bf')),
+  now(),
+  now(),
+  now(),
+  jsonb_build_object('full_name', 'E2E Owner', 'role', 'owner'),
+  jsonb_build_object('provider', 'email', 'providers', array['email']),
+  '', '', '', '', '', '', '', ''
+)
+on conflict (id) do nothing;
+
+insert into auth.identities (
+  id, user_id, provider_id, provider, identity_data,
+  created_at, updated_at, last_sign_in_at
+)
+select
+  gen_random_uuid(), u.id, u.id::text, 'email',
+  jsonb_build_object('sub', u.id::text, 'email', u.email, 'email_verified', true),
+  now(), now(), now()
+from auth.users u
+where u.email = 'e2e-owner@omamie.test'
+  and not exists (
+    select 1 from auth.identities i
+    where i.user_id = u.id and i.provider = 'email'
+  );
+
+insert into public.profiles (id, email, full_name, role)
+values (
+  '22222222-2222-2222-2222-222222222222',
+  'e2e-owner@omamie.test',
+  'E2E Owner',
+  'owner'
 )
 on conflict (id) do nothing;

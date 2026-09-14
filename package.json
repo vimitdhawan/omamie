@@ -10,6 +10,7 @@
     "format:check": "prettier --check .",
     "format:write": "prettier --write .",
     "type-check": "tsc --noEmit",
+    "gen:types": "supabase gen types typescript --db-url \"postgresql://postgres:postgres@127.0.0.1:54322/postgres\" > src/lib/supabase/types.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",

@@ -1,14 +1,16 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, BedDouble, Bath, MoreVertical } from "lucide-react";
+import { formatCurrency } from "@/lib/utils/format";
+import { MapPin, BedDouble, Bath, ImageIcon } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { getPublicImageUrl } from "@/lib/storage-url";
+import { PropertyRowActions } from "./property-row-actions";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  derivePropertyCode,
+  formatRelativeDate,
+  getStatusLabel,
+} from "../utils/display";
 import type { Property } from "../types";
 
 const STATUS_BADGE_VARIANT: Record<
@@ -16,40 +18,12 @@ const STATUS_BADGE_VARIANT: Record<
   "default" | "secondary" | "destructive" | "outline"
 > = {
   active: "default",
+  draft: "secondary",
   pending: "secondary",
   review: "secondary",
   rented: "outline",
   inactive: "outline",
 };
-
-function getStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    active: "Published",
-    pending: "Draft",
-    review: "Review",
-    rented: "Rented",
-    inactive: "Inactive",
-  };
-  return labels[status] || status;
-}
-
-function derivePropertyCode(id: string): string {
-  return `PROP-${id.slice(-4).toUpperCase()}`;
-}
-
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) return "Today";
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays} days ago`;
-  if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-
-  return date.toLocaleDateString();
-}
 
 interface Column {
   id: string;
@@ -58,32 +32,6 @@ interface Column {
   cell: (context: {
     row: { original: Property; index: number };
   }) => React.ReactNode;
-}
-
-function PropertyActionsCell({ property }: { property: Property }) {
-  const router = useRouter();
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger>
-        <button className="hover:bg-muted rounded p-2 transition-colors">
-          <MoreVertical className="size-4" />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          onClick={() => router.push(`/properties/${property.id}/edit`)}
-        >
-          Edit
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => router.push(`/properties/${property.id}`)}
-        >
-          View
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
 }
 
 export const propertyColumns: Column[] = [
@@ -96,33 +44,37 @@ export const propertyColumns: Column[] = [
       return (
         <Link
           href={`/properties/${property.id}/edit`}
-          className="hover:underline"
+          className="block max-w-[260px] hover:underline"
         >
           <div className="flex items-center gap-3">
-            <div className="bg-muted flex h-12 w-12 flex-shrink-0 items-center justify-center rounded">
-              <div className="text-muted-foreground text-sm">📷</div>
+            <div className="bg-surface-soft relative h-12 w-12 flex-shrink-0 overflow-hidden rounded">
+              {property.images[0] ? (
+                <Image
+                  src={getPublicImageUrl(property.images[0].storagePath)}
+                  alt=""
+                  fill
+                  sizes="48px"
+                  className="object-cover"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <ImageIcon className="text-muted-foreground size-4" />
+                </div>
+              )}
             </div>
-            <div>
-              <p className="text-sm font-semibold">{property.title}</p>
-              <p className="text-muted-foreground text-xs">
-                {derivePropertyCode(property.id)}
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold">{property.title}</p>
+              <p className="text-muted-foreground flex items-center gap-1 text-xs">
+                <MapPin className="size-3 shrink-0" />
+                <span className="truncate">
+                  {property.location || derivePropertyCode(property.id)}
+                </span>
               </p>
             </div>
           </div>
         </Link>
       );
     },
-  },
-  {
-    id: "location",
-    header: "Location",
-    enableSorting: true,
-    cell: ({ row }: { row: { original: Property; index: number } }) => (
-      <div className="flex items-center gap-1 text-sm">
-        <MapPin className="text-muted-foreground size-4" />
-        {row.original.location}
-      </div>
-    ),
   },
   {
     id: "propertyType",
@@ -138,7 +90,9 @@ export const propertyColumns: Column[] = [
     enableSorting: true,
     cell: ({ row }: { row: { original: Property; index: number } }) => (
       <div className="text-sm font-medium">
-        ₹{row.original.monthlyRent.toLocaleString()}
+        {row.original.monthlyRent
+          ? formatCurrency(row.original.monthlyRent, "en-US", "THB")
+          : "—"}
       </div>
     ),
   },
@@ -182,7 +136,7 @@ export const propertyColumns: Column[] = [
     enableSorting: true,
     cell: ({ row }: { row: { original: Property; index: number } }) => {
       const property = row.original;
-      return formatDate(property.updatedAt || property.createdAt);
+      return formatRelativeDate(property.updatedAt || property.createdAt);
     },
   },
   {
@@ -190,7 +144,7 @@ export const propertyColumns: Column[] = [
     header: "Actions",
     enableSorting: false,
     cell: ({ row }: { row: { original: Property; index: number } }) => (
-      <PropertyActionsCell property={row.original} />
+      <PropertyRowActions property={row.original} />
     ),
   },
 ];

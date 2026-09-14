@@ -15,6 +15,7 @@ import {
 import { getPropertiesListAction } from "../actions";
 import { PropertiesTable } from "./properties-table";
 import { PropertiesGrid } from "./properties-grid";
+import { PropertyListContext } from "./property-row-actions";
 import { PROPERTY_TYPES } from "../schema";
 import type { Property, PropertyStatus, PropertyType } from "../types";
 
@@ -23,19 +24,16 @@ type ViewType = "table" | "grid";
 const STATUS_OPTIONS: { label: string; value: PropertyStatus | "all" }[] = [
   { label: "All statuses", value: "all" },
   { label: "Published", value: "active" },
-  { label: "Draft", value: "pending" },
+  { label: "Draft", value: "draft" },
+  { label: "In review", value: "review" },
   { label: "Rented", value: "rented" },
 ];
 
 interface PropertiesClientProps {
   initialProperties: Property[];
-  profileId: string;
 }
 
-export function PropertiesClient({
-  initialProperties,
-  profileId,
-}: PropertiesClientProps) {
+export function PropertiesClient({ initialProperties }: PropertiesClientProps) {
   const searchParams = useSearchParams();
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -64,7 +62,7 @@ export function PropertiesClient({
       search: string | undefined
     ) => {
       startTransition(async () => {
-        const result = await getPropertiesListAction(profileId, {
+        const result = await getPropertiesListAction({
           status:
             status && status !== "all" ? (status as PropertyStatus) : undefined,
           propertyType:
@@ -74,7 +72,7 @@ export function PropertiesClient({
         setProperties(result);
       });
     },
-    [profileId]
+    []
   );
 
   const handleSearchChange = useCallback(
@@ -112,6 +110,18 @@ export function PropertiesClient({
   const handleViewChange = useCallback((view: ViewType) => {
     setCurrentView(view);
   }, []);
+
+  // A deleted row has to leave this list's own state; the server revalidate only refreshes the
+  // props this component was seeded with, not the filtered set it is currently showing.
+  const listContext = useMemo(
+    () => ({
+      onDeleted: (propertyId: string) =>
+        setProperties((current) =>
+          current.filter((property) => property.id !== propertyId)
+        ),
+    }),
+    []
+  );
 
   const typeOptions = useMemo(
     () => [
@@ -217,10 +227,14 @@ export function PropertiesClient({
               </p>
             </div>
           </div>
-        ) : currentView === "table" ? (
-          <PropertiesTable properties={properties} />
         ) : (
-          <PropertiesGrid properties={properties} />
+          <PropertyListContext.Provider value={listContext}>
+            {currentView === "table" ? (
+              <PropertiesTable properties={properties} />
+            ) : (
+              <PropertiesGrid properties={properties} />
+            )}
+          </PropertyListContext.Provider>
         )}
       </div>
     </>

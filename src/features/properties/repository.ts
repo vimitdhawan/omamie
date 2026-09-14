@@ -1,80 +1,43 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Tables, TablesInsert, TablesUpdate } from "@/lib/supabase/types";
+import type { Json, Tables } from "@/lib/supabase/types";
 import type {
   Property,
-  BasicDetailsInput,
-  AmenitiesInput,
-  ImagesInput,
+  PropertyImage,
+  PropertyImageStatus,
   PropertyType,
   FurnishedStatus,
   PropertyStatus,
   Amenity,
-  PropertyNextAction,
   Location,
 } from "./types";
 import { AppError } from "@/lib/errors";
 
 // Repository types (database table models)
 export type PropertyTable = Tables<"properties">;
-export type PropertyInsertTable = TablesInsert<"properties">;
-export type PropertyUpdateTable = TablesUpdate<"properties">;
-
 export type LocationTable = Tables<"locations">;
-export type LocationInsertTable = TablesInsert<"locations">;
-export type LocationUpdateTable = TablesUpdate<"locations">;
+export type PropertyImageTable = Tables<"property_images">;
+export type CondoTable = Tables<"condos">;
 
 type GeoJsonPoint = { coordinates?: [number, number] };
+
+type PropertyRow = PropertyTable & {
+  locations?: LocationTable | null;
+  property_images?: PropertyImageTable[] | null;
+  condos?: CondoTable | null;
+};
 
 /**
  * Repository layer for properties
  * Direct database operations only - mapping between domain and table models
  */
 
+// Only uploaded images are ever surfaced. A row can sit in "pending" if the process died
+// between the transaction committing and the file reaching storage, and rendering those
+// would produce broken images.
+const PROPERTY_SELECT =
+  "*, locations(*), condos(id, name, facilities, verified), property_images(id, storage_path, sort_order, status)";
+
 // Mapping Functions
-function mapBasicDetailsToInsert(
-  data: BasicDetailsInput,
-  profileId: string
-): PropertyInsertTable & { location_id?: string } {
-  return {
-    profile_id: profileId,
-    property_type: data.propertyType,
-    title: data.title,
-    location: data.location,
-    location_id: data.locationDetails?.id,
-    monthly_rent: data.monthlyRent,
-    description: data.description ?? null,
-    bedrooms: data.bedrooms,
-    bathrooms: data.bathrooms,
-    furnished_status: "unfurnished",
-    amenities: [],
-    status: "pending",
-    next_action: "amenities",
-  };
-}
-
-function mapAmenitiesDataToUpdate(
-  data: AmenitiesInput,
-  nextAction: string
-): Partial<PropertyUpdateTable> {
-  return {
-    furnished_status: data.furnishedStatus,
-    amenities: data.amenities,
-    next_action: nextAction,
-    updated_at: new Date().toISOString(),
-  };
-}
-
-function mapImagesDataToUpdate(
-  data: ImagesInput,
-  nextAction: string
-): Partial<PropertyUpdateTable> {
-  return {
-    images: data.images,
-    next_action: nextAction,
-    updated_at: new Date().toISOString(),
-  } as Partial<PropertyUpdateTable>;
-}
-
 function mapLocationToLocationDomain(table: LocationTable): Location {
   return {
     id: table.id,
@@ -93,13 +56,20 @@ function mapLocationToLocationDomain(table: LocationTable): Location {
   };
 }
 
-function mapTableToProperty(
-  table: PropertyTable & { locations?: LocationTable | null }
-): Property {
+function mapImageToDomain(table: PropertyImageTable): PropertyImage {
+  return {
+    id: table.id,
+    storagePath: table.storage_path,
+    sortOrder: table.sort_order,
+    status: table.status as PropertyImageStatus,
+  };
+}
+
+function mapTableToProperty(table: PropertyRow): Property {
   return {
     id: table.id,
     profileId: table.profile_id,
-    propertyType: table.property_type as PropertyType,
+    propertyType: table.property_type as PropertyType | null,
     title: table.title,
     location: table.location,
     locationId: table.location_id ?? undefined,
@@ -110,11 +80,30 @@ function mapTableToProperty(
     description: table.description,
     bedrooms: table.bedrooms,
     bathrooms: table.bathrooms,
-    furnishedStatus: table.furnished_status as FurnishedStatus,
+    furnishedStatus: table.furnished_status as FurnishedStatus | null,
+    // `?? null` rather than a bare read: these columns are genuinely absent from some
+    // fixtures and older rows, and the domain type is `number | null`, not `| undefined`.
+    securityDepositMonths: table.security_deposit_months ?? null,
+    minimumLeaseMonths: table.minimum_lease_months ?? null,
+    condoId: table.condo_id ?? null,
+    condo: table.condos
+      ? {
+          id: table.condos.id,
+          name: table.condos.name,
+          facilities: (table.condos.facilities ?? []) as Amenity[],
+          verified: table.condos.verified,
+        }
+      : null,
+    availableFrom: table.available_from ?? null,
+    areaSqm: table.area_sqm ?? null,
+    floorNumber: table.floor_number ?? null,
+    totalFloors: table.total_floors ?? null,
     amenities: (table.amenities || []) as Amenity[],
-    images: (table.images || []) as string[],
+    images: (table.property_images ?? [])
+      .filter((image) => image.status === "uploaded")
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map(mapImageToDomain),
     status: table.status as PropertyStatus,
-    nextAction: table.next_action as PropertyNextAction,
     createdAt: table.created_at,
     updatedAt: table.updated_at,
   };
@@ -135,8 +124,16 @@ function mapDatabaseErrorToUserMessage(
       return "Invalid user profile. Please log in again.";
     case "23505": // Unique constraint violation
       return "This property already exists.";
-    case "42P01": // Table doesn't exist
-      return "Service temporarily unavailable. Please try again later.";
+    case "42501": // Insufficient privilege - raised by the save_property ownership guard
+      return "You don't have permission to edit this property.";
+    // The schema this code expects is not the schema the database has. Almost always
+    // pending migrations, so say that rather than "try again later" — retrying cannot help.
+    case "PGRST202": // PostgREST: function missing from the schema cache
+    case "PGRST204": // PostgREST: column missing from the schema cache
+    case "42883": // undefined_function
+    case "42703": // undefined_column
+    case "42P01": // undefined_table
+      return "This database is missing a pending migration, so the listing could not be saved.";
     case "HV000": // FDW error
       return "Service temporarily unavailable. Please try again later.";
     default:
@@ -148,257 +145,180 @@ function mapDatabaseErrorToUserMessage(
 }
 
 /**
- * Create a new location
+ * Logs the underlying database error before it is replaced by a user-facing message.
+ *
+ * Without this the real code and message are discarded, and an unmapped failure surfaces as
+ * a bare "Failed to save property" with nothing in the logs to explain it.
  */
-export async function createLocation(
-  location: Location
-): Promise<LocationTable> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("locations")
-    .insert({
-      address_line_1: location.addressLine1,
-      address_line_2: location.addressLine2,
-      city: location.city,
-      district: location.district,
-      state: location.state,
-      postal_code: location.postalCode,
-      country: location.country,
-      country_code: location.countryCode,
-      location: `SRID=4326;POINT(${location.longitude} ${location.latitude})`,
-      provider: location.provider,
-      provider_place_id: location.providerPlaceId,
+function logDatabaseError(
+  operation: string,
+  error: { code?: string; message?: string; details?: string } | null
+): void {
+  if (!error) return;
+  console.error(
+    `[properties] ${operation} failed:`,
+    JSON.stringify({
+      code: error.code,
+      message: error.message,
+      details: error.details,
     })
-    .select()
-    .single();
-
-  if (error) {
-    const userMessage = mapDatabaseErrorToUserMessage(error);
-    throw new AppError(
-      "INTERNAL_ERROR",
-      userMessage || "Failed to create location"
-    );
-  }
-
-  return data;
-}
-
-/**
- * Update an existing location
- */
-export async function updateLocation(
-  locationId: string,
-  location: Partial<Location>
-): Promise<LocationTable> {
-  const supabase = await createClient();
-
-  const updateData: Partial<LocationUpdateTable> = {};
-  if (location.addressLine1 !== undefined)
-    updateData.address_line_1 = location.addressLine1;
-  if (location.addressLine2 !== undefined)
-    updateData.address_line_2 = location.addressLine2;
-  if (location.city !== undefined) updateData.city = location.city;
-  if (location.district !== undefined) updateData.district = location.district;
-  if (location.state !== undefined) updateData.state = location.state;
-  if (location.postalCode !== undefined)
-    updateData.postal_code = location.postalCode;
-  if (location.country !== undefined) updateData.country = location.country;
-  if (location.countryCode !== undefined)
-    updateData.country_code = location.countryCode;
-  if (location.provider !== undefined) updateData.provider = location.provider;
-  if (location.providerPlaceId !== undefined)
-    updateData.provider_place_id = location.providerPlaceId;
-
-  if (location.latitude !== undefined && location.longitude !== undefined) {
-    updateData.location = `SRID=4326;POINT(${location.longitude} ${location.latitude})`;
-  }
-
-  const { data, error } = await supabase
-    .from("locations")
-    .update(updateData)
-    .eq("id", locationId)
-    .select()
-    .single();
-
-  if (error) {
-    const userMessage = mapDatabaseErrorToUserMessage(error);
-    throw new AppError(
-      "INTERNAL_ERROR",
-      userMessage || "Failed to update location"
-    );
-  }
-
-  return data;
-}
-
-/**
- * Create a new property listing in the database
- */
-export async function createProperty(
-  property: PropertyInsertTable
-): Promise<Property> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("properties")
-    .insert(property)
-    .select("*, locations(*)")
-    .single();
-
-  if (error) {
-    const userMessage = mapDatabaseErrorToUserMessage(error);
-    throw new AppError(
-      "INTERNAL_ERROR",
-      userMessage || "Failed to create property listing"
-    );
-  }
-
-  return mapTableToProperty(
-    data as PropertyTable & { locations: LocationTable | null }
   );
 }
 
 /**
- * Get a property by ID
+ * PostgREST `or()` takes a comma-separated filter string, so an unescaped search term can
+ * inject extra filters.
  */
+function escapeSearchTerm(term: string): string {
+  return term.replace(/[,()*\\]/g, "");
+}
+
+// ---------------------------------------------------------------- writes (RPC)
+
+export type SavePropertyRpcInput = {
+  propertyId: string;
+  isNew: boolean;
+  property: Record<string, unknown>;
+  location: Record<string, unknown> | null;
+  images: Array<{
+    id: string | null;
+    storage_path: string | null;
+    sort_order: number;
+  }>;
+  publish: boolean;
+};
+
+export type SavePropertyRpcResult = {
+  property_id: string;
+  location_id: string | null;
+  status: PropertyStatus;
+  deleted_paths: string[];
+  pending: Array<{ id: string; storage_path: string; sort_order: number }>;
+};
+
+/**
+ * Commits the property, its location and the image bookkeeping in one transaction. New
+ * images land as "pending"; `finalizePropertyImagesRpc` promotes them once uploaded.
+ */
+export async function savePropertyRpc(
+  input: SavePropertyRpcInput
+): Promise<SavePropertyRpcResult> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("save_property", {
+    p_property_id: input.propertyId,
+    p_is_new: input.isNew,
+    p_property: input.property as Json,
+    p_location: input.location as Json,
+    p_images: input.images as Json,
+    p_publish: input.publish,
+  });
+
+  if (error) {
+    logDatabaseError("save_property", error);
+    const userMessage = mapDatabaseErrorToUserMessage(error);
+    throw new AppError(
+      "INTERNAL_ERROR",
+      userMessage || "Failed to save property"
+    );
+  }
+
+  return data as unknown as SavePropertyRpcResult;
+}
+
+export type FinalizeImagesRpcResult = {
+  status: PropertyStatus;
+  failed_paths: string[];
+};
+
+export async function finalizePropertyImagesRpc(
+  propertyId: string,
+  uploadedIds: string[],
+  failedIds: string[],
+  publish: boolean
+): Promise<FinalizeImagesRpcResult> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.rpc("finalize_property_images", {
+    p_property_id: propertyId,
+    p_uploaded: uploadedIds,
+    p_failed: failedIds,
+    p_publish: publish,
+  });
+
+  if (error) {
+    logDatabaseError("finalize_property_images", error);
+    const userMessage = mapDatabaseErrorToUserMessage(error);
+    throw new AppError(
+      "INTERNAL_ERROR",
+      userMessage || "Failed to finalize property images"
+    );
+  }
+
+  return data as unknown as FinalizeImagesRpcResult;
+}
+
+/** Every storage path still referenced by a row, used to scope the orphan sweep. */
+export async function listImagePathsForProperty(
+  propertyId: string
+): Promise<string[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("property_images")
+    .select("storage_path")
+    .eq("property_id", propertyId);
+
+  if (error) {
+    logDatabaseError("listImagePathsForProperty", error);
+    throw new AppError("INTERNAL_ERROR", "Failed to load property images");
+  }
+
+  return (data ?? []).map((row) => row.storage_path);
+}
+
+export async function deletePropertyById(propertyId: string): Promise<void> {
+  const supabase = await createClient();
+
+  // property_images rows cascade on the FK.
+  const { error } = await supabase
+    .from("properties")
+    .delete()
+    .eq("id", propertyId);
+
+  if (error) {
+    logDatabaseError("deletePropertyById", error);
+    const userMessage = mapDatabaseErrorToUserMessage(error);
+    throw new AppError(
+      "INTERNAL_ERROR",
+      userMessage || "Failed to delete property"
+    );
+  }
+}
+
+// ---------------------------------------------------------------- reads
+
 export async function getPropertyById(id: string): Promise<Property | null> {
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("properties")
-    .select("*, locations(*)")
+    .select(PROPERTY_SELECT)
     .eq("id", id)
     .single();
 
   if (error) {
+    // PGRST116 is the expected "no rows" case; anything else is a real fault that would
+    // otherwise masquerade as a missing property.
+    if (error.code !== "PGRST116") {
+      logDatabaseError("getPropertyById", error);
+    }
     return null;
   }
 
-  return mapTableToProperty(
-    data as PropertyTable & { locations: LocationTable | null }
-  );
+  return data ? mapTableToProperty(data as unknown as PropertyRow) : null;
 }
 
-/**
- * Get all properties (for future use)
- */
-export async function getAllProperties(): Promise<Property[]> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("properties")
-    .select("*, locations(*)")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    return [];
-  }
-
-  return (
-    data as Array<PropertyTable & { locations: LocationTable | null }>
-  ).map(mapTableToProperty);
-}
-
-/**
- * Update property with step data
- */
-export async function updateProperty(
-  propertyId: string,
-  stepData: Partial<PropertyUpdateTable>
-): Promise<Property> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("properties")
-    .update({
-      ...stepData,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", propertyId)
-    .select("*, locations(*)")
-    .single();
-
-  if (error) {
-    const userMessage = mapDatabaseErrorToUserMessage(error);
-    throw new AppError(
-      "INTERNAL_ERROR",
-      userMessage || "Failed to update property"
-    );
-  }
-
-  return mapTableToProperty(
-    data as PropertyTable & { locations: LocationTable | null }
-  );
-}
-
-// Backward compatibility alias
-export const updatePropertyStep = updateProperty;
-
-/**
- * Complete property submission - change status from pending to review
- * Property will be reviewed by admin before activation
- */
-export async function completePropertySubmission(
-  propertyId: string
-): Promise<Property> {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("properties")
-    .update({
-      status: "review",
-      next_action: "completed",
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", propertyId)
-    .select("*, locations(*)")
-    .single();
-
-  if (error) {
-    const userMessage = mapDatabaseErrorToUserMessage(error);
-    throw new AppError(
-      "INTERNAL_ERROR",
-      userMessage || "Failed to complete property submission"
-    );
-  }
-
-  return mapTableToProperty(
-    data as PropertyTable & { locations: LocationTable | null }
-  );
-}
-
-/**
- * Get pending property listing for a user
- * Returns first incomplete property (status = "pending")
- */
-export async function getPendingListing(
-  profileId: string
-): Promise<Property | null> {
-  const supabase = await createClient();
-
-  const { data, error } = (await supabase
-    .from("properties")
-    .select("*, locations(*)")
-    .eq("profile_id", profileId)
-    .eq("status", "pending")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .single()) as {
-    data: (PropertyTable & { locations: LocationTable | null }) | null;
-    error: { code?: string; message?: string } | null;
-  };
-
-  if (error) {
-    return null;
-  }
-
-  return data ? mapTableToProperty(data) : null;
-}
-
-/**
- * Get all properties for a user with optional filtering
- */
 export async function getPropertiesList(
   profileId: string,
   filters?: {
@@ -411,7 +331,7 @@ export async function getPropertiesList(
 
   let query = supabase
     .from("properties")
-    .select("*, locations(*)")
+    .select(PROPERTY_SELECT)
     .eq("profile_id", profileId)
     .order("created_at", { ascending: false });
 
@@ -424,76 +344,52 @@ export async function getPropertiesList(
   }
 
   if (filters?.search) {
-    query = query.or(
-      `title.ilike.%${filters.search}%,location.ilike.%${filters.search}%`
-    );
+    const term = escapeSearchTerm(filters.search);
+    query = query.or(`title.ilike.%${term}%,location.ilike.%${term}%`);
   }
 
   const { data, error } = await query;
 
   if (error) {
+    logDatabaseError("getPropertiesList", error);
     throw new AppError("INTERNAL_ERROR", "Failed to fetch properties");
   }
 
-  return data
-    ? (data as Array<PropertyTable & { locations: LocationTable | null }>).map(
-        mapTableToProperty
-      )
-    : [];
+  return data ? (data as unknown as PropertyRow[]).map(mapTableToProperty) : [];
 }
 
-/**
- * Get properties count by status
- */
 export async function getPropertiesCountByStatus(profileId: string): Promise<{
   all: number;
   active: number;
-  pending: number;
   draft: number;
+  review: number;
   rented: number;
 }> {
   const supabase = await createClient();
 
-  const { count: all } = await supabase
-    .from("properties")
-    .select("*", { count: "exact", head: true })
-    .eq("profile_id", profileId);
+  const countFor = async (status?: PropertyStatus) => {
+    let query = supabase
+      .from("properties")
+      .select("*", { count: "exact", head: true })
+      .eq("profile_id", profileId);
 
-  const { count: active } = await supabase
-    .from("properties")
-    .select("*", { count: "exact", head: true })
-    .eq("profile_id", profileId)
-    .eq("status", "active");
+    if (status) {
+      query = query.eq("status", status);
+    }
 
-  const { count: pending } = await supabase
-    .from("properties")
-    .select("*", { count: "exact", head: true })
-    .eq("profile_id", profileId)
-    .eq("status", "pending");
-
-  const { count: draft } = await supabase
-    .from("properties")
-    .select("*", { count: "exact", head: true })
-    .eq("profile_id", profileId)
-    .in("next_action", ["basic_details", "amenities", "review"]);
-
-  const { count: rented } = await supabase
-    .from("properties")
-    .select("*", { count: "exact", head: true })
-    .eq("profile_id", profileId)
-    .eq("status", "rented");
-
-  return {
-    all: all ?? 0,
-    active: active ?? 0,
-    pending: pending ?? 0,
-    draft: draft ?? 0,
-    rented: rented ?? 0,
+    const { count } = await query;
+    return count ?? 0;
   };
+
+  const [all, active, draft, review, rented] = await Promise.all([
+    countFor(),
+    countFor("active"),
+    countFor("draft"),
+    countFor("review"),
+    countFor("rented"),
+  ]);
+
+  return { all, active, draft, review, rented };
 }
 
-export {
-  mapBasicDetailsToInsert,
-  mapAmenitiesDataToUpdate,
-  mapImagesDataToUpdate,
-};
+export { mapTableToProperty, mapDatabaseErrorToUserMessage, escapeSearchTerm };

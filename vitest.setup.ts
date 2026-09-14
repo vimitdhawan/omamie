@@ -6,6 +6,22 @@ afterEach(() => {
   cleanup();
 });
 
+// jsdom has no matchMedia, which useIsMobile() (and therefore every responsive component)
+// calls on mount. Defaults to desktop; a test can override window.innerWidth first.
+if (!window.matchMedia) {
+  window.matchMedia = (query: string) =>
+    ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }) as unknown as MediaQueryList;
+}
+
 // Silence next/navigation and next/headers when used in unit tests.
 vi.mock("next/navigation", () => ({
   redirect: vi.fn(),

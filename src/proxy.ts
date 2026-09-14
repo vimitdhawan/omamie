@@ -8,7 +8,8 @@ const ROUTE_CONFIG = {
   auth: ["/login", "/signup"],
   protected: [
     {
-      pattern: "/properties/create/*",
+      // Covers /properties and everything under it (create, [id], [id]/edit).
+      pattern: "/properties/*",
       roles: ["agent", "owner"] as const,
     },
     {
@@ -22,20 +23,20 @@ const authRoutes = ROUTE_CONFIG.auth;
 const publicRoutes = ROUTE_CONFIG.public;
 const PROTECTED_ROUTES = ROUTE_CONFIG.protected;
 
-function isProtectedRoute(pathname: string): boolean {
+export function isProtectedRoute(pathname: string): boolean {
   return PROTECTED_ROUTES.some((route) =>
     matchPattern(pathname, route.pattern)
   );
 }
 
-function getAllowedRolesForRoute(
+export function getAllowedRolesForRoute(
   pathname: string
 ): readonly (typeof PROTECTED_ROUTES)[number]["roles"][number][] {
   const route = PROTECTED_ROUTES.find((r) => matchPattern(pathname, r.pattern));
   return route?.roles || [];
 }
 
-function matchPattern(pathname: string, pattern: string): boolean {
+export function matchPattern(pathname: string, pattern: string): boolean {
   // Step 1: Escape all regex special characters to prevent injection
   let regexStr = pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -44,6 +45,12 @@ function matchPattern(pathname: string, pattern: string): boolean {
 
   // Step 3: Handle Next.js wildcard syntax (/:path* → match anything after /)
   regexStr = regexStr.replace(/\/:path\\\*$/, "(?:/.*)?");
+
+  // Step 3b: A trailing "/*" matches the base path *and* anything beneath it.
+  // Without this the escaped "\*" from step 1 stays literal, so "/properties/*"
+  // only ever matched the literal string "/properties/*" — leaving the route
+  // ungated for every real request.
+  regexStr = regexStr.replace(/\/\\\*$/, "(?:/.*)?");
 
   // Step 4: Handle route parameters like :id → [^/]+
   regexStr = regexStr.replace(/:([^/]+)/g, "[^/]+");

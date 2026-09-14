@@ -114,7 +114,7 @@ export function PropertiesTable({ properties }: PropertiesTableProps) {
 
   return (
     <div className="space-y-4">
-      <div className="border-border overflow-hidden rounded-lg border">
+      <div className="border-border overflow-x-auto rounded-lg border">
         <Table>
           <DataTableHeader table={table} />
           <DataTableBody table={table} emptyMessage="No properties found" />

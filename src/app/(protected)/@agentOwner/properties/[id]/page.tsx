@@ -1,29 +1,39 @@
 import { getAuthSession } from "@/lib/auth-session";
 import { redirect } from "next/navigation";
-import { getPropertyById } from "@/features/properties/repository";
 import Link from "next/link";
-import { MapPin, Edit2, Eye, Share2, Trash2, TrendingUp } from "lucide-react";
+import {
+  Bath,
+  BedDouble,
+  Building2,
+  CalendarDays,
+  ChevronRight,
+  Layers,
+  MapPin,
+  Maximize2,
+  Sofa,
+} from "lucide-react";
+import { getProperty } from "@/features/properties/service";
+import { formatCurrency } from "@/lib/utils/format";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ShowInterestButton } from "@/features/property-matches/components/show-interest-button";
-
-function getStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    active: "Published",
-    pending: "Draft",
-    review: "Review",
-    rented: "Rented",
-    inactive: "Inactive",
-  };
-  return labels[status] || status;
-}
-
-const PLACEHOLDER_PHOTOS = [
-  "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=500&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=500&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&h=400&fit=crop",
-  "https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?w=500&h=400&fit=crop",
-];
+import { PropertyGallery } from "@/features/properties/components/property-gallery";
+import { PropertyDetailActions } from "@/features/properties/components/property-detail-actions";
+import {
+  AMENITIES,
+  FURNISHED_STATUS,
+  PROPERTY_TYPES,
+} from "@/features/properties/schema";
+import {
+  BUILDING_FACILITY_VALUES,
+  UNIT_AMENITY_VALUES,
+} from "@/features/properties/types";
+import {
+  derivePropertyCode,
+  formatRelativeDate,
+  getStatusDotClass,
+  getStatusLabel,
+} from "@/features/properties/utils/display";
+import type { Amenity, Property } from "@/features/properties/types";
 
 export default async function PropertyDetailPage({
   params,
@@ -36,205 +46,333 @@ export default async function PropertyDetailPage({
   }
 
   const { id } = await params;
-  const property = await getPropertyById(id);
+  const property = await getProperty(id);
 
   if (!property || property.profileId !== session.profileId) {
     redirect("/properties");
   }
 
+  const selected = new Set<Amenity>(property.amenities);
+  const buildingFacilities = BUILDING_FACILITY_VALUES.filter((value) =>
+    selected.has(value)
+  );
+  const unitAmenities = UNIT_AMENITY_VALUES.filter((value) =>
+    selected.has(value)
+  );
+
   return (
-    <div className="flex-1 space-y-8 p-8">
-      <div className="rounded-lg bg-blue-50 p-6">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <div className="mb-2 flex items-center gap-3">
-              <h1 className="text-[28px] font-bold">{property.title}</h1>
-              <Badge variant="default">{getStatusLabel(property.status)}</Badge>
-            </div>
-            <div className="text-muted-foreground flex items-center gap-1">
-              <MapPin className="size-4" />
-              {property.location}
-            </div>
-          </div>
-          <div className="text-right">
-            <div className="text-[36px] font-bold text-blue-600">
-              ${property.monthlyRent.toLocaleString()}
-              <span className="text-[16px] font-normal text-gray-600">/mo</span>
-            </div>
-            <Link href={`/properties/${property.id}/edit`}>
-              <Button size="sm" className="mt-2 gap-2">
-                <Edit2 className="size-4" />
-                Edit Property
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </div>
+    <div className="flex-1 space-y-6 p-6 lg:p-8">
+      <nav className="text-muted-foreground flex items-center gap-1 text-sm">
+        <Link href="/properties" className="hover:text-foreground">
+          Properties
+        </Link>
+        <ChevronRight className="size-3.5" />
+        <span className="text-foreground font-medium">
+          {derivePropertyCode(property.id)}
+        </span>
+      </nav>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-        <div className="space-y-8 lg:col-span-2">
-          <div>
-            <h3 className="mb-4 text-[20px] font-bold">Property Details</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-lg bg-blue-50 p-4">
-                <p className="text-muted-foreground text-sm">Bedrooms</p>
-                <p className="mt-1 text-lg font-semibold">
-                  {property.bedrooms} Bedrooms
-                </p>
-              </div>
-              <div className="rounded-lg bg-blue-50 p-4">
-                <p className="text-muted-foreground text-sm">Bathrooms</p>
-                <p className="mt-1 text-lg font-semibold">
-                  {property.bathrooms} Bathrooms
-                </p>
-              </div>
-              <div className="rounded-lg bg-blue-50 p-4">
-                <p className="text-muted-foreground text-sm">Type</p>
-                <p className="mt-1 text-lg font-semibold capitalize">
-                  {property.propertyType}
-                </p>
-              </div>
-              <div className="rounded-lg bg-blue-50 p-4">
-                <p className="text-muted-foreground text-sm">Furnished</p>
-                <p className="mt-1 text-lg font-semibold capitalize">
-                  {property.furnishedStatus}
-                </p>
-              </div>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* Listing */}
+        <div className="space-y-6 lg:col-span-2">
+          <Card className="p-5">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="text-foreground text-2xl font-bold">
+                {property.title}
+              </h1>
+              <span className="bg-surface-soft text-foreground inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold">
+                <span
+                  className={`size-2 rounded-full ${getStatusDotClass(property.status)}`}
+                  aria-hidden
+                />
+                {getStatusLabel(property.status)}
+              </span>
             </div>
-          </div>
 
-          {property.description && (
-            <div>
-              <h3 className="mb-3 text-[20px] font-bold">Description</h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {property.description}
+            <p className="text-muted-foreground mt-2 flex items-center gap-1.5 text-sm">
+              <MapPin className="size-4 shrink-0" />
+              {property.location || "Location not set"}
+            </p>
+
+            {property.condo?.name && (
+              <p className="text-muted-foreground mt-1 flex items-center gap-1.5 text-sm">
+                <Building2 className="size-4 shrink-0" />
+                {property.condo.name}
+              </p>
+            )}
+          </Card>
+
+          <Card className="p-5">
+            <PropertyGallery images={property.images} title={property.title} />
+          </Card>
+
+          <Card className="p-5">
+            <h2 className="text-foreground mb-4 text-lg font-bold">
+              Key specifications
+            </h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+              <SpecTile
+                icon={<BedDouble className="size-5" />}
+                label="Bedrooms"
+                value={String(property.bedrooms)}
+              />
+              <SpecTile
+                icon={<Bath className="size-5" />}
+                label="Bathrooms"
+                value={String(property.bathrooms)}
+              />
+              <SpecTile
+                icon={<Maximize2 className="size-5" />}
+                label="Floor area"
+                value={property.areaSqm ? `${property.areaSqm} m²` : "—"}
+              />
+              <SpecTile
+                icon={<Sofa className="size-5" />}
+                label="Furnishing"
+                value={
+                  property.furnishedStatus
+                    ? FURNISHED_STATUS[property.furnishedStatus]
+                    : "—"
+                }
+              />
+              <SpecTile
+                icon={<Layers className="size-5" />}
+                label="Floor"
+                value={formatFloor(property)}
+              />
+            </div>
+          </Card>
+
+          <Card className="p-5">
+            <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+              <h2 className="text-foreground text-lg font-bold">
+                About this listing
+              </h2>
+              <p className="text-muted-foreground text-xs">
+                Last updated{" "}
+                {formatRelativeDate(property.updatedAt || property.createdAt)}
               </p>
             </div>
-          )}
+            {property.description ? (
+              <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line">
+                {property.description}
+              </p>
+            ) : (
+              <EmptyNote>
+                No description yet. Add one so tenants know what makes this
+                place worth a viewing.
+              </EmptyNote>
+            )}
+          </Card>
 
-          {property.amenities.length > 0 && (
-            <div>
-              <h3 className="mb-3 text-[20px] font-bold">Amenities</h3>
-              <div className="flex flex-wrap gap-2">
-                {property.amenities.map((amenity) => (
-                  <Badge key={amenity} variant="secondary">
-                    {amenity}
-                  </Badge>
-                ))}
+          <Card className="p-5">
+            <h2 className="text-foreground mb-4 text-lg font-bold">
+              Amenities &amp; facility access
+            </h2>
+            {buildingFacilities.length === 0 && unitAmenities.length === 0 ? (
+              <EmptyNote>
+                Nothing listed yet — a plain house may genuinely have none.
+              </EmptyNote>
+            ) : (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                <AmenityGroup
+                  title="In the unit"
+                  amenities={unitAmenities}
+                  emptyNote="Nothing listed for the unit."
+                />
+                <AmenityGroup
+                  title="Building facilities"
+                  amenities={buildingFacilities}
+                  emptyNote="Nothing listed for the building."
+                />
               </div>
-            </div>
-          )}
-
-          <div>
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-[20px] font-bold">Performance & Analytics</h3>
-              <Link
-                href="#"
-                className="text-sm font-semibold text-blue-600 hover:underline"
-              >
-                View Detailed Report
-              </Link>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="rounded-lg border p-4">
-                <p className="text-muted-foreground text-sm">Total Views</p>
-                <p className="mt-2 text-2xl font-bold">1,248</p>
-                <div className="mt-1 flex items-center gap-1 text-xs text-green-600">
-                  <TrendingUp className="size-3" />
-                  +12% this week
-                </div>
-              </div>
-              <div className="rounded-lg border p-4">
-                <p className="text-muted-foreground text-sm">
-                  Viewing Requests
-                </p>
-                <p className="mt-2 text-2xl font-bold">24</p>
-                <div className="mt-1 flex items-center gap-1 text-xs text-green-600">
-                  <TrendingUp className="size-3" />
-                  +4 pending approval
-                </div>
-              </div>
-              <div className="rounded-lg border p-4">
-                <p className="text-muted-foreground text-sm">
-                  Inquiry Conversion
-                </p>
-                <p className="mt-2 text-2xl font-bold">8.4%</p>
-                <p className="text-muted-foreground mt-1 text-xs">
-                  Average market: 6.1%
-                </p>
-              </div>
-            </div>
-          </div>
+            )}
+          </Card>
         </div>
 
+        {/* Owner controls */}
         <div className="space-y-6 lg:col-span-1">
-          <div className="space-y-3 rounded-lg border p-6">
-            <h3 className="mb-4 text-[20px] font-bold">Actions</h3>
-            <Link href={`/properties/${property.id}/edit`} className="block">
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-start gap-2"
-              >
-                <Edit2 className="size-4" />
-                Edit Property
-              </Button>
-            </Link>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full justify-start gap-2"
-            >
-              <Eye className="size-4" />
-              View Public Listing
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full justify-start gap-2"
-            >
-              <Share2 className="size-4" />
-              Share Listing Link
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-destructive hover:text-destructive hover:bg-destructive/10 w-full justify-start gap-2"
-            >
-              <Trash2 className="size-4" />
-              Delete Property
-            </Button>
-          </div>
-
-          <div className="rounded-lg border p-6">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-[16px] font-bold">Photos</h3>
-              <Link
-                href="#"
-                className="text-xs font-semibold text-blue-600 hover:underline"
-              >
-                Manage (6)
-              </Link>
+          <Card className="p-5">
+            <h2 className="text-uppercase-tag text-muted-foreground tracking-wider uppercase">
+              Financial overview
+            </h2>
+            <div className="mt-3">
+              <p className="text-muted-foreground text-xs font-semibold">
+                MONTHLY RENT
+              </p>
+              <p className="text-foreground text-3xl font-bold">
+                {property.monthlyRent
+                  ? formatCurrency(property.monthlyRent, "en-US", "THB")
+                  : "Not set"}
+                {property.monthlyRent != null && (
+                  <span className="text-muted-foreground ml-1 text-sm font-normal">
+                    / month
+                  </span>
+                )}
+              </p>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              {PLACEHOLDER_PHOTOS.map((photo, idx) => (
-                <div
-                  key={idx}
-                  className="bg-muted aspect-square overflow-hidden rounded-lg"
-                >
-                  <img
-                    src={photo}
-                    alt={`Property ${idx + 1}`}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
 
-          <ShowInterestButton propertyId={property.id} />
+            <dl className="mt-4 space-y-2 text-sm">
+              <SummaryRow
+                label="Security deposit"
+                value={
+                  property.securityDepositMonths != null
+                    ? `${property.securityDepositMonths} ${plural(property.securityDepositMonths, "month")} rent`
+                    : null
+                }
+              />
+              <SummaryRow
+                label="Minimum lease"
+                value={
+                  property.minimumLeaseMonths != null
+                    ? `${property.minimumLeaseMonths} ${plural(property.minimumLeaseMonths, "month")}`
+                    : null
+                }
+              />
+              <SummaryRow
+                label="Available from"
+                value={
+                  property.availableFrom ? (
+                    <span className="inline-flex items-center gap-1.5">
+                      <CalendarDays className="size-3.5" />
+                      {formatAvailableFrom(property.availableFrom)}
+                    </span>
+                  ) : null
+                }
+              />
+            </dl>
+          </Card>
+
+          <Card className="p-5">
+            <h2 className="text-uppercase-tag text-muted-foreground mb-3 tracking-wider uppercase">
+              Host operations
+            </h2>
+            <PropertyDetailActions property={property} />
+          </Card>
+
+          <Card className="p-5">
+            <h2 className="text-uppercase-tag text-muted-foreground tracking-wider uppercase">
+              Property summary
+            </h2>
+            <dl className="mt-3 space-y-2 text-sm">
+              <SummaryRow
+                label="Property ID"
+                value={derivePropertyCode(property.id)}
+              />
+              <SummaryRow
+                label="Type"
+                value={
+                  property.propertyType
+                    ? PROPERTY_TYPES[property.propertyType]
+                    : null
+                }
+              />
+              <SummaryRow label="Building" value={property.condo?.name} />
+              <SummaryRow
+                label="Configuration"
+                value={`${property.bedrooms} bed, ${property.bathrooms} bath${
+                  property.areaSqm ? ` (${property.areaSqm} m²)` : ""
+                }`}
+              />
+              <SummaryRow label="Floor" value={formatFloor(property)} />
+              <SummaryRow
+                label="Photos"
+                value={`${property.images.length} of 10`}
+              />
+            </dl>
+          </Card>
         </div>
       </div>
     </div>
   );
+}
+
+function SpecTile({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="border-hairline-soft rounded-lg border p-3">
+      <div className="text-primary">{icon}</div>
+      <p className="text-foreground mt-2 text-sm font-semibold">{value}</p>
+      <p className="text-muted-foreground text-xs">{label}</p>
+    </div>
+  );
+}
+
+function SummaryRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: React.ReactNode | null | undefined;
+}) {
+  return (
+    <div className="flex items-start justify-between gap-3">
+      <dt className="text-muted-foreground shrink-0">{label}</dt>
+      <dd className="text-foreground text-right font-medium">
+        {value ?? <span className="text-muted-foreground">Not set</span>}
+      </dd>
+    </div>
+  );
+}
+
+function AmenityGroup({
+  title,
+  amenities,
+  emptyNote,
+}: {
+  title: string;
+  amenities: readonly Amenity[];
+  emptyNote: string;
+}) {
+  return (
+    <div>
+      <h3 className="text-micro-label text-muted-foreground mb-2 tracking-wider uppercase">
+        {title}
+      </h3>
+      {amenities.length === 0 ? (
+        <p className="text-muted-foreground text-sm">{emptyNote}</p>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {amenities.map((amenity) => (
+            <Badge key={amenity} variant="secondary">
+              {AMENITIES[amenity]}
+            </Badge>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EmptyNote({ children }: { children: React.ReactNode }) {
+  return <p className="text-muted-foreground text-sm">{children}</p>;
+}
+
+function plural(count: number, word: string): string {
+  return count === 1 ? word : `${word}s`;
+}
+
+function formatFloor(property: Property): string {
+  if (property.floorNumber == null) return "—";
+  return property.totalFloors
+    ? `${property.floorNumber} of ${property.totalFloors}`
+    : String(property.floorNumber);
+}
+
+/** `availableFrom` is a plain "YYYY-MM-DD"; parsing it as a Date would shift the day. */
+function formatAvailableFrom(value: string): string {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day)).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 }
