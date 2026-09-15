@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const PORT = 3000;
+// Overridable so the suite can run alongside a dev server already holding 3000.
+// `next start` reads PORT too, so the webServer below follows automatically.
+const PORT = Number(process.env.PORT ?? 3000);
 const baseURL = `http://127.0.0.1:${PORT}`;
 
 /**

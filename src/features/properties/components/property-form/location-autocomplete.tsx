@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { MapPin } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import {
   fetchLocationSuggestionsAction,
   fetchLocationEnrichmentAction,
-} from "../actions";
-import type { Location } from "../types";
+} from "../../actions";
+import type { Location } from "../../types";
 
 export type LocationSuggestion = {
   place_name: string;
@@ -16,6 +18,7 @@ export type LocationSuggestion = {
 };
 
 export type LocationAutocompleteProps = {
+  id?: string;
   value: string;
   onChange: (value: string, locationDetails?: Location) => void;
   onBlur?: () => void;
@@ -24,6 +27,7 @@ export type LocationAutocompleteProps = {
 };
 
 export function LocationAutocomplete({
+  id,
   value,
   onChange,
   onBlur,
@@ -130,11 +134,13 @@ export function LocationAutocomplete({
 
   return (
     <div className="relative">
-      <div className="relative flex h-8 items-center">
-        <span className="material-symbols-outlined text-on-surface-variant pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-base">
-          location_on
-        </span>
-        <input
+      <div className="relative flex items-center">
+        <MapPin
+          className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2"
+          aria-hidden
+        />
+        <Input
+          id={id}
           type="text"
           value={inputValue}
           onChange={(e) => handleInputChange(e.target.value)}
@@ -145,11 +151,7 @@ export function LocationAutocomplete({
           }}
           placeholder={placeholder}
           disabled={disabled}
-          className={cn(
-            "border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 h-8 w-full rounded-lg border bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:ring-2 disabled:opacity-50 md:text-sm",
-            "pl-9",
-            disabled && "cursor-not-allowed"
-          )}
+          className={cn("pl-9", disabled && "cursor-not-allowed")}
         />
         {isLoading && (
           <div className="border-primary pointer-events-none absolute top-1/2 right-2.5 h-4 w-4 -translate-y-1/2 animate-spin rounded-full border-2 border-t-transparent" />
@@ -157,9 +159,9 @@ export function LocationAutocomplete({
       </div>
 
       {open && (
-        <div className="border-outline-variant absolute top-full right-0 left-0 z-50 mt-1 max-h-72 overflow-y-auto rounded-lg border bg-white shadow-lg">
+        <div className="border-hairline-soft bg-popover absolute top-full right-0 left-0 z-50 mt-1 max-h-72 overflow-y-auto rounded-lg border shadow-lg">
           {!isLoading && suggestions.length === 0 && (
-            <div className="text-on-surface-variant px-3 py-4 text-sm">
+            <div className="text-muted-foreground px-3 py-4 text-sm">
               No neighbourhoods found in Bangkok.
             </div>
           )}
@@ -191,13 +193,13 @@ export function LocationAutocomplete({
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleSuggestionSelect(suggestion)}
-                className="hover:bg-surface-container-high flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors"
+                className="hover:bg-accent flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors"
               >
-                <span className="text-on-surface text-sm font-medium">
+                <span className="text-foreground text-sm font-medium">
                   {neighborhood}
                 </span>
                 {secondaryText && (
-                  <span className="text-on-surface-variant text-xs">
+                  <span className="text-muted-foreground text-xs">
                     {secondaryText}
                   </span>
                 )}

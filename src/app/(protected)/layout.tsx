@@ -13,5 +13,11 @@ export default async function ProtectedLayout({
     redirect("/login");
   }
 
-  return session.role === "tenant" ? tenant : agentOwner;
+  if (session.role === "tenant") return tenant;
+  if (session.role === "agent" || session.role === "owner") return agentOwner;
+
+  // An unrecognized role means the session cookie is malformed — never fall
+  // through to a default slot, since that would grant one role's UI to a
+  // session we can't actually validate.
+  redirect("/login");
 }

@@ -1,5 +1,12 @@
 import { cookies } from "next/headers";
+import { z } from "zod";
+import { roleEnum } from "@/features/auth/schema";
 import type { AuthSession, UserRole } from "@/types/auth";
+
+const authSessionSchema = z.object({
+  profileId: z.string().min(1),
+  role: roleEnum,
+});
 
 const ROLE_BASED_DEFAULTS: Record<UserRole, string> = {
   tenant: "/find-property",
@@ -31,7 +38,8 @@ export async function getAuthSession(): Promise<AuthSession | null> {
   if (!session) return null;
 
   try {
-    return JSON.parse(session) as AuthSession;
+    const parsed = authSessionSchema.safeParse(JSON.parse(session));
+    return parsed.success ? parsed.data : null;
   } catch {
     return null;
   }

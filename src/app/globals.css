@@ -105,6 +105,12 @@
   --color-surface-strong: #e6ebf4;
   --color-on-primary: #ffffff;
   --color-on-dark: #ffffff;
+  /* Status accents. The theme had neither, which is why status badges were reaching for
+     raw Tailwind palette values (text-emerald-600). Warning keys off --color-featured. */
+  --color-success: #0f7b55;
+  --color-success-soft: #e3f5ed;
+  --color-warning: #ca5100;
+  --color-warning-soft: #fdefe3;
   --color-legal-link: #336cfb;
   --color-star-rating: #757681;
   --color-scrim: #000000;
@@ -253,6 +259,13 @@
   --sidebar-accent-foreground: #dbe1ff;
   --sidebar-border: #344884;
   --sidebar-ring: #b5c4ff;
+
+  /* Status accents. Tailwind resolves bg-success to var(--color-success), so redefining
+     the custom property inside .dark is enough for the utilities to follow. */
+  --color-success: #80f9bd;
+  --color-success-soft: #14402f;
+  --color-warning: #ffb782;
+  --color-warning-soft: #43260f;
 }
 
 @layer base {
