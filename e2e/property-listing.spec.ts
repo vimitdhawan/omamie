@@ -238,7 +238,12 @@ test.describe("Single-form listing editor", () => {
       .getByRole("button", { name: /save draft/i })
       .first()
       .click();
-    await page.waitForTimeout(3000);
+    // An update-in-place save has no URL to wait on (it calls router.refresh(), not
+    // router.replace()), so wait on the actual completion signal rather than a fixed sleep —
+    // a slow save round-trip in CI would otherwise let the reload below race ahead of it.
+    await expect(page.getByText(/draft saved/i)).toBeVisible({
+      timeout: 15000,
+    });
     await page.reload();
 
     await expect(page.getByText("1 photo")).toBeVisible({ timeout: 15000 });
