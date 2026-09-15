@@ -73,6 +73,12 @@ export function MatchesClient({
 
   const handleStatusChange = useCallback(
     (value: string) => {
+      // A pending debounced search fetch closes over the status that was current when it was
+      // scheduled. Without cancelling it here, it can fire after this status change and
+      // overwrite these results with the old status filter.
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
       const newStatus = (value || "all") as MatchStatus | "all";
       setCurrentStatus(newStatus);
       refetchMatches(newStatus, localSearch);

@@ -1,4 +1,4 @@
-import type { PropertyStatus } from "../types";
+import type { Property, PropertyStatus } from "../types";
 
 const STATUS_LABELS: Record<string, string> = {
   active: "Published",
@@ -30,6 +30,32 @@ export function getStatusDotClass(status: PropertyStatus | string): string {
 /** A short human-facing handle, so an owner can refer to a listing without its UUID. */
 export function derivePropertyCode(id: string): string {
   return `PROP-${id.slice(-4).toUpperCase()}`;
+}
+
+/**
+ * Derives per-status counts from an already-fetched property list, rather than issuing
+ * separate count queries per status — the caller already has the full unfiltered list.
+ */
+export function deriveStatusCounts(properties: Property[]): {
+  all: number;
+  active: number;
+  draft: number;
+  review: number;
+  rented: number;
+} {
+  const counts = {
+    all: properties.length,
+    active: 0,
+    draft: 0,
+    review: 0,
+    rented: 0,
+  };
+  for (const property of properties) {
+    if (property.status in counts) {
+      counts[property.status as "active" | "draft" | "review" | "rented"]++;
+    }
+  }
+  return counts;
 }
 
 export function formatRelativeDate(dateString: string): string {

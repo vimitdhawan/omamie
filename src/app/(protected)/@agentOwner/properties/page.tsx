@@ -2,10 +2,8 @@ import { getAuthSession } from "@/lib/auth-session";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle2, Clock, KeyRound, PencilLine, Plus } from "lucide-react";
-import {
-  listProperties,
-  countPropertiesByStatus,
-} from "@/features/properties/service";
+import { listProperties } from "@/features/properties/service";
+import { deriveStatusCounts } from "@/features/properties/utils/display";
 import { PropertiesClient } from "@/features/properties/components/property-list/properties-client";
 import { MetricCard } from "@/features/agents/dashboard/components/metric-card";
 
@@ -18,12 +16,17 @@ export default async function PropertiesPage({
   if (!session?.profileId) {
     redirect("/login");
   }
+  // The parent layout already dispatches by role, but this page owns
+  // sensitive listing data, so it re-checks rather than trusting that
+  // dispatch alone.
+  if (session.role !== "agent" && session.role !== "owner") {
+    redirect("/login");
+  }
 
-  // Fetch all properties on first load
-  const [initialProperties, counts] = await Promise.all([
-    listProperties(session.profileId),
-    countPropertiesByStatus(session.profileId),
-  ]);
+  // Fetch all properties on first load. Counts are derived from this same
+  // list rather than a second query — see below.
+  const initialProperties = await listProperties(session.profileId);
+  const counts = deriveStatusCounts(initialProperties);
 
   return (
     <div className="flex-1 space-y-8 p-8">
