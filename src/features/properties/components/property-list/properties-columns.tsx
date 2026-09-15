@@ -10,8 +10,8 @@ import {
   derivePropertyCode,
   formatRelativeDate,
   getStatusLabel,
-} from "../utils/display";
-import type { Property } from "../types";
+} from "../../utils/display";
+import type { Property } from "../../types";
 
 const STATUS_BADGE_VARIANT: Record<
   string,

@@ -7,14 +7,14 @@ import { Card } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils/format";
 import { getPublicImageUrl } from "@/lib/storage-url";
 import { PropertyRowActions } from "./property-row-actions";
-import { PROPERTY_TYPES } from "../schema";
+import { PROPERTY_TYPES } from "../../schema";
 import {
   derivePropertyCode,
   formatRelativeDate,
   getStatusDotClass,
   getStatusLabel,
-} from "../utils/display";
-import type { Property } from "../types";
+} from "../../utils/display";
+import type { Property } from "../../types";
 
 interface PropertiesGridProps {
   properties: Property[];

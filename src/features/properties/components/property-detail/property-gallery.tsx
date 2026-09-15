@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, ImageIcon } from "lucide-react";
 import { getPublicImageUrl } from "@/lib/storage-url";
 import { cn } from "@/lib/utils";
-import type { PropertyImage } from "../types";
+import type { PropertyImage } from "../../types";
 
 interface PropertyGalleryProps {
   images: PropertyImage[];
@@ -71,7 +71,7 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
       </div>
 
       {images.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex gap-2 overflow-x-auto p-1">
           {images.map((image, position) => (
             <button
               key={image.id}

@@ -6,7 +6,7 @@ import {
   listProperties,
   countPropertiesByStatus,
 } from "@/features/properties/service";
-import { PropertiesClient } from "@/features/properties/components/properties-client";
+import { PropertiesClient } from "@/features/properties/components/property-list/properties-client";
 import { MetricCard } from "@/features/agents/dashboard/components/metric-card";
 
 export default async function PropertiesPage({
@@ -40,34 +40,45 @@ export default async function PropertiesPage({
       {/* Status Cards — the listing lifecycle, in order. A total is already implied by the
           "Showing N properties" line below, so it earns no card of its own. */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <MetricCard
-          icon={<PencilLine className="size-6" />}
-          label="Drafts"
-          value={counts.draft}
-          bgColor="bg-yellow-50"
-          iconColor="text-yellow-600"
-        />
-        <MetricCard
-          icon={<Clock className="size-6" />}
-          label="In review"
-          value={counts.review}
-          bgColor="bg-orange-50"
-          iconColor="text-orange-600"
-        />
-        <MetricCard
-          icon={<CheckCircle2 className="size-6" />}
-          label="Published"
-          value={counts.active}
-          bgColor="bg-green-50"
-          iconColor="text-green-600"
-        />
-        <MetricCard
-          icon={<KeyRound className="size-6" />}
-          label="Rented"
-          value={counts.rented}
-          bgColor="bg-blue-50"
-          iconColor="text-blue-600"
-        />
+        {[
+          {
+            icon: <PencilLine className="size-6" />,
+            label: "Drafts",
+            value: counts.draft,
+            bgColor: "bg-yellow-50",
+            iconColor: "text-yellow-600",
+          },
+          {
+            icon: <Clock className="size-6" />,
+            label: "In review",
+            value: counts.review,
+            bgColor: "bg-orange-50",
+            iconColor: "text-orange-600",
+          },
+          {
+            icon: <CheckCircle2 className="size-6" />,
+            label: "Published",
+            value: counts.active,
+            bgColor: "bg-green-50",
+            iconColor: "text-green-600",
+          },
+          {
+            icon: <KeyRound className="size-6" />,
+            label: "Rented",
+            value: counts.rented,
+            bgColor: "bg-blue-50",
+            iconColor: "text-blue-600",
+          },
+        ].map((metric) => (
+          <MetricCard
+            key={metric.label}
+            icon={metric.icon}
+            label={metric.label}
+            value={metric.value}
+            bgColor={metric.bgColor}
+            iconColor={metric.iconColor}
+          />
+        ))}
       </div>
 
       {/* Client-side filtering and table/grid - instant updates, no full page reload */}

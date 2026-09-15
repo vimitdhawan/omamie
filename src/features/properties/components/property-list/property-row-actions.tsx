@@ -20,8 +20,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { deletePropertyAction } from "../actions";
-import type { Property } from "../types";
+import { deletePropertyAction } from "../../actions";
+import type { Property } from "../../types";
 
 /**
  * Lets the list owning these rows drop a deleted property from its own state. The list keeps

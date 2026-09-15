@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { FieldError } from "@/components/ui/field";
-import { LocationAutocomplete } from "../location-autocomplete";
+import { LocationAutocomplete } from "./location-autocomplete";
 import { ChipRadio } from "./field-parts";
 import { IconInput } from "./icon-input";
 import {

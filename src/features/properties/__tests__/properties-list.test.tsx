@@ -33,7 +33,7 @@ vi.mock("next/image", () => ({
   },
 }));
 
-import { PropertiesClient } from "../components/properties-client";
+import { PropertiesClient } from "../components/property-list/properties-client";
 import type { Property } from "../types";
 
 function buildProperty(overrides: Partial<Property> = {}): Property {

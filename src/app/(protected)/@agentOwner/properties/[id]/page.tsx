@@ -16,8 +16,8 @@ import { getProperty } from "@/features/properties/service";
 import { formatCurrency } from "@/lib/utils/format";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { PropertyGallery } from "@/features/properties/components/property-gallery";
-import { PropertyDetailActions } from "@/features/properties/components/property-detail-actions";
+import { PropertyGallery } from "@/features/properties/components/property-detail/property-gallery";
+import { PropertyDetailActions } from "@/features/properties/components/property-detail/property-detail-actions";
 import {
   AMENITIES,
   FURNISHED_STATUS,
@@ -193,7 +193,7 @@ export default async function PropertyDetailPage({
         {/* Owner controls */}
         <div className="space-y-6 lg:col-span-1">
           <Card className="p-5">
-            <h2 className="text-uppercase-tag text-muted-foreground tracking-wider uppercase">
+            <h2 className="text-foreground mb-3 text-base font-semibold">
               Financial overview
             </h2>
             <div className="mt-3">
@@ -244,14 +244,14 @@ export default async function PropertyDetailPage({
           </Card>
 
           <Card className="p-5">
-            <h2 className="text-uppercase-tag text-muted-foreground mb-3 tracking-wider uppercase">
+            <h2 className="text-foreground mb-3 text-base font-semibold">
               Host operations
             </h2>
             <PropertyDetailActions property={property} />
           </Card>
 
           <Card className="p-5">
-            <h2 className="text-uppercase-tag text-muted-foreground tracking-wider uppercase">
+            <h2 className="text-foreground mb-3 text-base font-semibold">
               Property summary
             </h2>
             <dl className="mt-3 space-y-2 text-sm">

@@ -14,8 +14,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { deletePropertyAction } from "../actions";
-import type { Property } from "../types";
+import { deletePropertyAction } from "../../actions";
+import type { Property } from "../../types";
 
 /**
  * The single place this page offers actions. The header deliberately carries none, so there

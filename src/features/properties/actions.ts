@@ -12,7 +12,7 @@ import { PropertyValidationError } from "./errors";
 import { getAuthSession } from "@/lib/auth-session";
 import { isAppError } from "@/lib/errors";
 import type { PropertyStatus, PropertyType, Property } from "./types";
-import type { LocationSuggestion } from "./components/location-autocomplete";
+import type { LocationSuggestion } from "./components/property-form/location-autocomplete";
 
 const MAPBOX_TOKEN = process.env.MAPBOX_TOKEN;
 

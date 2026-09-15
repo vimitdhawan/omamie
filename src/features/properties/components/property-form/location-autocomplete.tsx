@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 import {
   fetchLocationSuggestionsAction,
   fetchLocationEnrichmentAction,
-} from "../actions";
-import type { Location } from "../types";
+} from "../../actions";
+import type { Location } from "../../types";
 
 export type LocationSuggestion = {
   place_name: string;

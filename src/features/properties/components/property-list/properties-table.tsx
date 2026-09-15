@@ -8,7 +8,7 @@ import {
   DataTablePagination,
 } from "@/components/custom/data-table";
 import { propertyColumns } from "./properties-columns";
-import type { Property } from "../types";
+import type { Property } from "../../types";
 
 interface PropertiesTableProps {
   properties: Property[];
