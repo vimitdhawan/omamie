@@ -7,6 +7,7 @@ import type {
   Bedrooms,
   Bathrooms,
   Furnishing,
+  LeaseLength,
 } from "./types";
 import { AppError } from "@/lib/errors";
 
@@ -33,6 +34,12 @@ function mapInputToInsert(
     bathrooms: input.bathrooms,
     min_size_sqm: input.minSizeSqm ?? null,
     furnishing: input.furnishing,
+    preferred_neighborhoods: input.preferredNeighborhoods ?? [],
+    pet_friendly: input.petFriendly ?? false,
+    parking_needed: input.parkingNeeded ?? false,
+    amenities_wishlist: input.amenitiesWishlist ?? [],
+    additional_notes: input.additionalNotes ?? null,
+    preferred_lease_length: input.preferredLeaseLength ?? null,
   };
 }
 
@@ -50,6 +57,12 @@ function mapTableToPropertyFindRequest(
     bathrooms: table.bathrooms as Bathrooms,
     minSizeSqm: table.min_size_sqm,
     furnishing: table.furnishing as Furnishing,
+    preferredNeighborhoods: table.preferred_neighborhoods ?? [],
+    petFriendly: table.pet_friendly ?? false,
+    parkingNeeded: table.parking_needed ?? false,
+    amenitiesWishlist: table.amenities_wishlist ?? [],
+    additionalNotes: table.additional_notes ?? null,
+    preferredLeaseLength: table.preferred_lease_length as LeaseLength | null,
     createdAt: table.created_at,
     updatedAt: table.updated_at,
   };
@@ -105,6 +118,32 @@ export async function createFindPropertyRequest(
   }
 
   return mapTableToPropertyFindRequest(data as PropertyFindRequestTable);
+}
+
+/**
+ * Fetch all find requests created by a given tenant profile, newest first.
+ */
+export async function getFindRequestsByProfileId(
+  profileId: string
+): Promise<PropertyFindRequest[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("property_find_requests")
+    .select("*")
+    .eq("profile_id", profileId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new AppError(
+      "INTERNAL_ERROR",
+      "Failed to fetch property find requests"
+    );
+  }
+
+  return (data || []).map((row) =>
+    mapTableToPropertyFindRequest(row as PropertyFindRequestTable)
+  );
 }
 
 export { mapInputToInsert, mapTableToPropertyFindRequest };

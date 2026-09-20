@@ -4,7 +4,9 @@ import {
   listImagePathsForProperty,
   getPropertyById,
   getPropertiesList,
+  getPublishedPropertiesList,
   getPropertiesCountByStatus,
+  getPropertiesByIds,
   deletePropertyById,
 } from "./repository";
 import {
@@ -249,6 +251,18 @@ export async function listProperties(
   filters?: Parameters<typeof getPropertiesList>[1]
 ): Promise<Property[]> {
   return await getPropertiesList(profileId, filters);
+}
+
+/** Active listings for the tenant explore grid — see `getPublishedPropertiesList`. */
+export async function listPublishedProperties(
+  filters?: Parameters<typeof getPublishedPropertiesList>[0]
+): Promise<Property[]> {
+  return await getPublishedPropertiesList(filters);
+}
+
+/** Properties by id for the tenant "Saved" grid — see `getPropertiesByIds`. */
+export async function listPropertiesByIds(ids: string[]): Promise<Property[]> {
+  return await getPropertiesByIds(ids);
 }
 
 export async function countPropertiesByStatus(profileId: string) {

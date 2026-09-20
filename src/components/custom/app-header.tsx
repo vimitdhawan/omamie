@@ -3,6 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/custom/logo";
 import { logoutAction } from "@/features/auth/actions";
 
+const TENANT_NAV_ITEMS = [
+  { href: "/explore", label: "Explore" },
+  { href: "/saved", label: "Saved" },
+  { href: "/matches", label: "Matches" },
+  { href: "/my-rentals", label: "My Rentals" },
+];
+
 export function Header() {
   return (
     <>
@@ -16,6 +23,17 @@ export function Header() {
             >
               <Logo className="h-8 w-auto" />
             </Link>
+            <nav className="hidden items-center gap-5 md:flex">
+              {TENANT_NAV_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
           </div>
           <div className="flex items-center gap-4 md:flex-col">
             <form action={logoutAction}>

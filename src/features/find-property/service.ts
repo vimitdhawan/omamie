@@ -19,6 +19,12 @@ export async function submitFindPropertyRequest(
     bathrooms: formData.bathrooms,
     minSizeSqm: formData.minSizeSqm ? Number(formData.minSizeSqm) : null,
     furnishing: formData.furnishing,
+    preferredNeighborhoods: formData.preferredNeighborhoods ?? [],
+    petFriendly: formData.petFriendly ?? false,
+    parkingNeeded: formData.parkingNeeded ?? false,
+    amenitiesWishlist: formData.amenitiesWishlist ?? [],
+    additionalNotes: formData.additionalNotes || null,
+    preferredLeaseLength: formData.preferredLeaseLength || null,
   };
 
   const request = await createFindPropertyRequest(input);

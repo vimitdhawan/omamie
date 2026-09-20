@@ -6,7 +6,10 @@ import {
   savePropertyListing,
   assertCanEditProperty,
   listProperties,
+  listPublishedProperties,
+  listPropertiesByIds,
   deleteProperty,
+  getProperty,
 } from "./service";
 import { PropertyValidationError } from "./errors";
 import { getAuthSession } from "@/lib/auth-session";
@@ -137,6 +140,69 @@ export async function getPropertiesListAction(filters?: {
     console.error("Failed to fetch properties:", error);
     return [];
   }
+}
+
+/**
+ * Fetch active listings across every owner for the tenant explore grid.
+ * Called from explore-client.tsx via useTransition for instant filtering.
+ */
+export async function getPublishedPropertiesAction(filters?: {
+  propertyType?: PropertyType;
+  location?: string;
+  minBedrooms?: number;
+  minMonthlyRent?: number;
+  maxMonthlyRent?: number;
+  search?: string;
+  fromDate?: string;
+  toDate?: string;
+}): Promise<Property[]> {
+  const session = await getAuthSession();
+  if (!session?.profileId || session.role !== "tenant") {
+    return [];
+  }
+
+  try {
+    return await listPublishedProperties(filters);
+  } catch (error) {
+    console.error("Failed to fetch published properties:", error);
+    return [];
+  }
+}
+
+/** Fetch properties by id (any order) for the tenant "Saved" grid. */
+export async function getPropertiesByIdsAction(
+  ids: string[]
+): Promise<Property[]> {
+  const session = await getAuthSession();
+  if (!session?.profileId || session.role !== "tenant") {
+    return [];
+  }
+
+  if (ids.length === 0) return [];
+
+  try {
+    return await listPropertiesByIds(ids);
+  } catch (error) {
+    console.error("Failed to fetch properties by ids:", error);
+    return [];
+  }
+}
+
+/** Fetch a single active listing for the tenant property detail page. */
+export async function getPublishedPropertyAction(
+  propertyId: string
+): Promise<Property | null> {
+  const session = await getAuthSession();
+  if (!session?.profileId || session.role !== "tenant") {
+    return null;
+  }
+
+  const property = await getProperty(propertyId);
+  if (!property || property.status !== "active") {
+    return null;
+  }
+
+  return property;
 }
 
 /**

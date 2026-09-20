@@ -68,6 +68,12 @@ describe("Find Property Repository", () => {
         bathrooms: input.bathrooms,
         min_size_sqm: input.minSizeSqm,
         furnishing: input.furnishing,
+        preferred_neighborhoods: [],
+        pet_friendly: false,
+        parking_needed: false,
+        amenities_wishlist: [],
+        additional_notes: null,
+        preferred_lease_length: null,
       });
     });
 
@@ -116,6 +122,12 @@ describe("Find Property Repository", () => {
         bathrooms: input.bathrooms,
         minSizeSqm: input.minSizeSqm,
         furnishing: input.furnishing,
+        preferredNeighborhoods: [],
+        petFriendly: false,
+        parkingNeeded: false,
+        amenitiesWishlist: [],
+        additionalNotes: null,
+        preferredLeaseLength: undefined,
         createdAt: "2026-08-01T00:00:00.000Z",
         updatedAt: "2026-08-01T00:00:00.000Z",
       });

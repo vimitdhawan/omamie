@@ -9,7 +9,6 @@ import {
   updateMatchStatusSchema,
   matchFilterSchema,
 } from "./schema";
-import { HARDCODED_TENANT_ID } from "./constants";
 import type { MatchFilter, UpdateMatchStatusInput } from "./types";
 
 export async function getMatchesAction(filters?: MatchFilter) {
@@ -49,16 +48,56 @@ export async function getPendingMatchesCountAction() {
   return repository.getPendingMatchesCount(session.profileId);
 }
 
-export async function createMatchAction(propertyId: string, notes?: string) {
-  // For now, anyone can show interest (no auth required for tenant-initiated interest)
-  // In future, this can gate on session.role === 'tenant' once tenant auth exists
+export async function createMatchAction(
+  propertyId: string,
+  options?: {
+    notes?: string;
+    requestedMoveInDate?: string;
+    requestedMoveOutDate?: string;
+  }
+) {
+  const session = await getAuthSession();
+  if (!session?.profileId || session.role !== "tenant") {
+    redirect("/login");
+  }
+
   const input = createMatchSchema.parse({
     propertyId,
-    tenantId: HARDCODED_TENANT_ID,
-    notes,
+    tenantId: session.profileId,
+    notes: options?.notes,
+    requestedMoveInDate: options?.requestedMoveInDate,
+    requestedMoveOutDate: options?.requestedMoveOutDate,
   });
 
-  return repository.createMatch(input);
+  return service.createMatch(input);
+}
+
+export async function getTenantMatchesAction() {
+  const session = await getAuthSession();
+  if (!session?.profileId || session.role !== "tenant") {
+    redirect("/login");
+  }
+
+  try {
+    return await repository.getMatchesByTenantId(session.profileId);
+  } catch (error) {
+    console.error("Failed to fetch tenant matches:", error);
+    return [];
+  }
+}
+
+export async function getMatchedPropertyIdsAction() {
+  const session = await getAuthSession();
+  if (!session?.profileId || session.role !== "tenant") {
+    redirect("/login");
+  }
+
+  try {
+    return await repository.getMatchedPropertyIdsByTenantId(session.profileId);
+  } catch (error) {
+    console.error("Failed to fetch matched property ids:", error);
+    return [];
+  }
 }
 
 export async function updateMatchStatusAction(input: UpdateMatchStatusInput) {
