@@ -76,6 +76,14 @@ describe("signupFormSchema", () => {
   it("rejects an unknown role", () => {
     const parsed = signupFormSchema.safeParse({
       ...validBase,
+      role: "superuser",
+    });
+    expect(parsed.success).toBe(false);
+  });
+
+  it("rejects role 'admin' — admin is provisioned directly in Supabase, never via public signup", () => {
+    const parsed = signupFormSchema.safeParse({
+      ...validBase,
       role: "admin",
     });
     expect(parsed.success).toBe(false);
@@ -83,15 +91,19 @@ describe("signupFormSchema", () => {
 });
 
 describe("roleEnum", () => {
-  it.each(["agent", "owner", "tenant"])("accepts role '%s'", (role) => {
-    expect(roleEnum.safeParse(role).success).toBe(true);
-  });
+  it.each(["agent", "owner", "tenant", "admin"])(
+    "accepts role '%s'",
+    (role) => {
+      expect(roleEnum.safeParse(role).success).toBe(true);
+    }
+  );
 
   it("exposes matching human-readable labels", () => {
     expect(USER_ROLES).toEqual({
       agent: "Agent",
       owner: "Owner",
       tenant: "Tenant",
+      admin: "Admin",
     });
   });
 });

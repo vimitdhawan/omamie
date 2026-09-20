@@ -21,7 +21,7 @@ export type LoginActionState = {
 };
 
 // signup
-export const roleEnum = z.enum(["agent", "owner", "tenant"]);
+export const roleEnum = z.enum(["agent", "owner", "tenant", "admin"]);
 
 export type UserRole = z.infer<typeof roleEnum>;
 
@@ -29,7 +29,14 @@ export const USER_ROLES = {
   agent: "Agent",
   owner: "Owner",
   tenant: "Tenant",
+  admin: "Admin",
 } as const;
+
+// Admin is provisioned directly in Supabase, never through the public signup form — this
+// narrower enum is what the signup schema actually validates against, so a tampered
+// `role=admin` field on the signup POST is rejected server-side rather than trusted because
+// the client-side form happens to only ever render agent/owner/tenant options.
+export const publicSignupRoleEnum = z.enum(["agent", "owner", "tenant"]);
 
 export const signupFormBaseSchema = z.object({
   email: z
@@ -39,7 +46,7 @@ export const signupFormBaseSchema = z.object({
   password: PasswordInputValidation,
   confirmPassword: z.string(),
   fullName: z.string().min(1, "Full name is required"),
-  role: roleEnum,
+  role: publicSignupRoleEnum,
 });
 
 // Add multiple refinements

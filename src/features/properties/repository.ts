@@ -34,7 +34,7 @@ type PropertyRow = PropertyTable & {
 // Only uploaded images are ever surfaced. A row can sit in "pending" if the process died
 // between the transaction committing and the file reaching storage, and rendering those
 // would produce broken images.
-const PROPERTY_SELECT =
+export const PROPERTY_SELECT =
   "*, locations(*), condos(id, name, facilities, verified), property_images(id, storage_path, sort_order, status)";
 
 // Mapping Functions
