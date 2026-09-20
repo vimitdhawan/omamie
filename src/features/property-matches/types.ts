@@ -9,6 +9,8 @@ export interface PropertyMatch {
   initiatedBy: InitiatedBy;
   status: MatchStatus;
   notes: string | null;
+  requestedMoveInDate: string | null;
+  requestedMoveOutDate: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -34,6 +36,8 @@ export interface CreateMatchInput {
   propertyId: string;
   tenantId: string;
   notes?: string;
+  requestedMoveInDate?: string;
+  requestedMoveOutDate?: string;
 }
 
 export interface UpdateMatchStatusInput {

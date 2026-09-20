@@ -1,6 +1,6 @@
 import { CheckCircle2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 
 export function FindPropertySuccess() {
   return (
@@ -18,15 +18,15 @@ export function FindPropertySuccess() {
           </p>
         </div>
         <div className="mt-2 grid w-full max-w-md grid-cols-1 gap-3 sm:grid-cols-2">
+          <a href="/matches" className={buttonVariants({ variant: "default" })}>
+            View My Requests
+          </a>
           <a
             href="/find-property"
-            className={buttonVariants({ variant: "default" })}
+            className={buttonVariants({ variant: "secondary" })}
           >
             Submit Another Request
           </a>
-          <Button variant="secondary" disabled className="cursor-not-allowed">
-            Dashboard Coming Soon
-          </Button>
         </div>
       </CardContent>
     </Card>

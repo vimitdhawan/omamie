@@ -358,6 +358,100 @@ export async function getPropertiesList(
   return data ? (data as unknown as PropertyRow[]).map(mapTableToProperty) : [];
 }
 
+/**
+ * Active listings across every owner, for the tenant explore grid. Unlike
+ * `getPropertiesList`, this is intentionally not scoped to a `profile_id` — RLS restricts it
+ * to `status = 'active'` rows regardless (see the "authenticated_select_active_properties"
+ * policy), so it's safe for any authenticated tenant to call.
+ */
+export async function getPublishedPropertiesList(filters?: {
+  propertyType?: PropertyType;
+  location?: string;
+  minBedrooms?: number;
+  minMonthlyRent?: number;
+  maxMonthlyRent?: number;
+  search?: string;
+  /** "YYYY-MM-DD" — inclusive lower bound for `available_from`. */
+  fromDate?: string;
+  /** "YYYY-MM-DD" — inclusive upper bound for `available_from`. */
+  toDate?: string;
+}): Promise<Property[]> {
+  const supabase = await createClient();
+
+  let query = supabase
+    .from("properties")
+    .select(PROPERTY_SELECT)
+    .eq("status", "active")
+    .order("created_at", { ascending: false });
+
+  if (filters?.propertyType) {
+    query = query.eq("property_type", filters.propertyType);
+  }
+
+  if (filters?.minBedrooms !== undefined) {
+    query = query.gte("bedrooms", filters.minBedrooms);
+  }
+
+  if (filters?.minMonthlyRent !== undefined) {
+    query = query.gte("monthly_rent", filters.minMonthlyRent);
+  }
+
+  if (filters?.maxMonthlyRent !== undefined) {
+    query = query.lte("monthly_rent", filters.maxMonthlyRent);
+  }
+
+  if (filters?.location) {
+    const term = escapeSearchTerm(filters.location);
+    query = query.ilike("location", `%${term}%`);
+  }
+
+  if (filters?.search) {
+    const term = escapeSearchTerm(filters.search);
+    query = query.or(`title.ilike.%${term}%,location.ilike.%${term}%`);
+  }
+
+  if (filters?.fromDate) {
+    query = query.gte("available_from", filters.fromDate);
+  }
+
+  if (filters?.toDate) {
+    query = query.lte("available_from", filters.toDate);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    logDatabaseError("getPublishedPropertiesList", error);
+    throw new AppError("INTERNAL_ERROR", "Failed to fetch properties");
+  }
+
+  return data ? (data as unknown as PropertyRow[]).map(mapTableToProperty) : [];
+}
+
+/**
+ * Fetches properties by id, in any order, for the tenant "Saved" grid. RLS still restricts
+ * the result to `status = 'active'` rows (the same policy `getPublishedPropertiesList` relies
+ * on), so a favorite whose property has since gone inactive simply drops out of the result.
+ */
+export async function getPropertiesByIds(ids: string[]): Promise<Property[]> {
+  if (ids.length === 0) return [];
+
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("properties")
+    .select(PROPERTY_SELECT)
+    .in("id", ids)
+    .eq("status", "active");
+
+  if (error) {
+    logDatabaseError("getPropertiesByIds", error);
+    throw new AppError("INTERNAL_ERROR", "Failed to fetch properties");
+  }
+
+  return data ? (data as unknown as PropertyRow[]).map(mapTableToProperty) : [];
+}
+
 export async function getPropertiesCountByStatus(profileId: string): Promise<{
   all: number;
   active: number;

@@ -11,6 +11,8 @@ describe("Match Columns", () => {
     initiatedBy: "tenant",
     status: "interested",
     notes: "Great property",
+    requestedMoveInDate: null,
+    requestedMoveOutDate: null,
     createdAt: "2024-09-01T10:00:00Z",
     updatedAt: "2024-09-01T10:00:00Z",
     property: {

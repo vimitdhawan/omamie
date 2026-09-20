@@ -124,6 +124,104 @@ export type Database = {
         };
         Relationships: [];
       };
+      leases: {
+        Row: {
+          created_at: string;
+          id: string;
+          lease_end: string;
+          lease_start: string;
+          monthly_rent: number;
+          next_payment_due: string | null;
+          payment_method: string | null;
+          property_id: string;
+          security_deposit: number | null;
+          status: string;
+          tenant_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          lease_end: string;
+          lease_start: string;
+          monthly_rent: number;
+          next_payment_due?: string | null;
+          payment_method?: string | null;
+          property_id: string;
+          security_deposit?: number | null;
+          status?: string;
+          tenant_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          lease_end?: string;
+          lease_start?: string;
+          monthly_rent?: number;
+          next_payment_due?: string | null;
+          payment_method?: string | null;
+          property_id?: string;
+          security_deposit?: number | null;
+          status?: string;
+          tenant_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "leases_property_id_fkey";
+            columns: ["property_id"];
+            isOneToOne: false;
+            referencedRelation: "properties";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "leases_tenant_id_fkey";
+            columns: ["tenant_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      lease_documents: {
+        Row: {
+          created_at: string;
+          file_size_bytes: number | null;
+          file_type: string | null;
+          id: string;
+          lease_id: string;
+          name: string;
+          storage_path: string;
+        };
+        Insert: {
+          created_at?: string;
+          file_size_bytes?: number | null;
+          file_type?: string | null;
+          id?: string;
+          lease_id: string;
+          name: string;
+          storage_path: string;
+        };
+        Update: {
+          created_at?: string;
+          file_size_bytes?: number | null;
+          file_type?: string | null;
+          id?: string;
+          lease_id?: string;
+          name?: string;
+          storage_path?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lease_documents_lease_id_fkey";
+            columns: ["lease_id"];
+            isOneToOne: false;
+            referencedRelation: "leases";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       locations: {
         Row: {
           address_line_1: string | null;
@@ -305,8 +403,46 @@ export type Database = {
           },
         ];
       };
+      property_favorites: {
+        Row: {
+          created_at: string;
+          id: string;
+          property_id: string;
+          tenant_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          property_id: string;
+          tenant_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          property_id?: string;
+          tenant_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "property_favorites_property_id_fkey";
+            columns: ["property_id"];
+            isOneToOne: false;
+            referencedRelation: "properties";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "property_favorites_tenant_id_fkey";
+            columns: ["tenant_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       property_find_requests: {
         Row: {
+          additional_notes: string | null;
+          amenities_wishlist: string[];
           bathrooms: string;
           bedrooms: string;
           created_at: string;
@@ -315,12 +451,18 @@ export type Database = {
           min_size_sqm: number | null;
           monthly_budget: number;
           move_in_date: string;
+          parking_needed: boolean;
+          pet_friendly: boolean;
+          preferred_lease_length: string | null;
           preferred_location: string;
+          preferred_neighborhoods: string[];
           profile_id: string;
           property_type: string;
           updated_at: string;
         };
         Insert: {
+          additional_notes?: string | null;
+          amenities_wishlist?: string[];
           bathrooms: string;
           bedrooms: string;
           created_at?: string;
@@ -329,12 +471,18 @@ export type Database = {
           min_size_sqm?: number | null;
           monthly_budget: number;
           move_in_date: string;
+          parking_needed?: boolean;
+          pet_friendly?: boolean;
+          preferred_lease_length?: string | null;
           preferred_location: string;
+          preferred_neighborhoods?: string[];
           profile_id: string;
           property_type: string;
           updated_at?: string;
         };
         Update: {
+          additional_notes?: string | null;
+          amenities_wishlist?: string[];
           bathrooms?: string;
           bedrooms?: string;
           created_at?: string;
@@ -343,7 +491,11 @@ export type Database = {
           min_size_sqm?: number | null;
           monthly_budget?: number;
           move_in_date?: string;
+          parking_needed?: boolean;
+          pet_friendly?: boolean;
+          preferred_lease_length?: string | null;
           preferred_location?: string;
+          preferred_neighborhoods?: string[];
           profile_id?: string;
           property_type?: string;
           updated_at?: string;
@@ -416,6 +568,8 @@ export type Database = {
           notes: string | null;
           property_id: string;
           property_owner_id: string;
+          requested_move_in_date: string | null;
+          requested_move_out_date: string | null;
           status: string;
           tenant_id: string;
           updated_at: string;
@@ -427,6 +581,8 @@ export type Database = {
           notes?: string | null;
           property_id: string;
           property_owner_id: string;
+          requested_move_in_date?: string | null;
+          requested_move_out_date?: string | null;
           status?: string;
           tenant_id: string;
           updated_at?: string;
@@ -438,6 +594,8 @@ export type Database = {
           notes?: string | null;
           property_id?: string;
           property_owner_id?: string;
+          requested_move_in_date?: string | null;
+          requested_move_out_date?: string | null;
           status?: string;
           tenant_id?: string;
           updated_at?: string;

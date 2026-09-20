@@ -1,9 +1,20 @@
 import {
   getMatchById,
+  createMatch as createMatchInRepository,
   updateMatchStatus as updateMatchStatusInRepository,
 } from "./repository";
-import type { PropertyMatchWithProperty } from "./types";
+import type {
+  CreateMatchInput,
+  PropertyMatch,
+  PropertyMatchWithProperty,
+} from "./types";
 import { AppError } from "@/lib/errors";
+
+export async function createMatch(
+  input: CreateMatchInput
+): Promise<PropertyMatch> {
+  return createMatchInRepository(input);
+}
 
 const VALID_TRANSITIONS: Record<string, string[]> = {
   interested: ["approved", "rejected"],

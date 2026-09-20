@@ -22,6 +22,12 @@ const formData: FindPropertyFormData = {
   bathrooms: "1",
   minSizeSqm: 35,
   furnishing: "furnished",
+  preferredNeighborhoods: [],
+  petFriendly: false,
+  parkingNeeded: false,
+  amenitiesWishlist: [],
+  additionalNotes: "",
+  preferredLeaseLength: "",
 };
 
 describe("Find Property Service", () => {

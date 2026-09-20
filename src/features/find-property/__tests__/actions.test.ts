@@ -3,6 +3,7 @@ import { handleFindProperty } from "../actions";
 
 const mockRevalidatePath = vi.hoisted(() => vi.fn());
 const mockSubmitFindPropertyRequest = vi.hoisted(() => vi.fn());
+const mockGetFindRequestsByProfileId = vi.hoisted(() => vi.fn());
 
 vi.mock("next/cache", () => ({
   revalidatePath: mockRevalidatePath,
@@ -10,6 +11,10 @@ vi.mock("next/cache", () => ({
 
 vi.mock("../service", () => ({
   submitFindPropertyRequest: mockSubmitFindPropertyRequest,
+}));
+
+vi.mock("../repository", () => ({
+  getFindRequestsByProfileId: mockGetFindRequestsByProfileId,
 }));
 
 function buildFormData(overrides: Record<string, string> = {}) {

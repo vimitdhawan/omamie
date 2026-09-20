@@ -18,6 +18,8 @@ interface DatabasePropertyMatch {
   initiated_by: string;
   status: string;
   notes: string | null;
+  requested_move_in_date: string | null;
+  requested_move_out_date: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -31,6 +33,8 @@ function mapDatabaseMatch(row: DatabasePropertyMatch): PropertyMatch {
     initiatedBy: row.initiated_by as unknown as InitiatedBy,
     status: row.status as unknown as MatchStatus,
     notes: row.notes,
+    requestedMoveInDate: row.requested_move_in_date ?? null,
+    requestedMoveOutDate: row.requested_move_out_date ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -94,6 +98,64 @@ export async function getMatchesByProfileId(
       },
     })
   );
+}
+
+export async function getMatchesByTenantId(
+  tenantId: string
+): Promise<PropertyMatchWithProperty[]> {
+  const supabase = await createClient();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const query: any = (supabase as any)
+    .from("property_matches")
+    .select(
+      `
+      *,
+      property:properties(id, title, location, monthly_rent)
+    `
+    )
+    .eq("tenant_id", tenantId)
+    .order("created_at", { ascending: false });
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw new AppError("INTERNAL_ERROR", "Failed to fetch property matches");
+  }
+
+  return (data || [])
+    .filter(
+      (
+        row: DatabasePropertyMatch & {
+          property: {
+            id: string;
+            title: string;
+            location: string;
+            monthly_rent: number;
+          } | null;
+        }
+      ) => row.property !== null
+    )
+    .map(
+      (
+        row: DatabasePropertyMatch & {
+          property: {
+            id: string;
+            title: string;
+            location: string;
+            monthly_rent: number;
+          };
+        }
+      ) => ({
+        ...mapDatabaseMatch(row),
+        property: {
+          id: row.property.id,
+          title: row.property.title,
+          location: row.property.location,
+          monthlyRent: row.property.monthly_rent,
+        },
+      })
+    );
 }
 
 export async function getMatchById(
@@ -186,6 +248,27 @@ export async function getPendingMatchesCount(
   return data.length;
 }
 
+/** The property IDs a tenant already has a match/interest on, for badge/button state in the explore grid. */
+export async function getMatchedPropertyIdsByTenantId(
+  tenantId: string
+): Promise<string[]> {
+  const supabase = await createClient();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const query: any = (supabase as any)
+    .from("property_matches")
+    .select("property_id")
+    .eq("tenant_id", tenantId);
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw new AppError("INTERNAL_ERROR", "Failed to fetch property matches");
+  }
+
+  return (data || []).map((row: { property_id: string }) => row.property_id);
+}
+
 export async function createMatch(
   input: CreateMatchInput
 ): Promise<PropertyMatch> {
@@ -214,6 +297,8 @@ export async function createMatch(
       tenant_id: input.tenantId,
       property_owner_id: property.profile_id,
       notes: input.notes || null,
+      requested_move_in_date: input.requestedMoveInDate || null,
+      requested_move_out_date: input.requestedMoveOutDate || null,
       initiated_by: "tenant",
       status: "interested",
     })

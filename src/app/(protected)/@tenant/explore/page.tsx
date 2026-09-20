@@ -1,0 +1,34 @@
+import { getAuthSession } from "@/lib/auth-session";
+import { redirect } from "next/navigation";
+import { getPublishedPropertiesAction } from "@/features/properties/actions";
+import { listFavoritedIdsAction } from "@/features/favorites/actions";
+import { getMatchedPropertyIdsAction } from "@/features/property-matches/actions";
+import { ExploreClient } from "./explore-client";
+
+export const dynamic = "force-dynamic";
+
+export default async function ExplorePage() {
+  const session = await getAuthSession();
+  if (!session?.profileId || session.role !== "tenant") {
+    redirect("/login");
+  }
+
+  const [properties, favoritedPropertyIds, matchedPropertyIds] =
+    await Promise.all([
+      getPublishedPropertiesAction(),
+      listFavoritedIdsAction(),
+      getMatchedPropertyIdsAction(),
+    ]);
+
+  return (
+    <main className="flex-1 bg-white px-4 pt-6 pb-12">
+      <div className="mx-auto max-w-[1200px]">
+        <ExploreClient
+          initialProperties={properties}
+          favoritedPropertyIds={favoritedPropertyIds}
+          matchedPropertyIds={matchedPropertyIds}
+        />
+      </div>
+    </main>
+  );
+}

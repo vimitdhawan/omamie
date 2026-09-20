@@ -195,6 +195,8 @@ describe("Property Matches Repository", () => {
         initiatedBy: "tenant",
         status: "interested",
         notes: null,
+        requestedMoveInDate: null,
+        requestedMoveOutDate: null,
         createdAt: "2024-09-01T00:00:00Z",
         updatedAt: "2024-09-01T00:00:00Z",
         property: {
