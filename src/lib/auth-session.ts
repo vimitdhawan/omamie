@@ -12,6 +12,7 @@ const ROLE_BASED_DEFAULTS: Record<UserRole, string> = {
   tenant: "/find-property",
   agent: "/properties/create",
   owner: "/properties/create",
+  admin: "/dashboard",
 };
 
 export function getRoleBasedRedirectPath(role: UserRole): string {

@@ -4,9 +4,11 @@ import { getAuthSession } from "@/lib/auth-session";
 export default async function ProtectedLayout({
   tenant,
   agentOwner,
+  admin,
 }: {
   tenant: React.ReactNode;
   agentOwner: React.ReactNode;
+  admin: React.ReactNode;
 }) {
   const session = await getAuthSession();
   if (!session) {
@@ -15,6 +17,7 @@ export default async function ProtectedLayout({
 
   if (session.role === "tenant") return tenant;
   if (session.role === "agent" || session.role === "owner") return agentOwner;
+  if (session.role === "admin") return admin;
 
   // An unrecognized role means the session cookie is malformed — never fall
   // through to a default slot, since that would grant one role's UI to a

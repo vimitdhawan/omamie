@@ -31,7 +31,7 @@ describe("matchPattern", () => {
 });
 
 describe("route protection", () => {
-  it("gates every agent/owner property route", () => {
+  it("gates every agent/owner/admin property route", () => {
     for (const path of [
       "/properties",
       "/properties/create",
@@ -39,13 +39,24 @@ describe("route protection", () => {
       "/properties/abc/edit",
     ]) {
       expect(isProtectedRoute(path)).toBe(true);
-      expect(getAllowedRolesForRoute(path)).toEqual(["agent", "owner"]);
+      expect(getAllowedRolesForRoute(path)).toEqual([
+        "agent",
+        "owner",
+        "admin",
+      ]);
     }
   });
 
   it("gates the tenant route", () => {
     expect(isProtectedRoute("/find-property")).toBe(true);
     expect(getAllowedRolesForRoute("/find-property")).toEqual(["tenant"]);
+  });
+
+  it("gates the admin-only users and requests routes", () => {
+    expect(isProtectedRoute("/users")).toBe(true);
+    expect(getAllowedRolesForRoute("/users")).toEqual(["admin"]);
+    expect(isProtectedRoute("/requests")).toBe(true);
+    expect(getAllowedRolesForRoute("/requests")).toEqual(["admin"]);
   });
 
   it("leaves unlisted routes ungated", () => {
