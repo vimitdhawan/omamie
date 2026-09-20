@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { signupFormSchema, SignupActionState, SignupFormData } from "../schema";
 import { handleSignup } from "../actions";
 import { Eye, EyeOff, LockKeyhole } from "lucide-react";
+import { GoogleAuthButton } from "./google-auth-button";
 
 export interface SignupFormProps {
   // Role is already resolved before this component renders
@@ -73,6 +74,16 @@ export function SignupForm({ role }: SignupFormProps) {
           {description}
         </CardDescription>
       </CardHeader>
+      <CardContent className="space-y-4 pb-0">
+        <GoogleAuthButton role={role} />
+        <div className="relative flex items-center">
+          <div className="border-border grow border-t" />
+          <span className="text-muted-foreground px-3 text-xs uppercase">
+            Or
+          </span>
+          <div className="border-border grow border-t" />
+        </div>
+      </CardContent>
       <form action={formAction}>
         <CardContent className="space-y-6 pt-6">
           <Controller

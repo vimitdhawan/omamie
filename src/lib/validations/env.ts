@@ -13,6 +13,13 @@ const envSchema = z.object({
   SUPABASE_PUBLISHABLE_KEY: z
     .string()
     .min(1, "SUPABASE_PUBLISHABLE_KEY cannot be empty"),
+  // Read by createClient() in the browser Supabase client, where only NEXT_PUBLIC_
+  // vars are inlined. Optional so a deployment that has not set it still boots;
+  // it falls back to SUPABASE_PUBLISHABLE_KEY below.
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z
+    .string()
+    .min(1, "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY cannot be empty")
+    .optional(),
   SUPABASE_SERVICE_ROLE_KEY: z
     .string()
     .min(1, "SUPABASE_SERVICE_ROLE_KEY cannot be empty"),
@@ -25,6 +32,9 @@ const parsed = envSchema.safeParse({
   NEXT_PUBLIC_SUPABASE_URL:
     process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL,
   SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY,
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+    process.env.SUPABASE_PUBLISHABLE_KEY,
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
 });
 
