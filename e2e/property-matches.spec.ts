@@ -7,10 +7,6 @@ test.describe("Property Matches Flow", () => {
       await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
     });
 
-    test.skip("should allow agent to access /matches", async () => {
-      // Skip: requires real auth backend - e2e tests cannot set httpOnly cookies from client
-    });
-
     test.skip("should allow owner to access /matches", async () => {
       // Skip: requires real auth backend - e2e tests cannot set httpOnly cookies from client
     });

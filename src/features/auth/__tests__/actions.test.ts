@@ -25,7 +25,6 @@ vi.mock("@/lib/auth-session", () => ({
   getRoleBasedRedirectPath: (role: string) => {
     const paths: Record<string, string> = {
       tenant: "/find-property",
-      agent: "/list-property",
       owner: "/list-property",
     };
     return paths[role] || "/login";
@@ -231,38 +230,6 @@ describe("Auth Actions", () => {
       }
     });
 
-    it("should redirect to /list-property for agent role", async () => {
-      const formData = new FormData();
-      formData.append("email", "test@example.com");
-      formData.append("password", "ValidPassword123!");
-      formData.append("confirmPassword", "ValidPassword123!");
-      formData.append("fullName", "John Doe");
-      formData.append("role", "agent");
-
-      const mockSupabase = {
-        auth: {
-          getUser: vi.fn().mockResolvedValue({
-            data: { user: { id: "user-123" } },
-          }),
-        },
-      };
-      mockCreateClient.mockResolvedValue(mockSupabase);
-      mockGetUserWithProfile.mockResolvedValue({
-        id: "profile-123",
-        role: "agent",
-      });
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      vi.mocked(signup).mockResolvedValueOnce(undefined as any);
-
-      try {
-        await handleSignup(null, formData);
-      } catch (error: unknown) {
-        const err = error as Error;
-        expect(err.message).toContain("/list-property");
-        expect(redirect).toHaveBeenCalledWith("/list-property");
-      }
-    });
-
     it("should redirect to /list-property for owner role", async () => {
       const formData = new FormData();
       formData.append("email", "test@example.com");
@@ -420,7 +387,7 @@ describe("Auth Actions", () => {
       mockCreateClient.mockResolvedValue(mockSupabase);
       mockGetUserWithProfile.mockResolvedValue({
         id: "profile-456",
-        role: "agent",
+        role: "owner",
       });
       vi.mocked(login).mockResolvedValueOnce({ success: true });
 
@@ -430,7 +397,7 @@ describe("Auth Actions", () => {
         // redirect throws
       }
 
-      expect(mockSetAuthSession).toHaveBeenCalledWith("profile-456", "agent");
+      expect(mockSetAuthSession).toHaveBeenCalledWith("profile-456", "owner");
     });
 
     it("should redirect to /find-property for tenant role on login", async () => {
@@ -461,7 +428,7 @@ describe("Auth Actions", () => {
       }
     });
 
-    it("should redirect to /list-property for agent role on login", async () => {
+    it("should redirect to /list-property for owner role on login", async () => {
       const formData = new FormData();
       formData.append("email", "test@example.com");
       formData.append("password", "ValidPassword123!");
@@ -476,7 +443,7 @@ describe("Auth Actions", () => {
       mockCreateClient.mockResolvedValue(mockSupabase);
       mockGetUserWithProfile.mockResolvedValue({
         id: "profile-456",
-        role: "agent",
+        role: "owner",
       });
       vi.mocked(login).mockResolvedValueOnce({ success: true });
 

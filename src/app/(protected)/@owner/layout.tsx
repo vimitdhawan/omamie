@@ -1,9 +1,9 @@
-import { AppSidebar } from "@/features/agents/sidebar/components/app-sidebar";
-import { SiteHeader } from "@/features/agents/sidebar/components/site-header";
+import { AppSidebar } from "@/features/owner/sidebar/components/app-sidebar";
+import { SiteHeader } from "@/features/owner/sidebar/components/site-header";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 
-export default async function AgentOwnerLayout({
+export default async function OwnerLayout({
   children,
 }: {
   children: React.ReactNode;

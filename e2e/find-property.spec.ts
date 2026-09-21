@@ -5,7 +5,7 @@ import { test, expect } from "@playwright/test";
  *
  * Tests verify role-based access control:
  * - Only tenant role can access /find-property
- * - Agent/owner are redirected to /list-property
+ * - Owner is redirected to /list-property
  * - Unauthenticated users redirected to /login
  */
 
@@ -35,30 +35,6 @@ test.describe("Find Property Page", () => {
 
       // Should stay on find-property
       await expect(page).toHaveURL(/\/find-property/, { timeout: 10000 });
-    });
-
-    test.skip("should redirect agent to /list-property", async ({ page }) => {
-      // Set up agent auth session
-      await page.context().addCookies([
-        {
-          name: "auth_session",
-          value: JSON.stringify({
-            profileId: "agent-profile-456",
-            role: "agent",
-          }),
-          domain: "127.0.0.1",
-          path: "/",
-          httpOnly: true,
-          secure: false,
-          sameSite: "Lax",
-        },
-      ]);
-
-      // Try to access find-property
-      await page.goto("/find-property");
-
-      // Should redirect to list-property (agent's allowed route)
-      await expect(page).toHaveURL(/\/list-property/, { timeout: 10000 });
     });
 
     test.skip("should redirect owner to /list-property", async ({ page }) => {
@@ -239,16 +215,16 @@ test.describe("Find Property Page", () => {
   });
 
   test.describe("Cross-role Redirect Consistency", () => {
-    test.skip("agent trying find-property always redirects to list-property", async ({
+    test.skip("owner trying find-property always redirects to list-property", async ({
       page,
     }) => {
-      // Set up agent session
+      // Set up owner session
       await page.context().addCookies([
         {
           name: "auth_session",
           value: JSON.stringify({
-            profileId: "agent-profile-456",
-            role: "agent",
+            profileId: "owner-profile-456",
+            role: "owner",
           }),
           domain: "127.0.0.1",
           path: "/",
@@ -331,31 +307,6 @@ test.describe("Find Property Page", () => {
       });
       expect(response.status()).toBe(307);
       expect(response.headers().location).toContain("/find-property");
-    });
-
-    test("agent visiting / is redirected to /properties/create", async ({
-      page,
-    }) => {
-      await page.context().addCookies([
-        {
-          name: "auth_session",
-          value: JSON.stringify({
-            profileId: "agent-profile-456",
-            role: "agent",
-          }),
-          domain: "127.0.0.1",
-          path: "/",
-          httpOnly: true,
-          secure: false,
-          sameSite: "Lax",
-        },
-      ]);
-
-      const response = await page.context().request.get("/", {
-        maxRedirects: 0,
-      });
-      expect(response.status()).toBe(307);
-      expect(response.headers().location).toContain("/properties/create");
     });
 
     test("owner visiting / is redirected to /properties/create", async ({

@@ -58,7 +58,7 @@ describe("savePropertyAction", () => {
 
     const state = await savePropertyAction(null, createMockPropertyFormData());
 
-    expect(state.errorMessage).toContain("Only agents and owners");
+    expect(state.errorMessage).toContain("Only owners");
     expect(mocks.savePropertyListing).not.toHaveBeenCalled();
   });
 

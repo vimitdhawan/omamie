@@ -5,7 +5,7 @@ import { CheckCircle2, Clock, KeyRound, PencilLine, Plus } from "lucide-react";
 import { listProperties } from "@/features/properties/service";
 import { deriveStatusCounts } from "@/features/properties/utils/display";
 import { PropertiesClient } from "@/features/properties/components/property-list/properties-client";
-import { MetricCard } from "@/features/agents/dashboard/components/metric-card";
+import { MetricCard } from "@/features/owner/dashboard/components/metric-card";
 
 export default async function PropertiesPage({
   params: _params,
@@ -19,7 +19,7 @@ export default async function PropertiesPage({
   // The parent layout already dispatches by role, but this page owns
   // sensitive listing data, so it re-checks rather than trusting that
   // dispatch alone.
-  if (session.role !== "agent" && session.role !== "owner") {
+  if (session.role !== "owner") {
     redirect("/login");
   }
 

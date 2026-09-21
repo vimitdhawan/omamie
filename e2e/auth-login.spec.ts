@@ -182,7 +182,7 @@ test.describe("Role-based redirects (with mock auth)", () => {
     // Fill valid credentials
     await page
       .getByRole("textbox", { name: /Email/i })
-      .fill("agent@example.com");
+      .fill("owner@example.com");
     await page
       .getByRole("textbox", { name: /Password/i })
       .fill("ValidPassword123!");
@@ -192,7 +192,7 @@ test.describe("Role-based redirects (with mock auth)", () => {
     await submitButton.click();
 
     // Should redirect to role-based path (or stay on login if auth fails in dummy setup)
-    // In real scenario: agent/owner → /list-property, tenant → /find-property
+    // In real scenario: owner → /list-property, tenant → /find-property
     const currentUrl = page.url();
     const validRedirects = ["/list-property", "/find-property", "/login"];
     const isValidRedirect = validRedirects.some((path) =>
@@ -243,7 +243,7 @@ test.describe("Auth session and cookies", () => {
         name: "auth_session",
         value: JSON.stringify({
           profileId: "test-profile-123",
-          role: "agent",
+          role: "owner",
         }),
         domain: "127.0.0.1",
         path: "/",

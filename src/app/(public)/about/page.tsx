@@ -23,8 +23,8 @@ export default function AboutPage() {
             <h2 className="text-ink text-lg font-bold">What is Omamie?</h2>
             <p className="text-muted text-sm leading-relaxed">
               Omamie is a property management platform that connects tenants and
-              property owners/agents through intelligent requirement matching.
-              We believe that finding the right rental property and reaching
+              property owners through intelligent requirement matching. We
+              believe that finding the right rental property and reaching
               qualified renters shouldn&apos;t be frustrating or time-consuming.
             </p>
           </div>
@@ -35,8 +35,8 @@ export default function AboutPage() {
             <p className="text-muted text-sm leading-relaxed">
               Today&apos;s rental market is fragmented and opaque. Tenants waste
               time browsing through irrelevant listings on multiple platforms.
-              Property owners and agents struggle to reach qualified renters and
-              waste resources managing unqualified inquiries.
+              Property owners struggle to reach qualified renters and waste
+              resources managing unqualified inquiries.
             </p>
             <p className="text-muted text-sm leading-relaxed">
               Omamie exists to change that. By collecting structured
@@ -71,8 +71,8 @@ export default function AboutPage() {
               </li>
               <li>
                 <strong className="text-ink">4. Both sides connect:</strong>{" "}
-                Once matched, tenants and owners/agents are introduced to
-                arrange viewings and next steps directly.
+                Once matched, tenants and owners are introduced to arrange
+                viewings and next steps directly.
               </li>
             </ol>
             <p className="text-muted text-sm leading-relaxed">
@@ -99,9 +99,7 @@ export default function AboutPage() {
               </div>
 
               <div>
-                <h3 className="text-ink font-semibold">
-                  Property Owners & Agents
-                </h3>
+                <h3 className="text-ink font-semibold">Property Owners</h3>
                 <p className="text-muted mt-1 text-sm leading-relaxed">
                   If you&apos;re renting out a property, Omamie connects you
                   with pre-qualified tenants who match your property profile.

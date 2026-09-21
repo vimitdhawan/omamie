@@ -194,12 +194,12 @@ test.describe("Role-based signup redirects (with mock auth)", () => {
     expect(isValid).toBe(true);
   });
 
-  test.skip("agent signup redirects to /list-property", async ({ page }) => {
+  test.skip("owner signup redirects to /list-property", async ({ page }) => {
     await page.goto("/signup?intent=list-property");
 
-    // Fill form with agent intent
-    await page.getByLabel(/Full Name/i).fill("Agent User");
-    await page.getByLabel(/Email/i).fill("agent@example.com");
+    // Fill form with owner intent
+    await page.getByLabel(/Full Name/i).fill("Owner User");
+    await page.getByLabel(/Email/i).fill("owner@example.com");
     await page.getByLabel(/^Password/i).fill("ValidPassword123!");
     await page.getByLabel(/Confirm Password/i).fill("ValidPassword123!");
 
@@ -211,7 +211,7 @@ test.describe("Role-based signup redirects (with mock auth)", () => {
     await page.waitForTimeout(2000);
 
     const currentUrl = page.url();
-    // Should redirect to list-property for agent role
+    // Should redirect to list-property for owner role
     // Or stay on signup/login if backend not available
     const validPaths = ["/list-property", "/signup", "/login"];
     const isValid = validPaths.some((path) => currentUrl.includes(path));

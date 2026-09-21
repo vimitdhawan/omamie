@@ -12,6 +12,6 @@ export default async function HomePage() {
     redirect("/find-property");
   }
 
-  // agent or owner
+  // owner or admin
   redirect("/dashboard");
 }

@@ -30,7 +30,7 @@ describe("Auth Session Helpers", () => {
   describe("setAuthSession", () => {
     it("should write auth_session cookie with profile data", async () => {
       const profileId = "test-profile-123";
-      const role: UserRole = "agent";
+      const role: UserRole = "owner";
 
       await setAuthSession(profileId, role);
 
@@ -61,7 +61,7 @@ describe("Auth Session Helpers", () => {
     });
 
     it("should handle different roles", async () => {
-      const roles: UserRole[] = ["tenant", "agent", "owner"];
+      const roles: UserRole[] = ["tenant", "owner", "admin"];
 
       for (const role of roles) {
         vi.clearAllMocks();
@@ -139,23 +139,16 @@ describe("Auth Session Helpers", () => {
       expect(path).toBe("/find-property");
     });
 
-    it("should return /properties/create for agent", () => {
-      const path = getRoleBasedRedirectPath("agent");
-      expect(path).toBe("/properties/create");
-    });
-
     it("should return /properties/create for owner", () => {
       const path = getRoleBasedRedirectPath("owner");
       expect(path).toBe("/properties/create");
     });
 
-    it("should have consistent mapping for all roles", () => {
+    it("should have distinct paths for tenant and owner", () => {
       const tenantPath = getRoleBasedRedirectPath("tenant");
-      const agentPath = getRoleBasedRedirectPath("agent");
       const ownerPath = getRoleBasedRedirectPath("owner");
 
-      expect(tenantPath).not.toBe(agentPath);
-      expect(agentPath).toBe(ownerPath);
+      expect(tenantPath).not.toBe(ownerPath);
     });
   });
 });

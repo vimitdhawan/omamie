@@ -17,7 +17,6 @@ Future verticals will add additional workflows.
 
 - Tenant
 - Property Owner
-- Property Agent
 - Administrator
 
 ---
@@ -205,7 +204,7 @@ Allow tenant to view property.
 ### Flow
 
 Tenant Interested
-→ Owner/Agent Approves Match
+→ Owner Approves Match
 → Tenant Receives Viewing Invitation
 → Schedule Viewing
 → Attend Viewing
@@ -234,7 +233,7 @@ Property added to favorites.
 
 ---
 
-# Owner / Agent Flows
+# Owner Flows
 
 ---
 
@@ -242,7 +241,7 @@ Property added to favorites.
 
 ### Goal
 
-Allow owner or agent to participate on platform.
+Allow an owner to participate on the platform.
 
 ### Flow
 
@@ -448,7 +447,7 @@ Property viewing is scheduled.
 
 These workflows are outside MVP scope.
 
-## Owner / Agent Operations
+## Owner Operations
 
 - Tenant management
 - Rental contracts

@@ -31,7 +31,7 @@ describe("matchPattern", () => {
 });
 
 describe("route protection", () => {
-  it("gates every agent/owner/admin property route", () => {
+  it("gates every owner/admin property route", () => {
     for (const path of [
       "/properties",
       "/properties/create",
@@ -39,11 +39,8 @@ describe("route protection", () => {
       "/properties/abc/edit",
     ]) {
       expect(isProtectedRoute(path)).toBe(true);
-      expect(getAllowedRolesForRoute(path)).toEqual([
-        "agent",
-        "owner",
-        "admin",
-      ]);
+      expect(getAllowedRolesForRoute(path)).toEqual(["owner", "admin"]);
+      expect(getAllowedRolesForRoute(path)).not.toContain("agent");
     }
   });
 

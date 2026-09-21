@@ -1,6 +1,6 @@
 import { Logo } from "@/components/custom/logo";
-import { NavMain } from "@/features/agents/sidebar/components/nav-main";
-import { NavUser } from "@/features/agents/sidebar/components/nav-user";
+import { NavMain } from "@/features/owner/sidebar/components/nav-main";
+import { NavUser } from "@/features/owner/sidebar/components/nav-user";
 import {
   Sidebar,
   SidebarContent,

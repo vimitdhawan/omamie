@@ -13,10 +13,7 @@ import type { MatchFilter, UpdateMatchStatusInput } from "./types";
 
 export async function getMatchesAction(filters?: MatchFilter) {
   const session = await getAuthSession();
-  if (
-    !session?.profileId ||
-    (session.role !== "agent" && session.role !== "owner")
-  ) {
+  if (!session?.profileId || session.role !== "owner") {
     redirect("/login");
   }
 
@@ -26,10 +23,7 @@ export async function getMatchesAction(filters?: MatchFilter) {
 
 export async function getMatchCountsAction() {
   const session = await getAuthSession();
-  if (
-    !session?.profileId ||
-    (session.role !== "agent" && session.role !== "owner")
-  ) {
+  if (!session?.profileId || session.role !== "owner") {
     redirect("/login");
   }
 
@@ -38,10 +32,7 @@ export async function getMatchCountsAction() {
 
 export async function getPendingMatchesCountAction() {
   const session = await getAuthSession();
-  if (
-    !session?.profileId ||
-    (session.role !== "agent" && session.role !== "owner")
-  ) {
+  if (!session?.profileId || session.role !== "owner") {
     redirect("/login");
   }
 
@@ -102,10 +93,7 @@ export async function getMatchedPropertyIdsAction() {
 
 export async function updateMatchStatusAction(input: UpdateMatchStatusInput) {
   const session = await getAuthSession();
-  if (
-    !session?.profileId ||
-    (session.role !== "agent" && session.role !== "owner")
-  ) {
+  if (!session?.profileId || session.role !== "owner") {
     redirect("/login");
   }
 

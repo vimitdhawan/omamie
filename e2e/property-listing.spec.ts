@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 
 /**
- * Property listing flow (agent/owner).
+ * Property listing flow (owner).
  *
  * Requires the local Supabase stack with `e2e/supabase/seed.sql` applied — the
  * `e2e-owner@omamie.test` / `e2e-tenant@omamie.test` credentials come from there.

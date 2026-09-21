@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { getAuthSession } from "@/lib/auth-session";
 import { redirect } from "next/navigation";
-import { getDashboardData } from "@/features/agents/dashboard/service";
-import { MetricCard } from "@/features/agents/dashboard/components/metric-card";
-import { EmptyState } from "@/features/agents/dashboard/components/empty-state";
+import { getDashboardData } from "@/features/owner/dashboard/service";
+import { MetricCard } from "@/features/owner/dashboard/components/metric-card";
+import { EmptyState } from "@/features/owner/dashboard/components/empty-state";
 import { Home, Clock, Calendar, Building2, MoreVertical } from "lucide-react";
 
 export default async function DashboardPage() {

@@ -1,6 +1,6 @@
 import { Logo } from "@/components/custom/logo";
-import { NavMain } from "@/features/agents/sidebar/components/nav-main";
-import { NavUser } from "@/features/agents/sidebar/components/nav-user";
+import { NavMain } from "@/features/owner/sidebar/components/nav-main";
+import { NavUser } from "@/features/owner/sidebar/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
@@ -52,7 +52,7 @@ export async function AppSidebar({
   const { user, profile } = await getCurrentUser();
 
   const userData = {
-    name: profile?.full_name || user?.user_metadata?.full_name || "Agent/Owner",
+    name: profile?.full_name || user?.user_metadata?.full_name || "Owner",
     email: user?.email || "user@omamie.local",
     avatar: user?.user_metadata?.avatar_url || "/avatars/default.jpg",
   };

@@ -51,7 +51,6 @@ Located in: `e2e/property-matches.spec.ts`
 ### Access Control Tests
 
 - ✅ Unauthenticated users redirected to login
-- ✅ Agents can access /matches
 - ✅ Owners can access /matches
 - ✅ Tenants are redirected (unauthorized role)
 
