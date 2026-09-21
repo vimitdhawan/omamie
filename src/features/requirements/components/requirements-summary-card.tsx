@@ -3,56 +3,51 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils/format";
 import { PROPERTY_TYPES, BEDROOMS_LABELS, BATHROOMS_LABELS } from "../schema";
-import type { PropertyFindRequest } from "../types";
+import type { TenantRequirements } from "../types";
 
-function formatRequestedDate(iso: string): string {
-  return new Date(iso).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-}
-
-export function FindRequestCard({ request }: { request: PropertyFindRequest }) {
+export function RequirementsSummaryCard({
+  requirements,
+}: {
+  requirements: TenantRequirements;
+}) {
   return (
     <Card className="space-y-3 p-4">
       <div className="flex items-start justify-between gap-2">
         <h3 className="text-foreground text-base font-semibold">
-          {PROPERTY_TYPES[request.propertyType]} ·{" "}
-          {BEDROOMS_LABELS[request.bedrooms]}
+          {PROPERTY_TYPES[requirements.propertyType]} ·{" "}
+          {BEDROOMS_LABELS[requirements.bedrooms]}
         </h3>
-        <Badge variant="secondary">{BATHROOMS_LABELS[request.bathrooms]}</Badge>
+        <Badge variant="secondary">
+          {BATHROOMS_LABELS[requirements.bathrooms]}
+        </Badge>
       </div>
 
       <p className="text-muted-foreground flex items-center gap-1 text-sm">
         <MapPin className="size-3.5 shrink-0" />
-        <span className="line-clamp-1">{request.preferredLocation}</span>
+        <span className="line-clamp-1">{requirements.preferredLocation}</span>
       </p>
 
       <p className="text-muted-foreground flex items-center gap-1 text-sm">
         <Wallet className="size-3.5 shrink-0" />
-        Up to {formatCurrency(request.monthlyBudget, "en-US", "THB")} / month
+        Up to {formatCurrency(requirements.monthlyBudget, "en-US", "THB")} /
+        month
       </p>
 
       <p className="text-muted-foreground flex items-center gap-1 text-sm">
         <CalendarClock className="size-3.5 shrink-0" />
         Move-in from{" "}
-        {new Date(request.moveInDate).toLocaleDateString("en-US", {
+        {new Date(requirements.moveInDate).toLocaleDateString("en-US", {
           year: "numeric",
           month: "short",
           day: "numeric",
         })}
       </p>
 
-      {request.additionalNotes && (
+      {requirements.additionalNotes && (
         <p className="text-muted-foreground line-clamp-2 text-sm italic">
-          &ldquo;{request.additionalNotes}&rdquo;
+          &ldquo;{requirements.additionalNotes}&rdquo;
         </p>
       )}
-
-      <p className="text-muted-foreground text-xs">
-        Requested on {formatRequestedDate(request.createdAt)}
-      </p>
     </Card>
   );
 }

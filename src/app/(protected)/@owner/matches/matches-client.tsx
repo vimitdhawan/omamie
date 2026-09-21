@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { getMatchesAction } from "@/features/property-matches/actions";
 import { MatchesTable } from "@/features/property-matches/components/matches-table";
+import { MatchDetailSheet } from "@/features/property-matches/components/match-detail-sheet";
 import type { PropertyMatchWithProperty } from "@/features/property-matches/types";
 import type { MatchStatus } from "@/features/property-matches/types";
 
@@ -40,6 +41,8 @@ export function MatchesClient({
     "all"
   );
   const [isPending, startTransition] = useTransition();
+  const [selectedMatch, setSelectedMatch] =
+    useState<PropertyMatchWithProperty | null>(null);
 
   const refetchMatches = useCallback(
     (status: MatchStatus | "all" | undefined, search: string | undefined) => {
@@ -137,9 +140,16 @@ export function MatchesClient({
             </div>
           </div>
         ) : (
-          <MatchesTable matches={matches} />
+          <MatchesTable matches={matches} onRowClick={setSelectedMatch} />
         )}
       </div>
+
+      <MatchDetailSheet
+        match={selectedMatch}
+        onOpenChange={(open) => {
+          if (!open) setSelectedMatch(null);
+        }}
+      />
     </>
   );
 }

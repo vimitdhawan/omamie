@@ -22,6 +22,9 @@ export interface PropertyMatchWithProperty extends PropertyMatch {
     location: string;
     monthlyRent: number;
   };
+  /** First name of the tenant, populated for the owner's view only (see
+   * getMatchesAction). Never sourced from `profiles` — comes from tenant_profile. */
+  tenantFirstName?: string;
 }
 
 export interface PropertyMatchWithTenant extends PropertyMatch {

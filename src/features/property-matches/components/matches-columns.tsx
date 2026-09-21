@@ -2,6 +2,7 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
 import type { PropertyMatchWithProperty } from "../types";
+import { MatchActions } from "./match-actions";
 
 const STATUS_BADGE_VARIANT: Record<
   string,
@@ -45,6 +46,20 @@ interface Column {
 }
 
 export const matchColumns: Column[] = [
+  {
+    id: "tenant",
+    header: "Tenant",
+    enableSorting: false,
+    cell: ({
+      row,
+    }: {
+      row: { original: PropertyMatchWithProperty; index: number };
+    }) => (
+      <p className="text-sm font-semibold">
+        {row.original.tenantFirstName || "Tenant"}
+      </p>
+    ),
+  },
   {
     id: "property",
     header: "Property",
@@ -112,6 +127,21 @@ export const matchColumns: Column[] = [
       <div className="text-muted-foreground text-sm">
         {formatDate(row.original.createdAt)}
       </div>
+    ),
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    enableSorting: false,
+    cell: ({
+      row,
+    }: {
+      row: { original: PropertyMatchWithProperty; index: number };
+    }) => (
+      <MatchActions
+        matchId={row.original.id}
+        currentStatus={row.original.status}
+      />
     ),
   },
 ];

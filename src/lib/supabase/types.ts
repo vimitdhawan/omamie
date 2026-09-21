@@ -7,6 +7,11 @@ export type Json =
   | Json[];
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "14.5";
+  };
   graphql_public: {
     Tables: {
       [_ in never]: never;
@@ -124,6 +129,44 @@ export type Database = {
         };
         Relationships: [];
       };
+      lease_documents: {
+        Row: {
+          created_at: string;
+          file_size_bytes: number | null;
+          file_type: string | null;
+          id: string;
+          lease_id: string;
+          name: string;
+          storage_path: string;
+        };
+        Insert: {
+          created_at?: string;
+          file_size_bytes?: number | null;
+          file_type?: string | null;
+          id?: string;
+          lease_id: string;
+          name: string;
+          storage_path: string;
+        };
+        Update: {
+          created_at?: string;
+          file_size_bytes?: number | null;
+          file_type?: string | null;
+          id?: string;
+          lease_id?: string;
+          name?: string;
+          storage_path?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "lease_documents_lease_id_fkey";
+            columns: ["lease_id"];
+            isOneToOne: false;
+            referencedRelation: "leases";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       leases: {
         Row: {
           created_at: string;
@@ -180,44 +223,6 @@ export type Database = {
             columns: ["tenant_id"];
             isOneToOne: false;
             referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
-      lease_documents: {
-        Row: {
-          created_at: string;
-          file_size_bytes: number | null;
-          file_type: string | null;
-          id: string;
-          lease_id: string;
-          name: string;
-          storage_path: string;
-        };
-        Insert: {
-          created_at?: string;
-          file_size_bytes?: number | null;
-          file_type?: string | null;
-          id?: string;
-          lease_id: string;
-          name: string;
-          storage_path: string;
-        };
-        Update: {
-          created_at?: string;
-          file_size_bytes?: number | null;
-          file_type?: string | null;
-          id?: string;
-          lease_id?: string;
-          name?: string;
-          storage_path?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "lease_documents_lease_id_fkey";
-            columns: ["lease_id"];
-            isOneToOne: false;
-            referencedRelation: "leases";
             referencedColumns: ["id"];
           },
         ];
@@ -442,77 +447,6 @@ export type Database = {
           },
         ];
       };
-      property_find_requests: {
-        Row: {
-          additional_notes: string | null;
-          amenities_wishlist: string[];
-          bathrooms: string;
-          bedrooms: string;
-          created_at: string;
-          furnishing: string;
-          id: string;
-          min_size_sqm: number | null;
-          monthly_budget: number;
-          move_in_date: string;
-          parking_needed: boolean;
-          pet_friendly: boolean;
-          preferred_lease_length: string | null;
-          preferred_location: string;
-          preferred_neighborhoods: string[];
-          profile_id: string;
-          property_type: string;
-          updated_at: string;
-        };
-        Insert: {
-          additional_notes?: string | null;
-          amenities_wishlist?: string[];
-          bathrooms: string;
-          bedrooms: string;
-          created_at?: string;
-          furnishing: string;
-          id?: string;
-          min_size_sqm?: number | null;
-          monthly_budget: number;
-          move_in_date: string;
-          parking_needed?: boolean;
-          pet_friendly?: boolean;
-          preferred_lease_length?: string | null;
-          preferred_location: string;
-          preferred_neighborhoods?: string[];
-          profile_id: string;
-          property_type: string;
-          updated_at?: string;
-        };
-        Update: {
-          additional_notes?: string | null;
-          amenities_wishlist?: string[];
-          bathrooms?: string;
-          bedrooms?: string;
-          created_at?: string;
-          furnishing?: string;
-          id?: string;
-          min_size_sqm?: number | null;
-          monthly_budget?: number;
-          move_in_date?: string;
-          parking_needed?: boolean;
-          pet_friendly?: boolean;
-          preferred_lease_length?: string | null;
-          preferred_location?: string;
-          preferred_neighborhoods?: string[];
-          profile_id?: string;
-          property_type?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: "property_find_requests_profile_id_fkey";
-            columns: ["profile_id"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["id"];
-          },
-        ];
-      };
       property_images: {
         Row: {
           byte_size: number | null;
@@ -650,6 +584,127 @@ export type Database = {
           srtext?: string | null;
         };
         Relationships: [];
+      };
+      tenant_profile: {
+        Row: {
+          bio: string | null;
+          created_at: string;
+          employer: string | null;
+          first_name: string;
+          has_pets: boolean;
+          intended_duration: string;
+          is_smoker: boolean;
+          number_of_occupants: number;
+          occupation: string;
+          profile_id: string;
+          reason_for_moving: string;
+          updated_at: string;
+        };
+        Insert: {
+          bio?: string | null;
+          created_at?: string;
+          employer?: string | null;
+          first_name: string;
+          has_pets?: boolean;
+          intended_duration: string;
+          is_smoker?: boolean;
+          number_of_occupants?: number;
+          occupation: string;
+          profile_id: string;
+          reason_for_moving: string;
+          updated_at?: string;
+        };
+        Update: {
+          bio?: string | null;
+          created_at?: string;
+          employer?: string | null;
+          first_name?: string;
+          has_pets?: boolean;
+          intended_duration?: string;
+          is_smoker?: boolean;
+          number_of_occupants?: number;
+          occupation?: string;
+          profile_id?: string;
+          reason_for_moving?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tenant_profile_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      tenant_requirements: {
+        Row: {
+          additional_notes: string | null;
+          amenities_wishlist: string[];
+          bathrooms: string;
+          bedrooms: string;
+          created_at: string;
+          furnishing: string;
+          min_size_sqm: number | null;
+          monthly_budget: number;
+          move_in_date: string;
+          parking_needed: boolean;
+          pet_friendly: boolean;
+          preferred_lease_length: string | null;
+          preferred_location: string;
+          preferred_neighborhoods: string[];
+          profile_id: string;
+          property_type: string;
+          updated_at: string;
+        };
+        Insert: {
+          additional_notes?: string | null;
+          amenities_wishlist?: string[];
+          bathrooms: string;
+          bedrooms: string;
+          created_at?: string;
+          furnishing: string;
+          min_size_sqm?: number | null;
+          monthly_budget: number;
+          move_in_date: string;
+          parking_needed?: boolean;
+          pet_friendly?: boolean;
+          preferred_lease_length?: string | null;
+          preferred_location: string;
+          preferred_neighborhoods?: string[];
+          profile_id: string;
+          property_type: string;
+          updated_at?: string;
+        };
+        Update: {
+          additional_notes?: string | null;
+          amenities_wishlist?: string[];
+          bathrooms?: string;
+          bedrooms?: string;
+          created_at?: string;
+          furnishing?: string;
+          min_size_sqm?: number | null;
+          monthly_budget?: number;
+          move_in_date?: string;
+          parking_needed?: boolean;
+          pet_friendly?: boolean;
+          preferred_lease_length?: string | null;
+          preferred_location?: string;
+          preferred_neighborhoods?: string[];
+          profile_id?: string;
+          property_type?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "tenant_requirements_profile_id_fkey";
+            columns: ["profile_id"];
+            isOneToOne: true;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
     };
     Views: {

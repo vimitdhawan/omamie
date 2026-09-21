@@ -12,6 +12,7 @@ import type { PropertyMatchWithProperty } from "../types";
 
 interface MatchesTableProps {
   matches: PropertyMatchWithProperty[];
+  onRowClick?: (match: PropertyMatchWithProperty) => void;
 }
 
 interface ColumnSort {
@@ -19,7 +20,7 @@ interface ColumnSort {
   desc: boolean;
 }
 
-export function MatchesTable({ matches }: MatchesTableProps) {
+export function MatchesTable({ matches, onRowClick }: MatchesTableProps) {
   const [sorting, setSorting] = React.useState<ColumnSort[]>([]);
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
@@ -137,7 +138,15 @@ export function MatchesTable({ matches }: MatchesTableProps) {
       <div className="border-border overflow-hidden rounded-lg border">
         <Table>
           <DataTableHeader table={table} />
-          <DataTableBody table={table} emptyMessage="No matches found" />
+          <DataTableBody
+            table={table}
+            emptyMessage="No matches found"
+            onRowClick={
+              onRowClick
+                ? (row) => onRowClick(row.original as PropertyMatchWithProperty)
+                : undefined
+            }
+          />
         </Table>
       </div>
       <DataTablePagination table={table} />

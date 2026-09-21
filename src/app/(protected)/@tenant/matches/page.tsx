@@ -1,7 +1,7 @@
 import { getAuthSession } from "@/lib/auth-session";
 import { redirect } from "next/navigation";
 import { getTenantMatchesAction } from "@/features/property-matches/actions";
-import { getFindRequestsAction } from "@/features/find-property/actions";
+import { getOwnRequirementsAction } from "@/features/requirements/actions";
 import { MatchesClient } from "./matches-client";
 
 export const dynamic = "force-dynamic";
@@ -12,15 +12,15 @@ export default async function TenantMatchesPage() {
     redirect("/login");
   }
 
-  const [matches, findRequests] = await Promise.all([
+  const [matches, { requirements }] = await Promise.all([
     getTenantMatchesAction(),
-    getFindRequestsAction(),
+    getOwnRequirementsAction(),
   ]);
 
   return (
     <main className="flex-1 bg-white px-4 pt-6 pb-12">
       <div className="mx-auto max-w-[1100px]">
-        <MatchesClient matches={matches} findRequests={findRequests} />
+        <MatchesClient matches={matches} requirements={requirements} />
       </div>
     </main>
   );

@@ -9,7 +9,6 @@ export type AdminMatchSummary = {
   propertyLocation: string | null;
   tenantId: string;
   tenantName: string | null;
-  tenantEmail: string | null;
 };
 
 export type AdminMatchFilter = {

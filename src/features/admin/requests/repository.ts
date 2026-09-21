@@ -11,14 +11,13 @@ import type { AdminMatchSummary, AdminMatchFilter } from "./types";
  * caller's role.
  */
 
-type MatchWithPropertyAndTenantRow = {
+type MatchWithPropertyRow = {
   id: string;
   status: string;
   created_at: string;
   property_id: string;
   tenant_id: string;
   properties: { title: string; location: string | null } | null;
-  tenant: { full_name: string | null; email: string } | null;
 };
 
 export async function listAllMatches(
@@ -29,7 +28,7 @@ export async function listAllMatches(
   let query = supabase
     .from("property_matches")
     .select(
-      "id, status, created_at, property_id, tenant_id, properties(title, location), tenant:profiles!property_matches_tenant_id_fkey(full_name, email)"
+      "id, status, created_at, property_id, tenant_id, properties(title, location)"
     )
     .order("created_at", { ascending: false });
 
@@ -43,9 +42,26 @@ export async function listAllMatches(
     throw new AppError("INTERNAL_ERROR", "Failed to fetch matching requests");
   }
 
-  return (
-    (data as unknown as MatchWithPropertyAndTenantRow[] | null) ?? []
-  ).map((row) => ({
+  const rows = (data as unknown as MatchWithPropertyRow[] | null) ?? [];
+
+  // No FK between property_matches and tenant_profile, so the tenant's name is
+  // batch-fetched separately rather than embedded. Service role bypasses RLS here (this
+  // is an admin oversight view across all owners), unlike the owner-scoped read in
+  // requirements/repository.ts.
+  const tenantIds = Array.from(new Set(rows.map((row) => row.tenant_id)));
+  const { data: tenantProfiles } =
+    tenantIds.length > 0
+      ? await supabase
+          .from("tenant_profile")
+          .select("profile_id, first_name")
+          .in("profile_id", tenantIds)
+      : { data: [] };
+
+  const firstNameByTenantId = Object.fromEntries(
+    (tenantProfiles ?? []).map((row) => [row.profile_id, row.first_name])
+  );
+
+  return rows.map((row) => ({
     id: row.id,
     status: row.status as MatchStatus,
     createdAt: row.created_at,
@@ -53,7 +69,6 @@ export async function listAllMatches(
     propertyTitle: row.properties?.title ?? "Untitled property",
     propertyLocation: row.properties?.location ?? null,
     tenantId: row.tenant_id,
-    tenantName: row.tenant?.full_name ?? null,
-    tenantEmail: row.tenant?.email ?? null,
+    tenantName: firstNameByTenantId[row.tenant_id] ?? null,
   }));
 }

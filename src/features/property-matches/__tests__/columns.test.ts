@@ -1,6 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { matchColumns } from "../components/matches-columns";
 import type { PropertyMatchWithProperty } from "../types";
+
+vi.mock("../actions", () => ({
+  updateMatchStatusAction: vi.fn(),
+}));
 
 describe("Match Columns", () => {
   const mockMatch: PropertyMatchWithProperty = {
@@ -24,13 +28,15 @@ describe("Match Columns", () => {
   };
 
   it("should have correct column definitions", () => {
-    expect(matchColumns).toHaveLength(5);
+    expect(matchColumns).toHaveLength(7);
     expect(matchColumns.map((col) => col.id)).toEqual([
+      "tenant",
       "property",
       "location",
       "monthlyRent",
       "status",
       "createdAt",
+      "actions",
     ]);
   });
 
