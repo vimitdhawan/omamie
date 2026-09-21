@@ -50,16 +50,16 @@ describe("admin actions — rejectPropertyAction", () => {
   it("returns success once the service call resolves", async () => {
     rejectProperty.mockResolvedValue(undefined);
 
-    const result = await rejectPropertyAction(VALID_ID);
+    const result = await rejectPropertyAction(VALID_ID, "Missing photos");
 
     expect(result).toEqual({ success: true });
-    expect(rejectProperty).toHaveBeenCalledWith(VALID_ID);
+    expect(rejectProperty).toHaveBeenCalledWith(VALID_ID, "Missing photos");
   });
 
   it("returns a generic error message for an unexpected failure", async () => {
     rejectProperty.mockRejectedValue(new Error("boom"));
 
-    const result = await rejectPropertyAction(VALID_ID);
+    const result = await rejectPropertyAction(VALID_ID, "Missing photos");
 
     expect(result.errorMessage).toBe(
       "Failed to reject property. Please try again."

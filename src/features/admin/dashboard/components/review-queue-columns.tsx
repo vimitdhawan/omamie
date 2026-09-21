@@ -9,6 +9,7 @@ interface Column {
   id: string;
   header: string;
   enableSorting: boolean;
+  className?: string;
   cell: (context: {
     row: { original: AdminPropertySummary; index: number };
   }) => React.ReactNode;
@@ -41,7 +42,24 @@ export const reviewQueueColumns: Column[] = [
     enableSorting: true,
     cell: ({ row }) => (
       <div className="text-sm">
-        {row.original.ownerName ?? row.original.ownerEmail ?? "Unknown"}
+        <p>{row.original.ownerName ?? "Unknown"}</p>
+        {row.original.ownerEmail && (
+          <p className="text-muted-foreground text-xs">
+            {row.original.ownerEmail}
+          </p>
+        )}
+      </div>
+    ),
+  },
+  {
+    id: "monthlyRent",
+    header: "Price",
+    enableSorting: true,
+    cell: ({ row }) => (
+      <div className="text-sm font-medium">
+        {row.original.monthlyRent != null
+          ? `฿${row.original.monthlyRent.toLocaleString()}/mo`
+          : "—"}
       </div>
     ),
   },

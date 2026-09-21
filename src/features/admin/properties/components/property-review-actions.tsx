@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { approvePropertyAction, rejectPropertyAction } from "../actions";
 
 export function PropertyReviewActions({
@@ -24,6 +25,8 @@ export function PropertyReviewActions({
 }) {
   const router = useRouter();
   const [confirming, setConfirming] = React.useState(false);
+  const [reason, setReason] = React.useState("");
+  const [reasonError, setReasonError] = React.useState<string | null>(null);
   const [isPending, startTransition] = React.useTransition();
 
   const handleApprove = () => {
@@ -39,8 +42,12 @@ export function PropertyReviewActions({
   };
 
   const handleReject = () => {
+    if (!reason.trim()) {
+      setReasonError("Please explain what's missing");
+      return;
+    }
     startTransition(async () => {
-      const result = await rejectPropertyAction(propertyId);
+      const result = await rejectPropertyAction(propertyId, reason.trim());
       if (result.errorMessage) {
         toast.error(result.errorMessage);
         return;
@@ -59,7 +66,11 @@ export function PropertyReviewActions({
           variant="outline"
           className="flex-1"
           disabled={isPending}
-          onClick={() => setConfirming(true)}
+          onClick={() => {
+            setReason("");
+            setReasonError(null);
+            setConfirming(true);
+          }}
         >
           Reject
         </Button>
@@ -85,9 +96,25 @@ export function PropertyReviewActions({
             <AlertDialogTitle>Reject this listing?</AlertDialogTitle>
             <AlertDialogDescription>
               &ldquo;{title}&rdquo; will be marked inactive and removed from the
-              review queue. The owner can resubmit it later.
+              review queue. Let the owner know what&apos;s missing so they can
+              fix it and resubmit.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="space-y-1.5">
+            <Textarea
+              value={reason}
+              onChange={(event) => {
+                setReason(event.target.value);
+                if (reasonError) setReasonError(null);
+              }}
+              placeholder="e.g. Photos are missing, address is incomplete..."
+              disabled={isPending}
+              rows={3}
+            />
+            {reasonError && (
+              <p className="text-destructive text-xs">{reasonError}</p>
+            )}
+          </div>
           <AlertDialogFooter>
             <Button
               type="button"

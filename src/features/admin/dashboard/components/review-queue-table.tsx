@@ -1,14 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { Table } from "@/components/ui/table";
 import {
   DataTableHeader,
   DataTableBody,
   DataTablePagination,
 } from "@/components/custom/data-table";
-import type { Row } from "@/components/custom/data-table/types";
 import { reviewQueueColumns } from "./review-queue-columns";
 import { ReviewQueueContext } from "./review-queue-context";
 import type { AdminPropertySummary } from "../../properties/types";
@@ -23,7 +21,6 @@ export function ReviewQueueTable({
 }: {
   properties: AdminPropertySummary[];
 }) {
-  const router = useRouter();
   const [removedIds, setRemovedIds] = React.useState<Set<string>>(new Set());
   const [sorting, setSorting] = React.useState<ColumnSort[]>([]);
   const [pagination, setPagination] = React.useState({
@@ -145,11 +142,6 @@ export function ReviewQueueTable({
             <DataTableBody
               table={table}
               emptyMessage="No properties are waiting for review"
-              onRowClick={(row: Row) =>
-                router.push(
-                  `/properties/${(row.original as AdminPropertySummary).id}`
-                )
-              }
             />
           </Table>
         </div>

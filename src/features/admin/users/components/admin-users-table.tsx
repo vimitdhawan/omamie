@@ -138,9 +138,13 @@ export function AdminUsersTable({ users }: { users: AdminUserSummary[] }) {
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList>
+          <TabsList className="bg-primary/10">
             {ROLE_TABS.map((option) => (
-              <TabsTrigger key={option.value} value={option.value}>
+              <TabsTrigger
+                key={option.value}
+                value={option.value}
+                className="text-foreground hover:text-foreground data-active:bg-primary data-active:text-primary-foreground data-active:hover:text-primary-foreground font-semibold"
+              >
                 {option.label}
               </TabsTrigger>
             ))}

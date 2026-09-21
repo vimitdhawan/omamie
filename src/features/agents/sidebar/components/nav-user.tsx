@@ -16,12 +16,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  EllipsisVertical,
-  CircleUserRound,
-  Settings,
-  LogOut,
-} from "lucide-react";
+import { EllipsisVertical, LogOut } from "lucide-react";
 import { logoutAction } from "@/features/auth/actions";
 
 export function NavUser({
@@ -96,19 +91,8 @@ export function NavUser({
               </DropdownMenuLabel>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <CircleUserRound className="size-4" />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Settings className="size-4" />
-                Settings
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
             <form action={logoutAction}>
-              <DropdownMenuItem>
+              <DropdownMenuItem render={<button type="submit" />}>
                 <LogOut className="size-4" />
                 Log out
               </DropdownMenuItem>

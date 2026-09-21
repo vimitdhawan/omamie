@@ -318,6 +318,7 @@ export type Database = {
           next_action: string | null;
           profile_id: string;
           property_type: string | null;
+          rejection_reason: string | null;
           security_deposit_months: number | null;
           started_at: string;
           status: string;
@@ -345,6 +346,7 @@ export type Database = {
           next_action?: string | null;
           profile_id: string;
           property_type?: string | null;
+          rejection_reason?: string | null;
           security_deposit_months?: number | null;
           started_at?: string;
           status?: string;
@@ -372,6 +374,7 @@ export type Database = {
           next_action?: string | null;
           profile_id?: string;
           property_type?: string | null;
+          rejection_reason?: string | null;
           security_deposit_months?: number | null;
           started_at?: string;
           status?: string;

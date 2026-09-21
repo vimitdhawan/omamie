@@ -150,13 +150,18 @@ export async function getPropertyById(
 
 export async function updatePropertyStatus(
   propertyId: string,
-  status: Extract<PropertyStatus, "active" | "inactive">
+  status: Extract<PropertyStatus, "active" | "inactive">,
+  rejectionReason?: string
 ): Promise<void> {
   const supabase = createServiceRoleClient();
 
   const { error } = await supabase
     .from("properties")
-    .update({ status })
+    .update({
+      status,
+      rejection_reason:
+        status === "inactive" ? (rejectionReason ?? null) : null,
+    })
     .eq("id", propertyId)
     .eq("status", "review");
 

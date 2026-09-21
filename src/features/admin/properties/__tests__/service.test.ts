@@ -51,9 +51,13 @@ describe("admin properties service — gated repository access", () => {
   it("rejectProperty sets status to inactive once requireAdmin resolves", async () => {
     requireAdmin.mockResolvedValue("admin-1");
 
-    await rejectProperty("prop-1");
+    await rejectProperty("prop-1", "Missing photos");
 
-    expect(updatePropertyStatus).toHaveBeenCalledWith("prop-1", "inactive");
+    expect(updatePropertyStatus).toHaveBeenCalledWith(
+      "prop-1",
+      "inactive",
+      "Missing photos"
+    );
   });
 
   it("approveProperty rejects when requireAdmin rejects, without touching the repository", async () => {
