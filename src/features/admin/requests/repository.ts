@@ -49,17 +49,22 @@ export async function listAllMatches(
   // is an admin oversight view across all owners), unlike the owner-scoped read in
   // requirements/repository.ts.
   const tenantIds = Array.from(new Set(rows.map((row) => row.tenant_id)));
-  const { data: tenantProfiles } =
-    tenantIds.length > 0
-      ? await supabase
-          .from("tenant_profile")
-          .select("profile_id, first_name")
-          .in("profile_id", tenantIds)
-      : { data: [] };
 
-  const firstNameByTenantId = Object.fromEntries(
-    (tenantProfiles ?? []).map((row) => [row.profile_id, row.first_name])
-  );
+  let firstNameByTenantId: Record<string, string> = {};
+  if (tenantIds.length > 0) {
+    const { data: tenantProfiles, error: tenantProfilesError } = await supabase
+      .from("tenant_profile")
+      .select("profile_id, first_name")
+      .in("profile_id", tenantIds);
+
+    if (tenantProfilesError) {
+      throw new AppError("INTERNAL_ERROR", "Failed to fetch tenant names");
+    }
+
+    firstNameByTenantId = Object.fromEntries(
+      (tenantProfiles ?? []).map((row) => [row.profile_id, row.first_name])
+    );
+  }
 
   return rows.map((row) => ({
     id: row.id,

@@ -29,7 +29,13 @@ export function MatchDetailSheet({
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (!match) return;
+    if (!match) {
+      startTransition(() => {
+        setDetail(null);
+        setIsLoading(false);
+      });
+      return;
+    }
 
     let cancelled = false;
     startTransition(() => {

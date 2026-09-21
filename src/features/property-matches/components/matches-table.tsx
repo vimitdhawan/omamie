@@ -15,6 +15,16 @@ interface MatchesTableProps {
   onRowClick?: (match: PropertyMatchWithProperty) => void;
 }
 
+function isPropertyMatch(value: unknown): value is PropertyMatchWithProperty {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "id" in value &&
+    "status" in value &&
+    "property" in value
+  );
+}
+
 interface ColumnSort {
   id: string;
   desc: boolean;
@@ -143,7 +153,11 @@ export function MatchesTable({ matches, onRowClick }: MatchesTableProps) {
             emptyMessage="No matches found"
             onRowClick={
               onRowClick
-                ? (row) => onRowClick(row.original as PropertyMatchWithProperty)
+                ? (row) => {
+                    if (isPropertyMatch(row.original)) {
+                      onRowClick(row.original);
+                    }
+                  }
                 : undefined
             }
           />
