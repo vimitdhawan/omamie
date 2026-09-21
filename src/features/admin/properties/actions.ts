@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { reviewDecisionSchema } from "./schema";
+import { reviewDecisionSchema, rejectDecisionSchema } from "./schema";
 import { approveProperty, rejectProperty } from "./service";
 import { isAppError } from "@/lib/errors";
 
@@ -34,15 +34,18 @@ export async function approvePropertyAction(
 }
 
 export async function rejectPropertyAction(
-  propertyId: string
+  propertyId: string,
+  reason: string
 ): Promise<ReviewActionState> {
-  const parsed = reviewDecisionSchema.safeParse({ propertyId });
+  const parsed = rejectDecisionSchema.safeParse({ propertyId, reason });
   if (!parsed.success) {
-    return { errorMessage: "Invalid property" };
+    return {
+      errorMessage: parsed.error.issues[0]?.message ?? "Invalid property",
+    };
   }
 
   try {
-    await rejectProperty(parsed.data.propertyId);
+    await rejectProperty(parsed.data.propertyId, parsed.data.reason);
     revalidatePath("/dashboard");
     revalidatePath("/properties");
     revalidatePath(`/properties/${parsed.data.propertyId}`);

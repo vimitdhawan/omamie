@@ -24,6 +24,7 @@ export interface ColumnDef {
   header?: string | React.ReactNode;
   cell?: (context: CellContext) => React.ReactNode;
   enableSorting?: boolean;
+  className?: string;
 }
 
 export interface HeaderGroup {

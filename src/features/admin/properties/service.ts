@@ -27,7 +27,10 @@ export async function approveProperty(propertyId: string): Promise<void> {
   await updatePropertyStatus(propertyId, "active");
 }
 
-export async function rejectProperty(propertyId: string): Promise<void> {
+export async function rejectProperty(
+  propertyId: string,
+  reason: string
+): Promise<void> {
   await requireAdmin();
-  await updatePropertyStatus(propertyId, "inactive");
+  await updatePropertyStatus(propertyId, "inactive", reason);
 }

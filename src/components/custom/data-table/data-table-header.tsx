@@ -3,6 +3,7 @@ import {
   TableHeader as TableHeaderUI,
   TableRow,
 } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 import type { DataTable } from "./types";
 
 interface DataTableHeaderProps {
@@ -22,11 +23,10 @@ export function DataTableHeader({ table }: DataTableHeaderProps) {
                   ? header.column?.getToggleSortingHandler?.()
                   : undefined
               }
-              className={
-                header.column?.getCanSort?.()
-                  ? "cursor-pointer select-none"
-                  : ""
-              }
+              className={cn(
+                header.column?.getCanSort?.() && "cursor-pointer select-none",
+                header.column?.columnDef?.className
+              )}
             >
               {header.column?.columnDef?.header}
               {{

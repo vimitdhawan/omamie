@@ -44,7 +44,12 @@ export const adminPropertyColumns: Column[] = [
     enableSorting: true,
     cell: ({ row }) => (
       <div className="text-sm">
-        {row.original.ownerName ?? row.original.ownerEmail ?? "Unknown"}
+        <p>{row.original.ownerName ?? "Unknown"}</p>
+        {row.original.ownerEmail && (
+          <p className="text-muted-foreground text-xs">
+            {row.original.ownerEmail}
+          </p>
+        )}
       </div>
     ),
   },

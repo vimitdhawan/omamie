@@ -58,7 +58,10 @@ export function DataTableBody({
           )}
         >
           {row.getVisibleCells().map((cell) => (
-            <TableCell key={cell.id}>
+            <TableCell
+              key={cell.id}
+              className={cell.column?.columnDef?.className}
+            >
               {cell.column?.columnDef?.cell?.(cell.getContext()) || ""}
             </TableCell>
           ))}
