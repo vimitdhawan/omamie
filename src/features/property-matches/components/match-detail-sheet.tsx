@@ -59,7 +59,10 @@ export function MatchDetailSheet({
     <Sheet open={match !== null} onOpenChange={onOpenChange}>
       <SheetContent>
         <SheetHeader>
-          <SheetTitle>{match?.property.title}</SheetTitle>
+          <p className="text-primary text-xs font-semibold tracking-wide uppercase">
+            Direct Rental Inquiry
+          </p>
+          <SheetTitle className="text-xl">{match?.property.title}</SheetTitle>
           <SheetDescription>{match?.property.location}</SheetDescription>
         </SheetHeader>
 
