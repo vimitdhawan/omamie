@@ -247,7 +247,7 @@ test.describe("Find Property Page", () => {
       expect(finalUrl).toContain("/list-property");
     });
 
-    test.skip("owner trying find-property always redirects to list-property", async ({
+    test.skip("owner trying find-property repeatedly always redirects to list-property", async ({
       page,
     }) => {
       // Set up owner session
