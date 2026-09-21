@@ -139,9 +139,9 @@ describe("Auth Session Helpers", () => {
       expect(path).toBe("/find-property");
     });
 
-    it("should return /properties/create for owner", () => {
+    it("should return /dashboard for owner", () => {
       const path = getRoleBasedRedirectPath("owner");
-      expect(path).toBe("/properties/create");
+      expect(path).toBe("/dashboard");
     });
 
     it("should have distinct paths for tenant and owner", () => {

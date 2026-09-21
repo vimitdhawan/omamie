@@ -309,9 +309,7 @@ test.describe("Find Property Page", () => {
       expect(response.headers().location).toContain("/find-property");
     });
 
-    test("owner visiting / is redirected to /properties/create", async ({
-      page,
-    }) => {
+    test("owner visiting / is redirected to /dashboard", async ({ page }) => {
       await page.context().addCookies([
         {
           name: "auth_session",
@@ -331,7 +329,7 @@ test.describe("Find Property Page", () => {
         maxRedirects: 0,
       });
       expect(response.status()).toBe(307);
-      expect(response.headers().location).toContain("/properties/create");
+      expect(response.headers().location).toContain("/dashboard");
     });
 
     test("logged-out visitor is redirected to login from root", async ({

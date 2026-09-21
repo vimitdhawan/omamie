@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { getDashboardData } from "@/features/owner/dashboard/service";
 import { MetricCard } from "@/features/owner/dashboard/components/metric-card";
 import { EmptyState } from "@/features/owner/dashboard/components/empty-state";
-import { Home, Clock, Calendar, Building2, MoreVertical } from "lucide-react";
+import { Home, Clock, KeyRound, Building2, Plus } from "lucide-react";
 
 export default async function DashboardPage() {
   const session = await getAuthSession();
@@ -13,6 +13,29 @@ export default async function DashboardPage() {
   }
 
   const data = await getDashboardData(session.profileId);
+
+  if (data.metrics.totalProperties === 0) {
+    return (
+      <div className="flex flex-1 items-center justify-center p-8">
+        <div className="max-w-sm text-center">
+          <h1 className="text-foreground text-[21px] font-bold">
+            No properties yet
+          </h1>
+          <p className="text-muted-foreground mt-2 text-[14px] leading-relaxed">
+            Start by creating a listing to see your occupancy, revenue, and
+            tenant interest here.
+          </p>
+          <Link
+            href="/properties/create"
+            className="bg-primary text-primary-foreground mt-6 inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-[14px] font-semibold hover:opacity-90"
+          >
+            <Plus className="size-4" />
+            Create your first listing
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 space-y-8 p-8">
@@ -69,12 +92,6 @@ export default async function DashboardPage() {
               icon={<Home className="size-8" />}
               label="Active Listings"
               value={`${data.metrics.activeListings}`}
-              subtitle={
-                data.metrics.activeListingsChange > 0
-                  ? `+${data.metrics.activeListingsChange} this month`
-                  : undefined
-              }
-              subtitleColor="text-blue-600 font-semibold"
               bgColor="bg-blue-50"
               iconColor="text-blue-600"
             />
@@ -82,30 +99,20 @@ export default async function DashboardPage() {
               icon={<Clock className="size-8" />}
               label="Pending Requests"
               value={data.metrics.pendingRequests}
-              subtitle={
-                data.metrics.pendingRequestsUrgent > 0
-                  ? `${data.metrics.pendingRequestsUrgent} need attention`
-                  : undefined
-              }
-              subtitleColor="text-red-600 font-semibold"
               bgColor="bg-blue-100"
               iconColor="text-blue-700"
             />
             <MetricCard
-              icon={<Calendar className="size-8" />}
-              label="Upcoming Viewings"
-              value={data.metrics.upcomingViewings}
-              subtitle={data.metrics.nextViewing || "No viewings scheduled"}
-              subtitleColor="text-muted-foreground"
-              bgColor="bg-blue-50"
-              iconColor="text-blue-600"
+              icon={<KeyRound className="size-8" />}
+              label="Rented"
+              value={data.metrics.rentedProperties}
+              bgColor="bg-green-50"
+              iconColor="text-green-600"
             />
             <MetricCard
               icon={<Building2 className="size-8" />}
               label="Total Properties"
               value={data.metrics.totalProperties}
-              subtitle={`${data.metrics.totalPropertiesActive} active`}
-              subtitleColor="text-muted-foreground"
               bgColor="bg-gray-50"
               iconColor="text-gray-600"
             />
@@ -113,110 +120,39 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Pending Requests + Upcoming Viewings */}
-      <div className="space-y-8">
-        {/* Pending Requests */}
-        <div className="border-border bg-card rounded-xl border p-6 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-foreground text-[21px] font-bold">
-              Pending Requests
-            </h3>
-            <Link
-              href="/viewing-requests?status=pending"
-              className="text-primary text-[16px] font-semibold hover:underline"
-            >
-              View All
-            </Link>
-          </div>
-          {data.pendingRequests.length === 0 ? (
-            <EmptyState message="No pending requests at the moment." />
-          ) : (
-            <div className="space-y-3">
-              {data.pendingRequests.map((request) => (
-                <div
-                  key={request.id}
-                  className="border-border bg-muted/30 hover:bg-muted/50 flex items-start justify-between rounded-lg border p-4 transition-colors"
-                >
-                  <div className="flex-1">
-                    <a
-                      href={`/viewing-requests/${request.id}`}
-                      className="block"
-                    >
-                      <p className="text-foreground text-[15px] font-semibold hover:underline">
-                        {request.title}
-                      </p>
-                      <p className="text-muted-foreground mt-1 text-[13px]">
-                        {request.requester} • {request.date} at {request.time}
-                      </p>
-                    </a>
-                  </div>
-                  <div className="ml-4 flex items-center gap-2">
-                    <button className="rounded border border-blue-500 px-3 py-1.5 text-[13px] font-medium text-blue-600 transition-colors hover:bg-blue-50">
-                      Accept
-                    </button>
-                    <button className="rounded px-3 py-1.5 text-[13px] font-medium text-gray-600 transition-colors hover:bg-gray-100">
-                      Decline
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+      {/* Pending Requests */}
+      <div className="border-border bg-card rounded-xl border p-6 shadow-sm">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-foreground text-[21px] font-bold">
+            Pending Requests
+          </h3>
+          <Link
+            href="/matches"
+            className="text-primary text-[16px] font-semibold hover:underline"
+          >
+            View All
+          </Link>
         </div>
-
-        {/* Upcoming Viewings */}
-        <div className="border-border bg-card rounded-xl border p-6 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-foreground text-[21px] font-bold">
-              Upcoming Viewings
-            </h3>
-            <Link
-              href="/viewing-requests?status=accepted"
-              className="text-primary text-[16px] font-semibold hover:underline"
-            >
-              View All
-            </Link>
+        {data.pendingRequests.length === 0 ? (
+          <EmptyState message="No pending requests at the moment." />
+        ) : (
+          <div className="space-y-3">
+            {data.pendingRequests.map((request) => (
+              <Link
+                key={request.id}
+                href="/matches"
+                className="border-border bg-muted/30 hover:bg-muted/50 block rounded-lg border p-4 transition-colors"
+              >
+                <p className="text-foreground text-[15px] font-semibold">
+                  {request.propertyTitle}
+                </p>
+                <p className="text-muted-foreground mt-1 text-[13px]">
+                  {request.tenantName} is interested
+                </p>
+              </Link>
+            ))}
           </div>
-          {data.upcomingViewings.length === 0 ? (
-            <EmptyState message="No viewings scheduled." />
-          ) : (
-            <div className="space-y-3">
-              {data.upcomingViewings.map((viewing) => (
-                <div
-                  key={viewing.id}
-                  className="border-border hover:bg-muted/30 group flex items-start justify-between rounded-lg border p-4 transition-colors"
-                >
-                  <a
-                    href={`/viewing-requests/${viewing.id}`}
-                    className="flex flex-1 items-start gap-4"
-                  >
-                    <div className="flex h-12 w-12 flex-shrink-0 flex-col items-center justify-center rounded-lg bg-blue-100 text-blue-600">
-                      <span className="text-sm font-bold">
-                        {new Date(viewing.date).getDate()}
-                      </span>
-                      <span className="text-xs font-medium uppercase">
-                        {new Date(viewing.date).toLocaleDateString("en-US", {
-                          month: "short",
-                        })}
-                      </span>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-foreground text-[15px] font-semibold hover:underline">
-                        {viewing.propertyTitle}
-                      </p>
-                      <p className="text-muted-foreground mt-1 text-[13px]">
-                        {viewing.time} • {viewing.requesterName}
-                      </p>
-                    </div>
-                  </a>
-                  <button className="text-muted-foreground hover:text-foreground p-2 opacity-0 transition-all group-hover:opacity-100">
-                    <MoreVertical className="size-5" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        )}
       </div>
     </div>
   );

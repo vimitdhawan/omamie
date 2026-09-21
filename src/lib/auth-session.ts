@@ -10,7 +10,7 @@ const authSessionSchema = z.object({
 
 const ROLE_BASED_DEFAULTS: Record<UserRole, string> = {
   tenant: "/find-property",
-  owner: "/properties/create",
+  owner: "/dashboard",
   admin: "/dashboard",
 };
 
