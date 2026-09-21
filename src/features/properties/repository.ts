@@ -486,4 +486,28 @@ export async function getPropertiesCountByStatus(profileId: string): Promise<{
   return { all, active, draft, review, rented };
 }
 
+/** Sum of `monthly_rent` across an owner's currently rented properties — the closest real
+ * proxy for recurring revenue available today (no payment/lease-collection tracking exists
+ * yet, see the `leases` table which nothing writes to from the app). */
+export async function getRentedPropertiesMonthlyRevenue(
+  profileId: string
+): Promise<number> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("properties")
+    .select("monthly_rent")
+    .eq("profile_id", profileId)
+    .eq("status", "rented");
+
+  if (error || !data) {
+    return 0;
+  }
+
+  return (data as { monthly_rent: number | null }[]).reduce(
+    (sum, row) => sum + (row.monthly_rent ?? 0),
+    0
+  );
+}
+
 export { mapTableToProperty, mapDatabaseErrorToUserMessage, escapeSearchTerm };

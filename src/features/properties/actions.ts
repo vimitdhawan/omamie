@@ -221,9 +221,9 @@ export async function savePropertyAction(
       return { errorMessage: "Profile not found. Please log in again." };
     }
 
-    if (session.role !== "agent" && session.role !== "owner") {
+    if (session.role !== "owner") {
       return {
-        errorMessage: "Only agents and owners can manage property listings",
+        errorMessage: "Only owners can manage property listings",
       };
     }
 

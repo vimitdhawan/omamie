@@ -91,16 +91,16 @@ describe("signupFormSchema", () => {
 });
 
 describe("roleEnum", () => {
-  it.each(["agent", "owner", "tenant", "admin"])(
-    "accepts role '%s'",
-    (role) => {
-      expect(roleEnum.safeParse(role).success).toBe(true);
-    }
-  );
+  it.each(["owner", "tenant", "admin"])("accepts role '%s'", (role) => {
+    expect(roleEnum.safeParse(role).success).toBe(true);
+  });
+
+  it("rejects the removed 'agent' role", () => {
+    expect(roleEnum.safeParse("agent").success).toBe(false);
+  });
 
   it("exposes matching human-readable labels", () => {
     expect(USER_ROLES).toEqual({
-      agent: "Agent",
       owner: "Owner",
       tenant: "Tenant",
       admin: "Admin",

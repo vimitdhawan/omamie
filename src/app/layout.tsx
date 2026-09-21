@@ -11,7 +11,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Omamie",
-  description: "Omamie — property management for tenants, owners, and agents",
+  description: "Omamie — property management for tenants and owners",
 };
 
 export default function RootLayout({

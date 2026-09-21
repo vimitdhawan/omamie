@@ -51,9 +51,7 @@ export default function PrivacyPage() {
               </div>
 
               <div>
-                <h3 className="text-ink font-semibold">
-                  From Property Owners/Agents
-                </h3>
+                <h3 className="text-ink font-semibold">From Property Owners</h3>
                 <p className="text-muted leading-relaxed">
                   When you list a property, we collect:
                 </p>
@@ -101,9 +99,7 @@ export default function PrivacyPage() {
             </p>
             <ul className="text-muted list-inside list-disc space-y-1 pl-2">
               <li>Perform property and tenant matching</li>
-              <li>
-                Facilitate introductions between tenants and owners/agents
-              </li>
+              <li>Facilitate introductions between tenants and owners</li>
               <li>Respond to your inquiries and provide customer support</li>
               <li>
                 Send you updates about matched properties or tenant profiles
@@ -132,8 +128,8 @@ export default function PrivacyPage() {
             <h2 className="text-ink text-lg font-bold">Data Sharing</h2>
             <p className="text-muted leading-relaxed">
               We do not sell, rent, or trade your personal information to third
-              parties. We may share your information with property owners/agents
-              and tenants when we believe a match exists and both parties have
+              parties. We may share your information with property owners and
+              tenants when we believe a match exists and both parties have
               consented to the introduction. We may also disclose information
               when required by law or to protect our legal rights.
             </p>

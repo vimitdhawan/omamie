@@ -248,6 +248,58 @@ export async function getPendingMatchesCount(
   return data.length;
 }
 
+/** The most recent "interested" matches for an owner's properties, with the tenant's name
+ * attached, for the dashboard's Pending Requests list. */
+export async function getRecentInterestedMatches(
+  profileId: string,
+  limit: number
+): Promise<
+  Array<{
+    id: string;
+    propertyTitle: string;
+    tenantName: string;
+    createdAt: string;
+  }>
+> {
+  const supabase = await createClient();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const query: any = (supabase as any)
+    .from("property_matches")
+    .select(
+      `
+      id,
+      created_at,
+      property:properties(title),
+      tenant:profiles(full_name)
+    `
+    )
+    .eq("property_owner_id", profileId)
+    .eq("status", "interested")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  const { data, error } = await query;
+
+  if (error || !data) {
+    return [];
+  }
+
+  return (
+    data as Array<{
+      id: string;
+      created_at: string;
+      property: { title: string } | null;
+      tenant: { full_name: string | null } | null;
+    }>
+  ).map((row) => ({
+    id: row.id,
+    propertyTitle: row.property?.title ?? "Property",
+    tenantName: row.tenant?.full_name ?? "A tenant",
+    createdAt: row.created_at,
+  }));
+}
+
 /** The property IDs a tenant already has a match/interest on, for badge/button state in the explore grid. */
 export async function getMatchedPropertyIdsByTenantId(
   tenantId: string

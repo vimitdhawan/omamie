@@ -65,7 +65,7 @@ const faqs: FAQItem[] = [
       <p>
         Not yet. Omamie is currently in the early stages, focused on connecting
         tenants with properties and facilitating initial conversations. Viewings
-        are arranged directly between you and the property owner/agent, or with
+        are arranged directly between you and the property owner, or with
         platform assistance. Rent payment, lease signing, and related logistics
         are handled directly between tenant and owner.
       </p>

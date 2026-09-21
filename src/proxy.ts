@@ -8,11 +8,11 @@ const ROUTE_CONFIG = {
   auth: ["/login", "/signup"],
   protected: [
     {
-      // Covers /properties and everything under it. Agent/owner get create/[id]/edit;
+      // Covers /properties and everything under it. Owner gets create/[id]/edit;
       // admin's own @admin/properties/page.tsx is the only /properties leaf in their slot,
       // so the nested sub-routes simply render nothing for that role (see (protected)/layout.tsx).
       pattern: "/properties/*",
-      roles: ["agent", "owner", "admin"] as const,
+      roles: ["owner", "admin"] as const,
     },
     {
       pattern: "/find-property/*",

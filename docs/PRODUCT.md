@@ -1,6 +1,6 @@
 # Product Overview
 
-We are building a property platform that helps connect tenants, property owners, agents, and service providers.
+We are building a property platform that helps connect tenants, property owners, and service providers.
 
 The platform is designed as a multi-vertical product where new business areas can be added over time without requiring major architectural changes.
 
@@ -33,9 +33,9 @@ Finding suitable rental properties and qualified tenants is inefficient and opaq
 
 Individuals and families actively searching for rental properties who value a quick, transparent search and a personalized matching process.
 
-### Owners & Agents
+### Owners
 
-Property owners and agents looking to increase occupancy rates, reduce vacancy periods, and connect with pre-qualified tenants without manual effort.
+Property owners looking to increase occupancy rates, reduce vacancy periods, and connect with pre-qualified tenants without manual effort.
 
 ## Value Proposition
 
@@ -87,7 +87,7 @@ By progressing through these phases, we systematically de-risk the product and m
 
 ## Vertical 1: Renting Out Property (MVP)
 
-Connect tenants with property owners and agents.
+Connect tenants with property owners.
 
 ### Tenant Benefits
 
@@ -96,7 +96,7 @@ Connect tenants with property owners and agents.
 - Save time searching
 - Get notified when matching properties become available
 
-### Owner / Agent Benefits
+### Owner Benefits
 
 - List rental properties
 - Reach qualified tenants
@@ -105,9 +105,9 @@ Connect tenants with property owners and agents.
 
 ---
 
-## Vertical 2: Owner / Agent Operations (Future)
+## Vertical 2: Owner Operations (Future)
 
-Help owners manage their properties without hassle.
+Help owners manage their properties without hassle. Agent support (managing properties on behalf of owners) is a candidate for a future vertical, not built today.
 
 Potential features:
 
@@ -182,18 +182,6 @@ A property owner renting out their property.
 - Publish property listings
 - Receive qualified tenant matches
 - Manage inquiries
-
----
-
-## Agent
-
-An agent representing property owners.
-
-### Goals
-
-- Manage multiple properties
-- Find suitable tenants
-- Coordinate viewings
 
 ---
 
@@ -309,11 +297,11 @@ Arrange property viewing.
 Options:
 
 - Platform-assisted viewing
-- Direct owner/agent contact
+- Direct owner contact
 
 ---
 
-### Owner / Agent Workflow
+### Owner Workflow
 
 #### Step 1
 
@@ -379,8 +367,8 @@ Matching factors may include:
 
 When a match is found:
 
-1. Owner/Agent receives tenant profile.
-2. Owner/Agent approves interest.
+1. Owner receives tenant profile.
+2. Owner approves interest.
 3. Tenant receives notification.
 4. Viewing is arranged.
 

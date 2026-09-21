@@ -8,6 +8,7 @@ import {
   getPropertiesCountByStatus,
   getPropertiesByIds,
   deletePropertyById,
+  getRentedPropertiesMonthlyRevenue,
 } from "./repository";
 import {
   buildImagePath,
@@ -267,6 +268,13 @@ export async function listPropertiesByIds(ids: string[]): Promise<Property[]> {
 
 export async function countPropertiesByStatus(profileId: string) {
   return await getPropertiesCountByStatus(profileId);
+}
+
+/** Recurring revenue proxy for the owner dashboard — see repository for caveats. */
+export async function getRentedPropertiesRevenue(
+  profileId: string
+): Promise<number> {
+  return await getRentedPropertiesMonthlyRevenue(profileId);
 }
 
 /** Throws unless the property exists and belongs to the caller. */

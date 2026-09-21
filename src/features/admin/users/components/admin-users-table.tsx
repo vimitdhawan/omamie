@@ -18,7 +18,6 @@ const ROLE_TABS: { label: string; value: UserRole | "all" }[] = [
   { label: "All Users", value: "all" },
   { label: "Tenants", value: "tenant" },
   { label: "Owners", value: "owner" },
-  { label: "Agents", value: "agent" },
   { label: "Admins", value: "admin" },
 ];
 

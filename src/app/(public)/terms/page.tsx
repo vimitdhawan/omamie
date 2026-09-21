@@ -50,12 +50,11 @@ export default function TermsPage() {
             <p className="text-muted leading-relaxed">
               Omamie is a property matching platform that facilitates
               connections between tenants seeking rental properties and property
-              owners/agents with available properties. Omamie is not a licensed
-              real estate broker or agent. We do not directly manage properties,
-              collect rent, handle lease agreements, or provide real estate
-              advice. Tenants and property owners are responsible for arranging
-              viewings, negotiating terms, and executing rental agreements
-              independently.
+              owners with available properties. Omamie is not a licensed real
+              estate broker. We do not directly manage properties, collect rent,
+              handle lease agreements, or provide real estate advice. Tenants
+              and property owners are responsible for arranging viewings,
+              negotiating terms, and executing rental agreements independently.
             </p>
           </div>
 

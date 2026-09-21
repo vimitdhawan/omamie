@@ -7,7 +7,7 @@ A clean, production-ready foundation for Omamie — a property management platfo
 This application acts as the backend and frontend skeleton for Omamie — a property management system. It supports:
 
 - **Tenants** searching for properties based on size, room count, pet-friendliness, and location.
-- **Owners and Agents** onboarding and managing properties.
+- **Owners** onboarding and managing properties.
 
 ### Folder Structure & Feature-Based Architecture
 
@@ -22,8 +22,8 @@ src/
 │   ├── auth/                  # Authentication module
 │   ├── properties/            # Property listings, searches, and management
 │   ├── requirements/          # Tenant room/search criteria requirements
-│   ├── users/                 # User profiles, agent/tenant management
-│   └── dashboard/             # Agent/Owner dashboards
+│   ├── users/                 # User profiles, owner/tenant management
+│   └── dashboard/             # Owner dashboards
 ├── hooks/                     # Custom shared React hooks
 ├── lib/                       # Common libraries and helpers
 │   ├── supabase/              # Supabase server clients and middleware configuration

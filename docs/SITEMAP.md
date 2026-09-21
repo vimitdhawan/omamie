@@ -260,7 +260,7 @@ Sections
 
 ---
 
-# Owner / Agent Portal
+# Owner Portal
 
 ## Dashboard
 
@@ -491,7 +491,7 @@ Platform analytics.
 
 ---
 
-# Future Vertical: Owner / Agent Operations
+# Future Vertical: Owner Operations
 
 Placeholder routes.
 

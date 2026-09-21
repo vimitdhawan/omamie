@@ -1,6 +1,6 @@
 import { ClipboardList, Building2, Users, MessagesSquare } from "lucide-react";
 import { getDashboardSummary } from "@/features/admin/dashboard/service";
-import { MetricCard } from "@/features/agents/dashboard/components/metric-card";
+import { MetricCard } from "@/features/owner/dashboard/components/metric-card";
 import { ReviewQueueTable } from "@/features/admin/dashboard/components/review-queue-table";
 
 export default async function AdminDashboardPage() {

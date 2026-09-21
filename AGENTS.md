@@ -9,7 +9,7 @@ Welcome! This file coordinates agent behavior across different AI tooling enviro
 This application acts as the backend and frontend skeleton for **Omamie — a property management platform**. It supports:
 
 - **Tenants** searching for properties based on size (sqm), room count, pet-friendliness, and location.
-- **Owners and Agents** onboarding and managing properties.
+- **Owners** onboarding and managing properties.
 
 ---
 
@@ -34,15 +34,15 @@ src/
 ├── app/                       # Next.js App Router (Public and Protected route groups)
 │   ├── (public)/               # Public routes (login, signup, home, contact)
 │   └── (protected)/            # Role-based authenticated routes (parallel routes)
-│       ├── layout.tsx           # Role-check layout: dispatches to @tenant or @agentOwner slot
+│       ├── layout.tsx           # Role-check layout: dispatches to @tenant or @owner slot
 │       ├── @tenant/             # Tenant app (parallel route slot)
 │       │   ├── layout.tsx        # Tenant app shell (header, nav, toaster)
 │       │   ├── find-property/    # Tenant: find properties
 │       │   │   └── page.tsx
 │       │   └── default.tsx       # Sibling slot fallback
-│       └── @agentOwner/          # Agent/Owner app (parallel route slot)
-│           ├── layout.tsx        # Agent/Owner app shell (header, nav, toaster)
-│           ├── list-property/    # Agent/Owner: manage properties
+│       └── @owner/               # Owner app (parallel route slot)
+│           ├── layout.tsx        # Owner app shell (header, nav, toaster)
+│           ├── list-property/    # Owner: manage properties
 │           │   ├── page.tsx       # Create/list properties
 │           │   └── [id]/page.tsx  # Edit property
 │           └── default.tsx       # Sibling slot fallback
@@ -53,8 +53,8 @@ src/
 │   ├── properties/            # Property listings, searches, and management
 │   ├── find-property/         # Tenant property find requests
 │   ├── requirements/          # Tenant room/search criteria requirements
-│   ├── users/                 # User profiles, agent/tenant management
-│   └── dashboard/             # Agent/Owner dashboards
+│   ├── users/                 # User profiles, owner/tenant management
+│   └── dashboard/             # Owner dashboards
 ├── hooks/                     # Custom shared React hooks
 ├── lib/                       # Common libraries and helpers
 │   ├── supabase/              # Supabase server clients and middleware configuration
@@ -109,8 +109,8 @@ Next.js 16 makes dynamic APIs asynchronous. Be sure to use:
 
 The `(protected)` route group uses [Next.js Parallel Routes](https://nextjs.org/docs/app/api-reference/file-conventions/parallel-routes#conditional-routes) to render different app trees based on the logged-in user's role:
 
-- `src/app/(protected)/layout.tsx` checks the session's `role` field (via `getAuthSession()`) and returns either the `@tenant` or `@agentOwner` slot.
-- Each slot (`@tenant`, `@agentOwner`) is a complete, independent app with its own `layout.tsx`, routes, and components.
+- `src/app/(protected)/layout.tsx` checks the session's `role` field (via `getAuthSession()`) and returns either the `@tenant` or `@owner` slot.
+- Each slot (`@tenant`, `@owner`) is a complete, independent app with its own `layout.tsx`, routes, and components.
 - Each slot's `default.tsx` returns `null` — this handles the case where a sibling slot is active and this one's URL segments don't match.
 - URL gating (ensuring a role-mismatched user can't access the wrong slot's routes) is handled in `src/proxy.ts`, not in the layout.
 

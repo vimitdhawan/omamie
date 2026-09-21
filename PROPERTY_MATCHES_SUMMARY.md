@@ -32,7 +32,7 @@ CREATE TABLE public.property_matches (
   property_id uuid NOT NULL REFERENCES public.properties(id),
   tenant_id uuid NOT NULL REFERENCES public.profiles(id),
   property_owner_id uuid NOT NULL REFERENCES public.profiles(id),
-  initiated_by text NOT NULL CHECK (initiated_by IN ('tenant', 'agent', 'owner')),
+  initiated_by text NOT NULL CHECK (initiated_by IN ('tenant', 'owner')),
   status text NOT NULL CHECK (status IN ('interested', 'approved', 'rejected')),
   notes text,
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -70,7 +70,7 @@ src/features/property-matches/
 ├── service.ts                  ✅ Business logic
 └── types.ts                    ✅ Type definitions
 
-src/app/(protected)/@agentOwner/matches/
+src/app/(protected)/@owner/matches/
 ├── page.tsx                    ✅ Server page
 ├── matches-client.tsx          ✅ Client component with filters
 └── (deleted: [id]/page.tsx)   ✅ No individual match pages
@@ -119,7 +119,7 @@ e2e/
 
 ### 6. Security
 
-- **Authentication**: Agent/Owner roles only
+- **Authentication**: Owner role only
 - **Authorization**: Can only see own matches
 - **Row-Level Security**: Enforced at database level
 - **Validation**: Zod schema validation
@@ -161,7 +161,7 @@ e2e/
 ```
 Access Control (4 tests)
   ✅ Redirect unauthenticated to login
-  ✅ Allow agent access
+  ✅ Allow owner access
   ✅ Allow owner access
   ✅ Redirect tenant (unauthorized)
 
@@ -320,7 +320,7 @@ npm run test:e2e -- --headed property-matches
 ### User Journey: View Matches
 
 ```
-User (Agent/Owner)
+User (Owner)
     ↓
 Authentication Check ✓
     ↓
@@ -362,7 +362,7 @@ UI: Show confirmation
 ### Data Flow: Update Match Status
 
 ```
-Agent/Owner User
+Owner User
     ↓
 Click status action (Approve/Reject)
     ↓
@@ -391,7 +391,7 @@ UI: Refresh with new status
 ## Security Checklist
 
 ✅ Authentication required (not bypassed)
-✅ Role-based access (agent/owner only)
+✅ Role-based access (owner only)
 ✅ Row-level security (database enforced)
 ✅ Input validation (Zod schemas)
 ✅ No SQL injection (Supabase parameterized queries)

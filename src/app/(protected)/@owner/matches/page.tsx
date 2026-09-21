@@ -5,15 +5,12 @@ import {
   getMatchCountsAction,
 } from "@/features/property-matches/actions";
 import { MatchesClient } from "./matches-client";
-import { MetricCard } from "@/features/agents/dashboard/components/metric-card";
+import { MetricCard } from "@/features/owner/dashboard/components/metric-card";
 import { MessageCircle } from "lucide-react";
 
 export default async function MatchesPage() {
   const session = await getAuthSession();
-  if (
-    !session?.profileId ||
-    (session.role !== "agent" && session.role !== "owner")
-  ) {
+  if (!session?.profileId || session.role !== "owner") {
     redirect("/login");
   }
 

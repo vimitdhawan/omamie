@@ -22,7 +22,7 @@ import { Eye, EyeOff, LockKeyhole } from "lucide-react";
 
 export interface SignupFormProps {
   // Role is already resolved before this component renders
-  role: "tenant" | "agent" | "owner";
+  role: "tenant" | "owner";
 }
 
 export function SignupForm({ role }: SignupFormProps) {
