@@ -13,6 +13,7 @@ import { Loader2 } from "lucide-react";
 import { getMatchTenantDetailAction } from "@/features/requirements/actions";
 import { TenantDetailContent } from "@/features/requirements/components/tenant-detail-content";
 import type { TenantRequestDetail } from "@/features/requirements/types";
+import { ViewingSlotPicker } from "@/features/viewings/components/viewing-slot-picker";
 import type { PropertyMatchWithProperty } from "../types";
 import { MatchActions } from "./match-actions";
 
@@ -73,6 +74,11 @@ export function MatchDetailSheet({
             </div>
           ) : (
             <TenantDetailContent detail={detail} />
+          )}
+          {match?.status === "approved" && (
+            <div className="border-border mt-4 border-t pt-4">
+              <ViewingSlotPicker matchId={match.id} />
+            </div>
           )}
         </div>
 

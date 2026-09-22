@@ -9,6 +9,16 @@ const STATUS_PILL: Record<
   MatchStatus,
   { label: string; icon: React.ElementType; className: string }
 > = {
+  curated: {
+    label: "New suggestion",
+    icon: Clock,
+    className: "bg-muted text-muted-foreground",
+  },
+  dismissed: {
+    label: "Dismissed",
+    icon: XCircle,
+    className: "bg-muted text-muted-foreground",
+  },
   interested: {
     label: "Waiting for owner",
     icon: Clock,

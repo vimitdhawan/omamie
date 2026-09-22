@@ -5,7 +5,6 @@ import { logoutAction } from "@/features/auth/actions";
 
 const TENANT_NAV_ITEMS = [
   { href: "/explore", label: "Explore" },
-  { href: "/saved", label: "Saved" },
   { href: "/matches", label: "Matches" },
   { href: "/my-rentals", label: "My Rentals" },
 ];

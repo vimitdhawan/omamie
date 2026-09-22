@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { CalendarClock, MapPin, Wallet } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,8 +8,11 @@ import type { TenantRequirements } from "../types";
 
 export function RequirementsSummaryCard({
   requirements,
+  action,
 }: {
   requirements: TenantRequirements;
+  /** Optional control (e.g. an Edit button) shown in the header row. */
+  action?: ReactNode;
 }) {
   return (
     <Card className="space-y-3 p-4">
@@ -17,9 +21,12 @@ export function RequirementsSummaryCard({
           {PROPERTY_TYPES[requirements.propertyType]} ·{" "}
           {BEDROOMS_LABELS[requirements.bedrooms]}
         </h3>
-        <Badge variant="secondary">
-          {BATHROOMS_LABELS[requirements.bathrooms]}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary">
+            {BATHROOMS_LABELS[requirements.bathrooms]}
+          </Badge>
+          {action}
+        </div>
       </div>
 
       <p className="text-muted-foreground flex items-center gap-1 text-sm">

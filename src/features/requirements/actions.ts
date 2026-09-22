@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getAuthSession } from "@/lib/auth-session";
 import * as service from "./service";
 import { requirementsFormSchema, type RequirementsActionState } from "./schema";
+import { curateMatchesForTenant } from "@/features/property-matches/service";
 
 export async function handleSaveRequirements(
   prevState: RequirementsActionState,
@@ -53,7 +54,19 @@ export async function handleSaveRequirements(
   }
 
   try {
-    await service.saveRequirements(session.profileId, validationResult.data);
+    const { requirements } = await service.saveRequirements(
+      session.profileId,
+      validationResult.data
+    );
+    // Best-effort — a scoring failure should never block saving the request itself.
+    await curateMatchesForTenant(session.profileId, requirements).catch(
+      (error) => {
+        console.error(
+          "Failed to curate matches after saving requirements:",
+          error
+        );
+      }
+    );
     revalidatePath("/find-property");
     revalidatePath("/matches");
     return { success: true };

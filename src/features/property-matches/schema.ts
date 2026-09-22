@@ -1,6 +1,17 @@
 import { z } from "zod";
 
-export const matchStatusSchema = z.enum(["interested", "approved", "rejected"]);
+export const matchStatusSchema = z.enum([
+  "curated",
+  "dismissed",
+  "interested",
+  "approved",
+  "rejected",
+]);
+
+/** The subset an owner may ever set explicitly via `updateMatchStatusAction`. */
+export const ownerSettableMatchStatusSchema = z.enum(["approved", "rejected"]);
+
+export const leaseDecisionSchema = z.enum(["confirmed", "declined"]);
 
 export const createMatchSchema = z
   .object({
@@ -23,7 +34,7 @@ export const createMatchSchema = z
 
 export const updateMatchStatusSchema = z.object({
   matchId: z.string().uuid("Invalid match ID"),
-  status: matchStatusSchema,
+  status: ownerSettableMatchStatusSchema,
   notes: z.string().optional(),
 });
 
@@ -31,4 +42,11 @@ export const matchFilterSchema = z.object({
   status: matchStatusSchema.optional(),
   search: z.string().optional(),
   propertyId: z.string().uuid().optional(),
+});
+
+export const matchIdSchema = z.string().uuid("Invalid match ID");
+
+export const decideLeaseSchema = z.object({
+  matchId: matchIdSchema,
+  decision: leaseDecisionSchema,
 });

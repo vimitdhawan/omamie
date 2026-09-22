@@ -17,6 +17,10 @@ describe("Match Columns", () => {
     notes: "Great property",
     requestedMoveInDate: null,
     requestedMoveOutDate: null,
+    matchScore: null,
+    curatedAt: null,
+    leaseDecision: null,
+    leaseDecisionAt: null,
     createdAt: "2024-09-01T10:00:00Z",
     updatedAt: "2024-09-01T10:00:00Z",
     property: {
