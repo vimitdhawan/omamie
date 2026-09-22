@@ -22,15 +22,16 @@ import {
 } from "@/components/ui/card";
 
 import {
-  findPropertyFormSchema,
+  requirementsFormSchema,
   PROPERTY_TYPES,
   BEDROOMS_LABELS,
   BATHROOMS_LABELS,
   FURNISHING_LABELS,
   LEASE_LENGTH_LABELS,
+  INTENDED_DURATION_LABELS,
   AMENITY_WISHLIST_LABELS,
-  type FindPropertyFormData,
-  type FindPropertyActionState,
+  type RequirementsFormData,
+  type RequirementsActionState,
 } from "../schema";
 import {
   PROPERTY_TYPE_VALUES,
@@ -38,35 +39,55 @@ import {
   BATHROOMS_VALUES,
   FURNISHING_VALUES,
   LEASE_LENGTH_VALUES,
+  INTENDED_DURATION_VALUES,
   AMENITY_WISHLIST_VALUES,
 } from "../types";
-import { handleFindProperty } from "../actions";
-import { FindPropertySuccess } from "./find-property-success";
+import type { TenantProfile, TenantRequirements, Amenity } from "../types";
+import { handleSaveRequirements } from "../actions";
+import { RequirementsSuccess } from "./requirements-success";
 
-export function FindPropertyForm() {
+interface RequirementsFormProps {
+  initialProfile: TenantProfile | null;
+  initialRequirements: TenantRequirements | null;
+}
+
+export function RequirementsForm({
+  initialProfile,
+  initialRequirements,
+}: RequirementsFormProps) {
   const [state, formAction, isPending] = useActionState(
-    handleFindProperty,
-    {} as FindPropertyActionState
+    handleSaveRequirements,
+    {} as RequirementsActionState
   );
 
-  const form = useForm<z.input<typeof findPropertyFormSchema>>({
-    resolver: zodResolver(findPropertyFormSchema),
+  const form = useForm<z.input<typeof requirementsFormSchema>>({
+    resolver: zodResolver(requirementsFormSchema),
     mode: "onBlur",
     defaultValues: {
-      propertyType: "apartment",
-      preferredLocation: "",
-      monthlyBudget: undefined,
-      moveInDate: "",
-      bedrooms: "studio",
-      bathrooms: "1",
-      minSizeSqm: undefined,
-      furnishing: "furnished",
-      preferredNeighborhoods: [],
-      petFriendly: false,
-      parkingNeeded: false,
-      amenitiesWishlist: [],
-      additionalNotes: "",
-      preferredLeaseLength: "",
+      firstName: initialProfile?.firstName ?? "",
+      occupation: initialProfile?.occupation ?? "",
+      employer: initialProfile?.employer ?? "",
+      reasonForMoving: initialProfile?.reasonForMoving ?? "",
+      intendedDuration: initialProfile?.intendedDuration ?? "1_year",
+      numberOfOccupants: initialProfile?.numberOfOccupants ?? 1,
+      hasPets: initialProfile?.hasPets ?? false,
+      isSmoker: initialProfile?.isSmoker ?? false,
+      bio: initialProfile?.bio ?? "",
+      propertyType: initialRequirements?.propertyType ?? "apartment",
+      preferredLocation: initialRequirements?.preferredLocation ?? "",
+      monthlyBudget: initialRequirements?.monthlyBudget,
+      moveInDate: initialRequirements?.moveInDate ?? "",
+      bedrooms: initialRequirements?.bedrooms ?? "studio",
+      bathrooms: initialRequirements?.bathrooms ?? "1",
+      minSizeSqm: initialRequirements?.minSizeSqm ?? undefined,
+      furnishing: initialRequirements?.furnishing ?? "furnished",
+      preferredNeighborhoods: initialRequirements?.preferredNeighborhoods ?? [],
+      petFriendly: initialRequirements?.petFriendly ?? false,
+      parkingNeeded: initialRequirements?.parkingNeeded ?? false,
+      amenitiesWishlist:
+        (initialRequirements?.amenitiesWishlist as Amenity[] | undefined) ?? [],
+      additionalNotes: initialRequirements?.additionalNotes ?? "",
+      preferredLeaseLength: initialRequirements?.preferredLeaseLength ?? "",
     },
   });
 
@@ -76,7 +97,7 @@ export function FindPropertyForm() {
     }
     if (state?.errors) {
       Object.entries(state.errors).forEach(([key, messages]) => {
-        form.setError(key as keyof FindPropertyFormData, {
+        form.setError(key as keyof RequirementsFormData, {
           type: "manual",
           message: messages?.join(", "),
         });
@@ -86,7 +107,7 @@ export function FindPropertyForm() {
   }, [state]);
 
   if (state?.success) {
-    return <FindPropertySuccess />;
+    return <RequirementsSuccess />;
   }
 
   return (
@@ -94,13 +115,268 @@ export function FindPropertyForm() {
       <CardHeader>
         <CardTitle className="text-2xl">Find Property</CardTitle>
         <CardDescription className="text-base">
-          Tell us where we can send your curated property matches.
+          Tell owners a bit about yourself and what you&apos;re looking for.
+          This is what owners see on your requests instead of your contact
+          details.
         </CardDescription>
       </CardHeader>
       <form action={formAction}>
         <CardContent className="space-y-6">
+          <div>
+            <h3 className="text-foreground text-lg font-semibold">About you</h3>
+            <p className="text-muted-foreground text-sm">
+              Shown to owners when you request one of their properties.
+            </p>
+          </div>
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {/* Property Type */}
+            <Controller
+              name="firstName"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    First Name <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    placeholder="e.g. Alex"
+                    aria-invalid={fieldState.invalid}
+                    disabled={isPending}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.clearErrors("firstName");
+                    }}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="occupation"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    Occupation <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    placeholder="e.g. Software Engineer"
+                    aria-invalid={fieldState.invalid}
+                    disabled={isPending}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.clearErrors("occupation");
+                    }}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="employer"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    Employer (optional)
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    placeholder="e.g. Beer Co"
+                    aria-invalid={fieldState.invalid}
+                    disabled={isPending}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.clearErrors("employer");
+                    }}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="intendedDuration"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    How long do you plan to stay?{" "}
+                    <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <select
+                    {...field}
+                    id={field.name}
+                    className="border-input focus-visible:border-ring focus-visible:ring-ring/50 h-8 w-full min-w-0 rounded-lg border bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:ring-3 md:text-sm"
+                    disabled={isPending}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.clearErrors("intendedDuration");
+                    }}
+                  >
+                    {INTENDED_DURATION_VALUES.map((value) => (
+                      <option key={value} value={value}>
+                        {INTENDED_DURATION_LABELS[value]}
+                      </option>
+                    ))}
+                  </select>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="numberOfOccupants"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    Number of Occupants{" "}
+                    <span className="text-destructive">*</span>
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={field.name}
+                    type="number"
+                    min={1}
+                    aria-invalid={fieldState.invalid}
+                    disabled={isPending}
+                    value={(field.value as string | number | undefined) ?? 1}
+                    onChange={(e) => {
+                      field.onChange(e.target.value);
+                      form.clearErrors("numberOfOccupants");
+                    }}
+                  />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </div>
+
+          <Controller
+            name="reasonForMoving"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>
+                  Why are you moving?{" "}
+                  <span className="text-destructive">*</span>
+                </FieldLabel>
+                <Textarea
+                  {...field}
+                  id={field.name}
+                  placeholder="e.g. Relocating for a new job, need more space, closer to family..."
+                  disabled={isPending}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    form.clearErrors("reasonForMoving");
+                  }}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Controller
+              name="hasPets"
+              control={form.control}
+              render={({ field }) => (
+                <Field orientation="horizontal" className="items-center gap-2">
+                  <Checkbox
+                    id="hasPets"
+                    name="hasPets"
+                    disabled={isPending}
+                    defaultChecked={field.value}
+                    onCheckedChange={(checked) =>
+                      field.onChange(checked === true)
+                    }
+                  />
+                  <FieldLabel htmlFor="hasPets" className="font-normal">
+                    I have pets
+                  </FieldLabel>
+                </Field>
+              )}
+            />
+
+            <Controller
+              name="isSmoker"
+              control={form.control}
+              render={({ field }) => (
+                <Field orientation="horizontal" className="items-center gap-2">
+                  <Checkbox
+                    id="isSmoker"
+                    name="isSmoker"
+                    disabled={isPending}
+                    defaultChecked={field.value}
+                    onCheckedChange={(checked) =>
+                      field.onChange(checked === true)
+                    }
+                  />
+                  <FieldLabel htmlFor="isSmoker" className="font-normal">
+                    I smoke
+                  </FieldLabel>
+                </Field>
+              )}
+            />
+          </div>
+
+          <Controller
+            name="bio"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>
+                  A short intro (optional)
+                </FieldLabel>
+                <Textarea
+                  {...field}
+                  id={field.name}
+                  placeholder="Anything else that helps an owner get to know you..."
+                  disabled={isPending}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    form.clearErrors("bio");
+                  }}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+        </CardContent>
+
+        <CardContent className="border-border space-y-6 border-t pt-6">
+          <div>
+            <h3 className="text-foreground text-lg font-semibold">
+              What you&apos;re looking for
+            </h3>
+            <p className="text-muted-foreground text-sm">
+              Help us narrow down the best matches for you.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Controller
               name="propertyType"
               control={form.control}
@@ -132,7 +408,6 @@ export function FindPropertyForm() {
               )}
             />
 
-            {/* Preferred Location */}
             <Controller
               name="preferredLocation"
               control={form.control}
@@ -161,7 +436,6 @@ export function FindPropertyForm() {
               )}
             />
 
-            {/* Monthly Budget */}
             <Controller
               name="monthlyBudget"
               control={form.control}
@@ -199,7 +473,6 @@ export function FindPropertyForm() {
               )}
             />
 
-            {/* Move-in Date */}
             <Controller
               name="moveInDate"
               control={form.control}
@@ -226,7 +499,6 @@ export function FindPropertyForm() {
               )}
             />
 
-            {/* Bedrooms */}
             <Controller
               name="bedrooms"
               control={form.control}
@@ -258,7 +530,6 @@ export function FindPropertyForm() {
               )}
             />
 
-            {/* Bathrooms */}
             <Controller
               name="bathrooms"
               control={form.control}
@@ -290,7 +561,6 @@ export function FindPropertyForm() {
               )}
             />
 
-            {/* Min Size */}
             <Controller
               name="minSizeSqm"
               control={form.control}
@@ -319,7 +589,6 @@ export function FindPropertyForm() {
               )}
             />
 
-            {/* Furnishing */}
             <Controller
               name="furnishing"
               control={form.control}
@@ -359,12 +628,11 @@ export function FindPropertyForm() {
               Additional Preferences
             </h3>
             <p className="text-muted-foreground text-sm">
-              Help us narrow down the best matches for you.
+              Optional, but it helps owners understand your fit.
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            {/* Preferred Neighborhoods */}
             <Controller
               name="preferredNeighborhoods"
               control={form.control}
@@ -399,7 +667,6 @@ export function FindPropertyForm() {
               )}
             />
 
-            {/* Preferred Lease Length */}
             <Controller
               name="preferredLeaseLength"
               control={form.control}
@@ -432,7 +699,6 @@ export function FindPropertyForm() {
               )}
             />
 
-            {/* Pet Friendly */}
             <Controller
               name="petFriendly"
               control={form.control}
@@ -454,7 +720,6 @@ export function FindPropertyForm() {
               )}
             />
 
-            {/* Parking Needed */}
             <Controller
               name="parkingNeeded"
               control={form.control}
@@ -477,7 +742,6 @@ export function FindPropertyForm() {
             />
           </div>
 
-          {/* Amenities Wishlist */}
           <Controller
             name="amenitiesWishlist"
             control={form.control}
@@ -518,7 +782,6 @@ export function FindPropertyForm() {
             )}
           />
 
-          {/* Additional Notes */}
           <Controller
             name="additionalNotes"
             control={form.control}

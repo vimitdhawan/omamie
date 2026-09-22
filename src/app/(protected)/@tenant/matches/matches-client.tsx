@@ -6,13 +6,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
 import { MatchCard } from "@/features/property-matches/components/match-card";
-import { FindRequestCard } from "@/features/find-property/components/find-request-card";
+import { RequirementsSummaryCard } from "@/features/requirements/components/requirements-summary-card";
 import type { PropertyMatchWithProperty } from "@/features/property-matches/types";
-import type { PropertyFindRequest } from "@/features/find-property/types";
+import type { TenantRequirements } from "@/features/requirements/types";
 
 interface MatchesClientProps {
   matches: PropertyMatchWithProperty[];
-  findRequests: PropertyFindRequest[];
+  requirements: TenantRequirements | null;
 }
 
 function CreateSearchRequestCard() {
@@ -39,7 +39,7 @@ function CreateSearchRequestCard() {
   );
 }
 
-export function MatchesClient({ matches, findRequests }: MatchesClientProps) {
+export function MatchesClient({ matches, requirements }: MatchesClientProps) {
   // `property_matches.status` has no terminal "completed"/"rented" outcome yet
   // (only interested/approved/rejected). Once that concept lands in the schema,
   // filter matches by that status here instead of always showing the empty state.
@@ -70,15 +70,13 @@ export function MatchesClient({ matches, findRequests }: MatchesClientProps) {
 
       <TabsContent value="requests" className="mt-6">
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:col-span-2">
-            {findRequests.length === 0 ? (
-              <p className="text-muted-foreground col-span-full py-12 text-center text-sm">
-                No search requests yet.
+          <div className="lg:col-span-2">
+            {requirements === null ? (
+              <p className="text-muted-foreground py-12 text-center text-sm">
+                No search request yet.
               </p>
             ) : (
-              findRequests.map((request) => (
-                <FindRequestCard key={request.id} request={request} />
-              ))
+              <RequirementsSummaryCard requirements={requirements} />
             )}
           </div>
           <CreateSearchRequestCard />

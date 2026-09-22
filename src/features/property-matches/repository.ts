@@ -257,7 +257,7 @@ export async function getRecentInterestedMatches(
   Array<{
     id: string;
     propertyTitle: string;
-    tenantName: string;
+    tenantId: string;
     createdAt: string;
   }>
 > {
@@ -269,9 +269,9 @@ export async function getRecentInterestedMatches(
     .select(
       `
       id,
+      tenant_id,
       created_at,
-      property:properties(title),
-      tenant:profiles(full_name)
+      property:properties(title)
     `
     )
     .eq("property_owner_id", profileId)
@@ -288,14 +288,14 @@ export async function getRecentInterestedMatches(
   return (
     data as Array<{
       id: string;
+      tenant_id: string;
       created_at: string;
       property: { title: string } | null;
-      tenant: { full_name: string | null } | null;
     }>
   ).map((row) => ({
     id: row.id,
     propertyTitle: row.property?.title ?? "Property",
-    tenantName: row.tenant?.full_name ?? "A tenant",
+    tenantId: row.tenant_id,
     createdAt: row.created_at,
   }));
 }

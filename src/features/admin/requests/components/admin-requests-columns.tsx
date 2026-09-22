@@ -50,9 +50,7 @@ export const adminMatchColumns: Column[] = [
     header: "Tenant",
     enableSorting: true,
     cell: ({ row }) => (
-      <div className="text-sm">
-        {row.original.tenantName ?? row.original.tenantEmail ?? "Unknown"}
-      </div>
+      <div className="text-sm">{row.original.tenantName ?? "Unknown"}</div>
     ),
   },
   {

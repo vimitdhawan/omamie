@@ -4,6 +4,7 @@ import { getAuthSession } from "@/lib/auth-session";
 import { redirect } from "next/navigation";
 import * as repository from "./repository";
 import * as service from "./service";
+import { getTenantFirstNames } from "@/features/requirements/service";
 import {
   createMatchSchema,
   updateMatchStatusSchema,
@@ -18,7 +19,19 @@ export async function getMatchesAction(filters?: MatchFilter) {
   }
 
   const validFilters = matchFilterSchema.parse(filters || {});
-  return repository.getMatchesByProfileId(session.profileId, validFilters);
+  const matches = await repository.getMatchesByProfileId(
+    session.profileId,
+    validFilters
+  );
+
+  const firstNames = await getTenantFirstNames(
+    matches.map((match) => match.tenantId)
+  );
+
+  return matches.map((match) => ({
+    ...match,
+    tenantFirstName: firstNames[match.tenantId],
+  }));
 }
 
 export async function getMatchCountsAction() {
