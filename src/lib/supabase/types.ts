@@ -500,8 +500,12 @@ export type Database = {
       property_matches: {
         Row: {
           created_at: string;
+          curated_at: string | null;
           id: string;
           initiated_by: string;
+          lease_decision: string | null;
+          lease_decision_at: string | null;
+          match_score: number | null;
           notes: string | null;
           property_id: string;
           property_owner_id: string;
@@ -513,8 +517,12 @@ export type Database = {
         };
         Insert: {
           created_at?: string;
+          curated_at?: string | null;
           id?: string;
           initiated_by?: string;
+          lease_decision?: string | null;
+          lease_decision_at?: string | null;
+          match_score?: number | null;
           notes?: string | null;
           property_id: string;
           property_owner_id: string;
@@ -526,8 +534,12 @@ export type Database = {
         };
         Update: {
           created_at?: string;
+          curated_at?: string | null;
           id?: string;
           initiated_by?: string;
+          lease_decision?: string | null;
+          lease_decision_at?: string | null;
+          match_score?: number | null;
           notes?: string | null;
           property_id?: string;
           property_owner_id?: string;
@@ -702,6 +714,47 @@ export type Database = {
             columns: ["profile_id"];
             isOneToOne: true;
             referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      viewings: {
+        Row: {
+          access_notes: string | null;
+          created_at: string;
+          host_name: string | null;
+          id: string;
+          match_id: string;
+          scheduled_at: string | null;
+          status: string;
+          updated_at: string;
+        };
+        Insert: {
+          access_notes?: string | null;
+          created_at?: string;
+          host_name?: string | null;
+          id?: string;
+          match_id: string;
+          scheduled_at?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          access_notes?: string | null;
+          created_at?: string;
+          host_name?: string | null;
+          id?: string;
+          match_id?: string;
+          scheduled_at?: string | null;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "viewings_match_id_fkey";
+            columns: ["match_id"];
+            isOneToOne: false;
+            referencedRelation: "property_matches";
             referencedColumns: ["id"];
           },
         ];

@@ -24,7 +24,8 @@ describe("Property Matches Repository", () => {
 
       const mockQuery = {
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockResolvedValue({ data: mockMatches, error: null }),
+        eq: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: mockMatches, error: null }),
       };
 
       const mockClient = {
@@ -47,7 +48,8 @@ describe("Property Matches Repository", () => {
     it("should return zero counts when no matches found", async () => {
       const mockQuery = {
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+        eq: vi.fn().mockReturnThis(),
+        in: vi.fn().mockResolvedValue({ data: [], error: null }),
       };
 
       const mockClient = {
@@ -70,7 +72,8 @@ describe("Property Matches Repository", () => {
     it("should handle query errors gracefully", async () => {
       const mockQuery = {
         select: vi.fn().mockReturnThis(),
-        eq: vi
+        eq: vi.fn().mockReturnThis(),
+        in: vi
           .fn()
           .mockResolvedValue({ data: null, error: new Error("Query failed") }),
       };
@@ -173,6 +176,7 @@ describe("Property Matches Repository", () => {
       const mockQuery = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        in: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({ data: mockMatches, error: null }),
       };
 
@@ -197,6 +201,10 @@ describe("Property Matches Repository", () => {
         notes: null,
         requestedMoveInDate: null,
         requestedMoveOutDate: null,
+        matchScore: null,
+        curatedAt: null,
+        leaseDecision: null,
+        leaseDecisionAt: null,
         createdAt: "2024-09-01T00:00:00Z",
         updatedAt: "2024-09-01T00:00:00Z",
         property: {
@@ -214,6 +222,7 @@ describe("Property Matches Repository", () => {
       const mockQuery = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        in: vi.fn().mockReturnThis(),
         order: vi.fn().mockResolvedValue({
           data: null,
           error: { message: "Database error" },
@@ -238,6 +247,7 @@ describe("Property Matches Repository", () => {
       const mockQuery = {
         select: vi.fn().mockReturnThis(),
         eq: vi.fn().mockReturnThis(),
+        in: vi.fn().mockReturnThis(),
         order: vi.fn().mockReturnThis(),
         or: vi.fn().mockResolvedValue({ data: [], error: null }),
       };

@@ -1,11 +1,11 @@
 export async function sendNewInterestNotification(
   propertyOwnerId: string,
-  propertyTitle: string,
-  tenantName: string
+  propertyId: string,
+  tenantId: string
 ) {
   // TODO: Implement email/notification
   console.log(
-    `New interest for "${propertyTitle}" from ${tenantName} (owner: ${propertyOwnerId})`
+    `New interest in property ${propertyId} from tenant ${tenantId} (owner: ${propertyOwnerId})`
   );
 }
 

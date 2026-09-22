@@ -2,59 +2,35 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import {
   Bath,
   Calendar,
   ChevronLeft,
   ChevronRight,
-  Heart,
   ImageIcon,
   Maximize2,
 } from "lucide-react";
-import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 import { getPublicImageUrl } from "@/lib/storage-url";
 import { formatCurrency, formatDate } from "@/lib/utils/format";
-import { toggleFavoriteAction } from "@/features/favorites/actions";
 import type { Property } from "@/features/properties/types";
 
 interface PropertyExploreCardProps {
   property: Property;
-  isFavorited: boolean;
   isInterested: boolean;
 }
 
 export function PropertyExploreCard({
   property,
-  isFavorited,
   isInterested,
 }: PropertyExploreCardProps) {
-  const [isTogglingFavorite, startFavoriteTransition] = useTransition();
-  const [favorited, setFavorited] = useState(isFavorited);
   const [imageIndex, setImageIndex] = useState(0);
 
   const images = property.images;
   const activeImage = images[imageIndex];
   const hasMultipleImages = images.length > 1;
-
-  const handleToggleFavorite = (event: React.MouseEvent) => {
-    event.preventDefault();
-    event.stopPropagation();
-    startFavoriteTransition(async () => {
-      const previous = favorited;
-      setFavorited(!previous);
-      try {
-        const result = await toggleFavoriteAction(property.id);
-        setFavorited(result.favorited);
-      } catch {
-        setFavorited(previous);
-        toast.error("Failed to update favorites");
-      }
-    });
-  };
 
   const handlePrevImage = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -115,22 +91,6 @@ export function PropertyExploreCard({
               </button>
             </>
           )}
-
-          <button
-            type="button"
-            onClick={handleToggleFavorite}
-            disabled={isTogglingFavorite}
-            aria-label={favorited ? "Remove from saved" : "Save property"}
-            aria-pressed={favorited}
-            className="bg-background/90 absolute top-3 right-3 grid size-8 place-items-center rounded-full shadow-sm transition-opacity hover:opacity-90"
-          >
-            <Heart
-              className={cn(
-                "size-4",
-                favorited ? "fill-red-500 text-red-500" : "text-foreground"
-              )}
-            />
-          </button>
 
           {isInterested && (
             <Badge className="bg-background/90 text-foreground absolute top-3 left-3 shadow-sm">

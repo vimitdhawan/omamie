@@ -1,101 +1,197 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
-import { buttonVariants } from "@/components/ui/button";
-import { MatchCard } from "@/features/property-matches/components/match-card";
-import { RequirementsSummaryCard } from "@/features/requirements/components/requirements-summary-card";
-import type { PropertyMatchWithProperty } from "@/features/property-matches/types";
-import type { TenantRequirements } from "@/features/requirements/types";
+import { RequirementsEditDrawer } from "@/features/requirements/components/requirements-edit-drawer";
+import { SearchSummaryPanel } from "@/features/search-journey/components/search-summary-panel";
+import { CuratedMatchCard } from "@/features/search-journey/components/curated-match-card";
+import { ViewingFlowPanel } from "@/features/search-journey/components/viewing-flow-panel";
+import { CompletedPanel } from "@/features/search-journey/components/completed-panel";
+import { MatchFilterBar } from "@/features/search-journey/components/match-filter-bar";
+import type {
+  MatchJourney,
+  TenantJourney,
+} from "@/features/search-journey/types";
 
 interface MatchesClientProps {
-  matches: PropertyMatchWithProperty[];
-  requirements: TenantRequirements | null;
+  journey: TenantJourney;
 }
 
-function CreateSearchRequestCard() {
-  return (
-    <Card className="bg-surface-soft/50 flex h-fit flex-col items-start gap-3 border-gray-200 p-6">
-      <div className="bg-primary/10 text-primary flex size-12 items-center justify-center rounded-full">
-        <Search className="size-6" />
-      </div>
-      <h3 className="text-foreground text-lg font-semibold">
-        Can&apos;t find the perfect place?
-      </h3>
-      <p className="text-muted-foreground text-sm">
-        Tell us what you&apos;re looking for and we&apos;ll curate property
-        matches for you.
-      </p>
-      <Link
-        href="/find-property"
-        className={buttonVariants({ variant: "default", className: "mt-2" })}
-      >
-        Create Search Request
-        <ArrowRight className="size-4" />
-      </Link>
-    </Card>
+const TABS = [
+  { value: "searching", label: "Searching" },
+  { value: "matches", label: "Matches" },
+  { value: "viewing", label: "Viewing" },
+  { value: "completed", label: "Completed" },
+] as const;
+
+type StageValue = (typeof TABS)[number]["value"];
+
+function sortByBestMatch(matches: MatchJourney[]) {
+  return [...matches].sort(
+    (a, b) => (b.match.matchScore ?? 0) - (a.match.matchScore ?? 0)
   );
 }
 
-export function MatchesClient({ matches, requirements }: MatchesClientProps) {
-  // `property_matches.status` has no terminal "completed"/"rented" outcome yet
-  // (only interested/approved/rejected). Once that concept lands in the schema,
-  // filter matches by that status here instead of always showing the empty state.
-  const completedMatches: PropertyMatchWithProperty[] = [];
+export function MatchesClient({ journey }: MatchesClientProps) {
+  const router = useRouter();
+  const [editOpen, setEditOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [activeTab, setActiveTab] = useState<StageValue>("searching");
+  const { profile, requirements, requestCode, matches, counts } = journey;
+
+  const refresh = () => router.refresh();
+
+  const filtered = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    const byTerm = term
+      ? matches.filter(
+          (mj) =>
+            mj.match.property.title.toLowerCase().includes(term) ||
+            mj.match.property.location.toLowerCase().includes(term)
+        )
+      : matches;
+    return sortByBestMatch(byTerm.filter((mj) => mj.stage !== "closed"));
+  }, [matches, search]);
+
+  const byStage = {
+    searching: filtered.filter((mj) => mj.stage === "searching"),
+    matches: filtered.filter((mj) => mj.stage === "matches"),
+    viewing: filtered.filter((mj) => mj.stage === "viewing"),
+    completed: filtered.filter((mj) => mj.stage === "completed"),
+  };
 
   return (
-    <Tabs defaultValue="interest" className="mt-8 w-full">
-      <TabsList variant="line">
-        <TabsTrigger value="interest">Property Interest</TabsTrigger>
-        <TabsTrigger value="requests">Property Search Requests</TabsTrigger>
-        <TabsTrigger value="completed">Completed</TabsTrigger>
-      </TabsList>
+    <>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="space-y-4 lg:col-span-2">
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) => setActiveTab(value as StageValue)}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3 sm:flex-nowrap">
+              <TabsList className="bg-primary/10 shrink-0">
+                {TABS.map((tab) => {
+                  const isActive = activeTab === tab.value;
+                  return (
+                    <TabsTrigger
+                      key={tab.value}
+                      value={tab.value}
+                      className={cn(
+                        "gap-1.5 font-semibold",
+                        isActive &&
+                          "!bg-primary !text-primary-foreground hover:!text-primary-foreground"
+                      )}
+                    >
+                      {tab.label}
+                      <Badge
+                        variant="secondary"
+                        className={cn(
+                          "h-4 min-w-4 px-1 text-[10px]",
+                          isActive && "!bg-white/25 !text-white"
+                        )}
+                      >
+                        {counts[tab.value]}
+                      </Badge>
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+              <MatchFilterBar search={search} onSearchChange={setSearch} />
+            </div>
 
-      <TabsContent value="interest" className="mt-6">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="space-y-4 lg:col-span-2">
-            {matches.length === 0 ? (
-              <p className="text-muted-foreground py-12 text-center text-sm">
-                No property interests yet. Explore listings to get started.
-              </p>
-            ) : (
-              matches.map((match) => <MatchCard key={match.id} match={match} />)
-            )}
-          </div>
-          <CreateSearchRequestCard />
+            <TabsContent value="searching" className="mt-4">
+              {byStage.searching.length === 0 ? (
+                <p className="text-muted-foreground py-12 text-center text-sm">
+                  {requirements
+                    ? "Our match engine is scanning active listings for you — check back shortly."
+                    : "Create a search request and we'll start scanning active listings for you."}
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {byStage.searching.map((mj) => (
+                    <CuratedMatchCard
+                      key={mj.match.id}
+                      journey={mj}
+                      onChanged={refresh}
+                    />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="matches" className="mt-4">
+              {byStage.matches.length === 0 ? (
+                <p className="text-muted-foreground py-12 text-center text-sm">
+                  No properties you&apos;re interested in yet. Browse{" "}
+                  <Link href="/explore" className="text-primary font-medium">
+                    Explore
+                  </Link>{" "}
+                  to send interest directly.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {byStage.matches.map((mj) => (
+                    <CuratedMatchCard
+                      key={mj.match.id}
+                      journey={mj}
+                      onChanged={refresh}
+                    />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="viewing" className="mt-4 space-y-3">
+              {byStage.viewing.length === 0 ? (
+                <p className="text-muted-foreground py-12 text-center text-sm">
+                  No viewings in progress.
+                </p>
+              ) : (
+                byStage.viewing.map((mj) => (
+                  <ViewingFlowPanel
+                    key={mj.match.id}
+                    journey={mj}
+                    onChanged={refresh}
+                  />
+                ))
+              )}
+            </TabsContent>
+
+            <TabsContent value="completed" className="mt-4 space-y-3">
+              {byStage.completed.length === 0 ? (
+                <p className="text-muted-foreground py-12 text-center text-sm">
+                  No completed viewings yet.
+                </p>
+              ) : (
+                byStage.completed.map((mj) => (
+                  <CompletedPanel
+                    key={mj.match.id}
+                    journey={mj}
+                    onChanged={refresh}
+                  />
+                ))
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
-      </TabsContent>
+        <SearchSummaryPanel
+          counts={counts}
+          requirements={requirements}
+          requestCode={requestCode}
+          onOpenDrawer={() => setEditOpen(true)}
+        />
+      </div>
 
-      <TabsContent value="requests" className="mt-6">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            {requirements === null ? (
-              <p className="text-muted-foreground py-12 text-center text-sm">
-                No search request yet.
-              </p>
-            ) : (
-              <RequirementsSummaryCard requirements={requirements} />
-            )}
-          </div>
-          <CreateSearchRequestCard />
-        </div>
-      </TabsContent>
-
-      <TabsContent value="completed" className="mt-6">
-        {completedMatches.length === 0 ? (
-          <p className="text-muted-foreground py-12 text-center text-sm">
-            No completed requests yet.
-          </p>
-        ) : (
-          <div className="space-y-4">
-            {completedMatches.map((match) => (
-              <MatchCard key={match.id} match={match} />
-            ))}
-          </div>
-        )}
-      </TabsContent>
-    </Tabs>
+      <RequirementsEditDrawer
+        profile={profile}
+        requirements={requirements}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+      />
+    </>
   );
 }

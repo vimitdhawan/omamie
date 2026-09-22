@@ -8,12 +8,16 @@ const STATUS_BADGE_VARIANT: Record<
   MatchStatus,
   "default" | "secondary" | "destructive"
 > = {
+  curated: "secondary",
+  dismissed: "secondary",
   interested: "secondary",
   approved: "default",
   rejected: "destructive",
 };
 
 const STATUS_LABEL: Record<MatchStatus, string> = {
+  curated: "Curated",
+  dismissed: "Dismissed",
   interested: "Interested",
   approved: "Approved",
   rejected: "Rejected",

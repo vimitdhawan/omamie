@@ -1,14 +1,20 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { getAuthSession } from "@/lib/auth-session";
 import { redirect } from "next/navigation";
 import * as repository from "./repository";
 import * as service from "./service";
-import { getTenantFirstNames } from "@/features/requirements/service";
+import {
+  getTenantFirstNames,
+  getOwnRequirements,
+} from "@/features/requirements/service";
 import {
   createMatchSchema,
   updateMatchStatusSchema,
   matchFilterSchema,
+  matchIdSchema,
+  decideLeaseSchema,
 } from "./schema";
 import type { MatchFilter, UpdateMatchStatusInput } from "./types";
 
@@ -73,7 +79,9 @@ export async function createMatchAction(
     requestedMoveOutDate: options?.requestedMoveOutDate,
   });
 
-  return service.createMatch(input);
+  const result = await service.createMatch(input);
+  revalidatePath("/matches");
+  return result;
 }
 
 export async function getTenantMatchesAction() {
@@ -111,10 +119,76 @@ export async function updateMatchStatusAction(input: UpdateMatchStatusInput) {
   }
 
   const validInput = updateMatchStatusSchema.parse(input);
-  return service.updateMatchStatus(
+  const result = await service.updateMatchStatus(
     validInput.matchId,
     validInput.status,
     session.profileId,
     validInput.notes
   );
+  revalidatePath("/matches");
+  revalidatePath("/requests");
+  return result;
+}
+
+/** Re-runs the match engine for the current tenant's saved request. No-ops (returns 0)
+ * if they have no request yet. */
+export async function refreshMatchesAction(): Promise<number> {
+  const session = await getAuthSession();
+  if (!session?.profileId || session.role !== "tenant") {
+    redirect("/login");
+  }
+
+  const { requirements } = await getOwnRequirements(session.profileId);
+  if (!requirements) return 0;
+
+  const count = await service.curateMatchesForTenant(
+    session.profileId,
+    requirements
+  );
+  revalidatePath("/matches");
+  return count;
+}
+
+export async function expressInterestAction(matchId: string) {
+  const session = await getAuthSession();
+  if (!session?.profileId || session.role !== "tenant") {
+    redirect("/login");
+  }
+
+  const validMatchId = matchIdSchema.parse(matchId);
+  const result = await service.expressInterest(validMatchId, session.profileId);
+  revalidatePath("/matches");
+  return result;
+}
+
+/** Tenant withdraws from a match — any stage up to a confirmed viewing. */
+export async function rejectMatchAction(matchId: string) {
+  const session = await getAuthSession();
+  if (!session?.profileId || session.role !== "tenant") {
+    redirect("/login");
+  }
+
+  const validMatchId = matchIdSchema.parse(matchId);
+  const result = await service.rejectMatch(validMatchId, session.profileId);
+  revalidatePath("/matches");
+  return result;
+}
+
+export async function decideLeaseAction(
+  matchId: string,
+  decision: "confirmed" | "declined"
+) {
+  const session = await getAuthSession();
+  if (!session?.profileId || session.role !== "tenant") {
+    redirect("/login");
+  }
+
+  const validInput = decideLeaseSchema.parse({ matchId, decision });
+  const result = await service.decideLease(
+    validInput.matchId,
+    session.profileId,
+    validInput.decision
+  );
+  revalidatePath("/matches");
+  return result;
 }

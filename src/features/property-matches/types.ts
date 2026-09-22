@@ -1,5 +1,7 @@
-export type MatchStatus = "interested" | "approved" | "rejected";
-export type InitiatedBy = "tenant" | "owner";
+export type MatchStatus =
+  "curated" | "dismissed" | "interested" | "approved" | "rejected";
+export type InitiatedBy = "tenant" | "owner" | "system";
+export type LeaseDecision = "pending" | "confirmed" | "declined";
 
 export interface PropertyMatch {
   id: string;
@@ -11,6 +13,11 @@ export interface PropertyMatch {
   notes: string | null;
   requestedMoveInDate: string | null;
   requestedMoveOutDate: string | null;
+  /** 0-100, set only on engine-curated matches (`initiatedBy === "system"`). */
+  matchScore: number | null;
+  curatedAt: string | null;
+  leaseDecision: LeaseDecision | null;
+  leaseDecisionAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -49,6 +56,8 @@ export interface UpdateMatchStatusInput {
   notes?: string;
 }
 
+/** Owner-facing counts only — curated/dismissed rows are tenant-only suggestions the
+ * tenant hasn't acted on yet, so they never reach the owner's queue. */
 export interface MatchCounts {
   all: number;
   interested: number;

@@ -7,6 +7,7 @@ import type {
   MatchFilter,
   InitiatedBy,
   MatchStatus,
+  LeaseDecision,
 } from "./types";
 import { AppError } from "@/lib/errors";
 
@@ -20,9 +21,16 @@ interface DatabasePropertyMatch {
   notes: string | null;
   requested_move_in_date: string | null;
   requested_move_out_date: string | null;
+  match_score: number | null;
+  curated_at: string | null;
+  lease_decision: string | null;
+  lease_decision_at: string | null;
   created_at: string;
   updated_at: string;
 }
+
+/** Statuses that represent tenant-visible-only suggestions, never surfaced to an owner. */
+const OWNER_VISIBLE_STATUSES = ["interested", "approved", "rejected"];
 
 function mapDatabaseMatch(row: DatabasePropertyMatch): PropertyMatch {
   return {
@@ -35,6 +43,10 @@ function mapDatabaseMatch(row: DatabasePropertyMatch): PropertyMatch {
     notes: row.notes,
     requestedMoveInDate: row.requested_move_in_date ?? null,
     requestedMoveOutDate: row.requested_move_out_date ?? null,
+    matchScore: row.match_score ?? null,
+    curatedAt: row.curated_at ?? null,
+    leaseDecision: (row.lease_decision as LeaseDecision | null) ?? null,
+    leaseDecisionAt: row.lease_decision_at ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -56,6 +68,8 @@ export async function getMatchesByProfileId(
     `
     )
     .eq("property_owner_id", profileId)
+    // Curated/dismissed rows are tenant-only suggestions the tenant hasn't acted on.
+    .in("status", OWNER_VISIBLE_STATUSES)
     .order("created_at", { ascending: false });
 
   if (filters?.status) {
@@ -201,6 +215,52 @@ export async function getMatchById(
   };
 }
 
+/** Same shape as `getMatchById`, scoped to the tenant instead of the owner — the
+ * permission gate for every tenant-initiated transition (express interest, dismiss,
+ * lease decision). */
+export async function getMatchByIdForTenant(
+  matchId: string,
+  tenantId: string
+): Promise<PropertyMatchWithProperty | null> {
+  const supabase = await createClient();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const query: any = (supabase as any)
+    .from("property_matches")
+    .select(
+      `
+      *,
+      property:properties(id, title, location, monthly_rent)
+    `
+    )
+    .eq("id", matchId)
+    .eq("tenant_id", tenantId);
+
+  const { data, error } = await query.single();
+
+  if (error) {
+    return null;
+  }
+
+  const match = data as DatabasePropertyMatch & {
+    property: {
+      id: string;
+      title: string;
+      location: string;
+      monthly_rent: number;
+    };
+  };
+  return {
+    ...mapDatabaseMatch(match),
+    property: {
+      id: match.property.id,
+      title: match.property.title,
+      location: match.property.location,
+      monthlyRent: match.property.monthly_rent,
+    },
+  };
+}
+
 export async function getMatchCounts(profileId: string): Promise<MatchCounts> {
   const supabase = await createClient();
 
@@ -208,7 +268,8 @@ export async function getMatchCounts(profileId: string): Promise<MatchCounts> {
   const query: any = (supabase as any)
     .from("property_matches")
     .select(`id, status`)
-    .eq("property_owner_id", profileId);
+    .eq("property_owner_id", profileId)
+    .in("status", OWNER_VISIBLE_STATUSES);
 
   const { data: allMatches, error } = await query;
 
@@ -365,6 +426,40 @@ export async function createMatch(
   return mapDatabaseMatch(data as DatabasePropertyMatch);
 }
 
+/** Engine-curated suggestions. Runs under the tenant's own session (the tenant insert RLS
+ * policy only checks `tenant_id = auth.uid()`, so no service-role bypass is needed here),
+ * with `initiated_by: "system"` distinguishing these from tenant/owner-initiated rows. */
+export async function insertCuratedMatches(
+  rows: Array<{
+    propertyId: string;
+    tenantId: string;
+    propertyOwnerId: string;
+    matchScore: number;
+  }>
+): Promise<void> {
+  if (rows.length === 0) return;
+
+  const supabase = await createClient();
+  const now = new Date().toISOString();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any).from("property_matches").insert(
+    rows.map((row) => ({
+      property_id: row.propertyId,
+      tenant_id: row.tenantId,
+      property_owner_id: row.propertyOwnerId,
+      initiated_by: "system",
+      status: "curated",
+      match_score: row.matchScore,
+      curated_at: now,
+    }))
+  );
+
+  if (error) {
+    throw new AppError("INTERNAL_ERROR", "Failed to save curated matches");
+  }
+}
+
 export async function updateMatchStatus(
   matchId: string,
   newStatus: string,
@@ -372,14 +467,21 @@ export async function updateMatchStatus(
 ): Promise<PropertyMatch> {
   const supabase = await createClient();
 
+  const update: Record<string, unknown> = {
+    status: newStatus,
+    updated_at: new Date().toISOString(),
+  };
+  // Only touch `notes` when the caller actually supplied one — an approve/reject with no
+  // notes argument must not wipe out notes left by an earlier step. An explicit empty
+  // string still normalizes to null, same as a cleared field always has in this table.
+  if (notes !== undefined) {
+    update.notes = notes || null;
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const query: any = (supabase as any)
     .from("property_matches")
-    .update({
-      status: newStatus,
-      notes: notes || null,
-      updated_at: new Date().toISOString(),
-    })
+    .update(update)
     .eq("id", matchId)
     .select();
 
@@ -387,6 +489,65 @@ export async function updateMatchStatus(
 
   if (error) {
     throw new AppError("INTERNAL_ERROR", "Failed to update match status");
+  }
+
+  return mapDatabaseMatch(data as DatabasePropertyMatch);
+}
+
+/** Tenant-side status transition (curated -> interested/dismissed). There is no tenant
+ * UPDATE RLS policy on `property_matches` — deliberately, so a tenant can never write
+ * `approved`/`rejected` themselves — so this goes through the service-role client, with the
+ * `tenant_id` predicate standing in for the RLS check that would otherwise gate it. The
+ * caller (service.ts) is responsible for verifying the current status first. */
+export async function updateMatchStatusForTenant(
+  matchId: string,
+  tenantId: string,
+  newStatus: string
+): Promise<PropertyMatch> {
+  const supabase = await createServiceRoleClient();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const query: any = (supabase as any)
+    .from("property_matches")
+    .update({ status: newStatus, updated_at: new Date().toISOString() })
+    .eq("id", matchId)
+    .eq("tenant_id", tenantId)
+    .select();
+
+  const { data, error } = await query.single();
+
+  if (error) {
+    throw new AppError("INTERNAL_ERROR", "Failed to update match status");
+  }
+
+  return mapDatabaseMatch(data as DatabasePropertyMatch);
+}
+
+/** Records the tenant's final decision once a viewing is done. Same service-role +
+ * `tenant_id` pattern as `updateMatchStatusForTenant`, for the same reason. */
+export async function setLeaseDecision(
+  matchId: string,
+  tenantId: string,
+  decision: string
+): Promise<PropertyMatch> {
+  const supabase = await createServiceRoleClient();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const query: any = (supabase as any)
+    .from("property_matches")
+    .update({
+      lease_decision: decision,
+      lease_decision_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", matchId)
+    .eq("tenant_id", tenantId)
+    .select();
+
+  const { data, error } = await query.single();
+
+  if (error) {
+    throw new AppError("INTERNAL_ERROR", "Failed to record lease decision");
   }
 
   return mapDatabaseMatch(data as DatabasePropertyMatch);

@@ -24,7 +24,6 @@ import type {
 
 interface ExploreClientProps {
   initialProperties: Property[];
-  favoritedPropertyIds: string[];
   matchedPropertyIds: string[];
 }
 
@@ -39,7 +38,6 @@ function addWeeks(dateStr: string, weeks: number): string {
 
 export function ExploreClient({
   initialProperties,
-  favoritedPropertyIds,
   matchedPropertyIds,
 }: ExploreClientProps) {
   const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -58,10 +56,6 @@ export function ExploreClient({
   const [amenities, setAmenities] = useState<Set<Amenity>>(new Set());
   const [isPending, startTransition] = useTransition();
 
-  const favoritedSet = useMemo(
-    () => new Set(favoritedPropertyIds),
-    [favoritedPropertyIds]
-  );
   const matchedSet = useMemo(
     () => new Set(matchedPropertyIds),
     [matchedPropertyIds]
@@ -372,7 +366,6 @@ export function ExploreClient({
                 <PropertyExploreCard
                   key={property.id}
                   property={property}
-                  isFavorited={favoritedSet.has(property.id)}
                   isInterested={matchedSet.has(property.id)}
                 />
               ))}
