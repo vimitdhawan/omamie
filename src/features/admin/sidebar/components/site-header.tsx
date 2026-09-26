@@ -9,6 +9,7 @@ const routeTitleMap: Record<string, string> = {
   "/properties": "Properties",
   "/users": "User Management",
   "/requests": "Matching Requests",
+  "/contact-messages": "Contact Messages",
 };
 
 export function SiteHeader() {
