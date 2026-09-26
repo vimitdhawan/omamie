@@ -26,6 +26,10 @@ const ROUTE_CONFIG = {
       pattern: "/requests/*",
       roles: ["admin"] as const,
     },
+    {
+      pattern: "/contact-messages/*",
+      roles: ["admin"] as const,
+    },
   ],
 } as const;
 

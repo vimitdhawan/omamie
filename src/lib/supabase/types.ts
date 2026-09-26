@@ -107,6 +107,10 @@ export type Database = {
           id: string;
           message: string;
           phone: string | null;
+          resolution_note: string | null;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          status: string;
           subject: Database["public"]["Enums"]["contact_subject"];
         };
         Insert: {
@@ -116,6 +120,10 @@ export type Database = {
           id?: string;
           message: string;
           phone?: string | null;
+          resolution_note?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          status?: string;
           subject: Database["public"]["Enums"]["contact_subject"];
         };
         Update: {
@@ -125,9 +133,21 @@ export type Database = {
           id?: string;
           message?: string;
           phone?: string | null;
+          resolution_note?: string | null;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          status?: string;
           subject?: Database["public"]["Enums"]["contact_subject"];
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "contact_messages_resolved_by_fkey";
+            columns: ["resolved_by"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       lease_documents: {
         Row: {

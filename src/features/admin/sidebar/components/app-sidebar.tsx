@@ -8,7 +8,13 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 import { getCurrentUser } from "@/features/auth/service";
-import { LayoutDashboard, Building2, Users, ClipboardList } from "lucide-react";
+import {
+  LayoutDashboard,
+  Building2,
+  Users,
+  ClipboardList,
+  Mail,
+} from "lucide-react";
 
 const navigationItems = [
   {
@@ -30,6 +36,11 @@ const navigationItems = [
     label: "Requests",
     href: "/requests",
     icon: <ClipboardList className="size-4" />,
+  },
+  {
+    label: "Contact Messages",
+    href: "/contact-messages",
+    icon: <Mail className="size-4" />,
   },
 ];
 
