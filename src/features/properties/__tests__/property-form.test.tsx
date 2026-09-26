@@ -183,12 +183,22 @@ describe("PropertyForm", () => {
       await screen.findByText(/select a neighbourhood from the suggestions/i)
     ).toBeInTheDocument();
 
-    await user.click(await screen.findByRole("button", { name: /Thonglor/ }));
+    await user.click(
+      await screen.findByRole(
+        "button",
+        { name: /Thonglor/ },
+        // The 300ms input debounce plus the mocked suggestions round trip can outrun
+        // testing-library's default 1000ms wait under CI load; give it more room.
+        { timeout: 3000 }
+      )
+    );
 
-    await waitFor(() =>
-      expect(
-        screen.queryByText(/select a neighbourhood from the suggestions/i)
-      ).not.toBeInTheDocument()
+    await waitFor(
+      () =>
+        expect(
+          screen.queryByText(/select a neighbourhood from the suggestions/i)
+        ).not.toBeInTheDocument(),
+      { timeout: 3000 }
     );
   });
 

@@ -3,7 +3,13 @@
 import { useTransition } from "react";
 import { updateMatchStatusAction } from "../actions";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, XCircle } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { CheckCircle, MoreVertical, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 const VALID_TRANSITIONS: Record<string, { label: string; status: string }[]> = {
@@ -18,9 +24,16 @@ const VALID_TRANSITIONS: Record<string, { label: string; status: string }[]> = {
 interface MatchActionsProps {
   matchId: string;
   currentStatus: string;
+  /** "menu" renders a 3-dot dropdown (table rows); "buttons" renders the actions inline
+   * (detail sheet). Defaults to "buttons". */
+  variant?: "menu" | "buttons";
 }
 
-export function MatchActions({ matchId, currentStatus }: MatchActionsProps) {
+export function MatchActions({
+  matchId,
+  currentStatus,
+  variant = "buttons",
+}: MatchActionsProps) {
   const [isPending, startTransition] = useTransition();
 
   const actions = VALID_TRANSITIONS[currentStatus] || [];
@@ -46,6 +59,41 @@ export function MatchActions({ matchId, currentStatus }: MatchActionsProps) {
       }
     });
   };
+
+  if (variant === "menu") {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              size="icon-sm"
+              variant="ghost"
+              disabled={isPending}
+              aria-label="Match actions"
+            />
+          }
+        >
+          <MoreVertical className="size-4" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {actions.map((action) => (
+            <DropdownMenuItem
+              key={action.status}
+              variant={action.status === "rejected" ? "destructive" : "default"}
+              onClick={() => handleAction(action.status)}
+            >
+              {action.status === "approved" ? (
+                <CheckCircle className="text-green-600" />
+              ) : (
+                <XCircle className="text-red-600" />
+              )}
+              {action.label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
 
   return (
     <div className="flex gap-2">
