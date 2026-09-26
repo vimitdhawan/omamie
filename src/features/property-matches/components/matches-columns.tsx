@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
 import type { PropertyMatchWithProperty } from "../types";
 import { MatchActions } from "./match-actions";
+import { derivePropertyCode } from "@/features/properties/utils/display";
 
 const STATUS_BADGE_VARIANT: Record<
   string,
@@ -69,7 +70,12 @@ export const matchColumns: Column[] = [
     }: {
       row: { original: PropertyMatchWithProperty; index: number };
     }) => (
-      <p className="text-sm font-semibold">{row.original.property.title}</p>
+      <div>
+        <p className="text-sm font-semibold">{row.original.property.title}</p>
+        <p className="text-muted-foreground font-mono text-xs">
+          {derivePropertyCode(row.original.property.id)}
+        </p>
+      </div>
     ),
   },
   {
@@ -138,10 +144,13 @@ export const matchColumns: Column[] = [
     }: {
       row: { original: PropertyMatchWithProperty; index: number };
     }) => (
-      <MatchActions
-        matchId={row.original.id}
-        currentStatus={row.original.status}
-      />
+      <div onClick={(event) => event.stopPropagation()}>
+        <MatchActions
+          matchId={row.original.id}
+          currentStatus={row.original.status}
+          variant="menu"
+        />
+      </div>
     ),
   },
 ];

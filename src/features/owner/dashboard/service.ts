@@ -2,6 +2,7 @@ import * as repository from "./repository";
 import type { DashboardMetrics, DashboardOverview } from "./types";
 
 const PENDING_REQUESTS_PREVIEW_LIMIT = 5;
+const RECENT_ACTIVITY_LIMIT = 6;
 
 function toOverview(
   statusCounts: { active: number; rented: number },
@@ -17,16 +18,24 @@ function toOverview(
 }
 
 export async function getDashboardData(profileId: string) {
-  const [statusCounts, pendingRequestsCount, monthlyRevenue, pendingRequests] =
-    await Promise.all([
-      repository.countPropertiesByStatus(profileId),
-      repository.getPendingRequestsCount(profileId),
-      repository.getRentedPropertiesRevenue(profileId),
-      repository.getRecentPendingRequests(
-        profileId,
-        PENDING_REQUESTS_PREVIEW_LIMIT
-      ),
-    ]);
+  const [
+    statusCounts,
+    pendingRequestsCount,
+    monthlyRevenue,
+    pendingRequests,
+    revenueByProperty,
+    recentActivity,
+  ] = await Promise.all([
+    repository.countPropertiesByStatus(profileId),
+    repository.getPendingRequestsCount(profileId),
+    repository.getRentedPropertiesRevenue(profileId),
+    repository.getRecentPendingRequests(
+      profileId,
+      PENDING_REQUESTS_PREVIEW_LIMIT
+    ),
+    repository.getRevenueByProperty(profileId),
+    repository.getRecentActivity(profileId, RECENT_ACTIVITY_LIMIT),
+  ]);
 
   const metrics: DashboardMetrics = {
     totalProperties: statusCounts.all,
@@ -39,5 +48,7 @@ export async function getDashboardData(profileId: string) {
     metrics,
     overview: toOverview(statusCounts, monthlyRevenue),
     pendingRequests,
+    revenueByProperty,
+    recentActivity,
   };
 }

@@ -60,9 +60,6 @@ export function MatchDetailSheet({
     <Sheet open={match !== null} onOpenChange={onOpenChange}>
       <SheetContent>
         <SheetHeader>
-          <p className="text-primary text-xs font-semibold tracking-wide uppercase">
-            Direct Rental Inquiry
-          </p>
           <SheetTitle className="text-xl">{match?.property.title}</SheetTitle>
           <SheetDescription>{match?.property.location}</SheetDescription>
         </SheetHeader>
@@ -83,7 +80,7 @@ export function MatchDetailSheet({
         </div>
 
         {match && (
-          <SheetFooter>
+          <SheetFooter className="flex-row justify-end">
             <MatchActions matchId={match.id} currentStatus={match.status} />
           </SheetFooter>
         )}
