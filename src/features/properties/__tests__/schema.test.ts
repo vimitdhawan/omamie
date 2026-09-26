@@ -2,7 +2,9 @@ import { describe, it, expect } from "vitest";
 import {
   propertyDraftSchema,
   propertyPublishSchema,
+  propertyFormClientSchema,
   propertyFormPublishClientSchema,
+  validateSection,
   imageManifestSchema,
   imageFileSchema,
   imageFilesSchema,
@@ -10,6 +12,7 @@ import {
   parsePropertyFormData,
   SECTION_FIELDS,
   CLEARABLE_FIELDS,
+  numericFieldOptions,
 } from "../schema";
 import {
   AMENITY_VALUES,
@@ -37,7 +40,6 @@ const completePayload = {
   amenities: ["ac", "wifi"],
   images: JSON.stringify([{ id: null, fileIndex: 0, sortOrder: 0 }]),
   acceptTerms: "on",
-  confirmAccuracy: "on",
 };
 
 describe("propertyDraftSchema", () => {
@@ -120,16 +122,16 @@ describe("propertyPublishSchema", () => {
     ).toBe(true);
   });
 
-  it("requires both confirmations", () => {
-    for (const field of ["acceptTerms", "confirmAccuracy"]) {
-      const result = propertyPublishSchema.safeParse({
-        ...completePayload,
-        [field]: "",
-      });
+  it("requires accepting the terms", () => {
+    const result = propertyPublishSchema.safeParse({
+      ...completePayload,
+      acceptTerms: "",
+    });
 
-      expect(result.success).toBe(false);
-      expect(result.error!.issues.some((i) => i.path[0] === field)).toBe(true);
-    }
+    expect(result.success).toBe(false);
+    expect(result.error!.issues.some((i) => i.path[0] === "acceptTerms")).toBe(
+      true
+    );
   });
 });
 
@@ -476,9 +478,13 @@ describe("propertyFormPublishClientSchema", () => {
       description: "",
       furnishedStatus: "furnished",
       areaSqm: 85,
+      floorNumber: 18,
+      totalFloors: 34,
+      availableFrom: "2026-10-01",
+      securityDepositMonths: 2,
+      minimumLeaseMonths: 12,
       amenities: [],
       acceptTerms: true,
-      confirmAccuracy: true,
       imageCount: 1,
     });
 
@@ -497,9 +503,13 @@ describe("propertyFormPublishClientSchema", () => {
       bathrooms: 1,
       furnishedStatus: "furnished",
       areaSqm: 85,
+      floorNumber: 18,
+      totalFloors: 34,
+      availableFrom: "2026-10-01",
+      securityDepositMonths: 2,
+      minimumLeaseMonths: 12,
       amenities: [],
       acceptTerms: true,
-      confirmAccuracy: true,
       imageCount: 0,
     });
 
@@ -507,5 +517,188 @@ describe("propertyFormPublishClientSchema", () => {
     expect(result.error!.issues.some((i) => i.path[0] === "imageCount")).toBe(
       true
     );
+  });
+
+  const basePublishPayload = {
+    propertyType: "condo",
+    title: "Bright two bedroom near BTS",
+    location: "Thonglor, Bangkok",
+    latitude: 13.7308,
+    longitude: 100.5698,
+    monthlyRent: 45000,
+    bedrooms: 2,
+    bathrooms: 1,
+    furnishedStatus: "furnished",
+    areaSqm: 85,
+    availableFrom: "2026-10-01",
+    securityDepositMonths: 2,
+    minimumLeaseMonths: 12,
+    amenities: [],
+    acceptTerms: true,
+    imageCount: 1,
+  };
+
+  it("requires the floor to publish", () => {
+    const result =
+      propertyFormPublishClientSchema.safeParse(basePublishPayload);
+
+    expect(result.success).toBe(false);
+    expect(result.error!.issues.some((i) => i.path[0] === "floorNumber")).toBe(
+      true
+    );
+  });
+
+  it("lets floors in building stay empty", () => {
+    const result = propertyFormPublishClientSchema.safeParse({
+      ...basePublishPayload,
+      floorNumber: 18,
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a building shorter than the unit's own floor", () => {
+    const result = propertyFormPublishClientSchema.safeParse({
+      ...basePublishPayload,
+      floorNumber: 18,
+      totalFloors: 10,
+    });
+
+    expect(result.success).toBe(false);
+    expect(
+      result.error!.issues.some(
+        (i) =>
+          i.path[0] === "totalFloors" &&
+          i.message === "Floors in building must be at least the floor number"
+      )
+    ).toBe(true);
+  });
+
+  it("accepts floors in building equal to or above the unit's own floor", () => {
+    expect(
+      propertyFormPublishClientSchema.safeParse({
+        ...basePublishPayload,
+        floorNumber: 18,
+        totalFloors: 18,
+      }).success
+    ).toBe(true);
+    expect(
+      propertyFormPublishClientSchema.safeParse({
+        ...basePublishPayload,
+        floorNumber: 18,
+        totalFloors: 34,
+      }).success
+    ).toBe(true);
+  });
+});
+
+describe("numericFieldOptions on bedrooms/bathrooms", () => {
+  it("clears to null on empty input, so the draft schema sees a genuinely empty field", () => {
+    for (const input of ["", null, "abc"]) {
+      expect(numericFieldOptions.setValueAs(input)).toBeNull();
+    }
+  });
+
+  it("passes negative, zero and valid counts through unchanged, so min(1) can reject them", () => {
+    // A count below 1 must reach the resolver as-is: silently clamping it here would leave
+    // the (uncontrolled) input showing what the owner typed while the stored value quietly
+    // became valid, with no error to explain the mismatch.
+    expect(numericFieldOptions.setValueAs("-23")).toBe(-23);
+    expect(numericFieldOptions.setValueAs("0")).toBe(0);
+    expect(numericFieldOptions.setValueAs("3")).toBe(3);
+    expect(numericFieldOptions.setValueAs(5)).toBe(5);
+  });
+});
+
+describe("bedrooms/bathrooms as a draft", () => {
+  it("allows a cleared count, same as floorNumber/areaSqm", () => {
+    const result = propertyFormClientSchema.safeParse({
+      ...draftDefaults(),
+      bedrooms: null,
+      bathrooms: null,
+    });
+
+    expect(result.success).toBe(true);
+  });
+});
+
+/** The bare minimum a draft form value object needs to satisfy required keys. */
+function draftDefaults() {
+  return {
+    bedrooms: 1,
+    bathrooms: 1,
+    amenities: [],
+    acceptTerms: false,
+    imageCount: 0,
+  };
+}
+
+describe("floorNumber / totalFloors", () => {
+  it("rejects a shorter building even while still a draft", () => {
+    const result = propertyFormClientSchema.safeParse({
+      ...draftDefaults(),
+      floorNumber: 18,
+      totalFloors: 10,
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error!.issues.some((i) => i.path[0] === "totalFloors")).toBe(
+      true
+    );
+  });
+
+  it("is fine with totalFloors left empty", () => {
+    const result = propertyFormClientSchema.safeParse({
+      ...draftDefaults(),
+      floorNumber: 18,
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("flags a shorter building in validateSection even while other section fields are still empty", () => {
+    // Regression guard. zod skips a whole-object superRefine once any other field has
+    // already failed (e.g. areaSqm still empty), so this message must not depend on the
+    // rest of the section being valid.
+    const issues = validateSection("specs", {
+      ...draftDefaults(),
+      floorNumber: 18,
+      totalFloors: 10,
+      // areaSqm intentionally left unset, alongside everything else specs still needs.
+    });
+
+    expect(issues.totalFloors).toBe(
+      "Floors in building must be at least the floor number"
+    );
+  });
+});
+
+describe("bedrooms/bathrooms minimum", () => {
+  it("rejects zero and negative counts with a clear message", () => {
+    const bedrooms = propertyFormClientSchema.safeParse({
+      ...draftDefaults(),
+      bedrooms: -23,
+    });
+    expect(bedrooms.success).toBe(false);
+    expect(
+      bedrooms.error!.issues.some(
+        (i) =>
+          i.path[0] === "bedrooms" &&
+          i.message === "At least 1 bedroom is required"
+      )
+    ).toBe(true);
+
+    const bathrooms = propertyFormClientSchema.safeParse({
+      ...draftDefaults(),
+      bathrooms: 0,
+    });
+    expect(bathrooms.success).toBe(false);
+    expect(
+      bathrooms.error!.issues.some(
+        (i) =>
+          i.path[0] === "bathrooms" &&
+          i.message === "At least 1 bathroom is required"
+      )
+    ).toBe(true);
   });
 });

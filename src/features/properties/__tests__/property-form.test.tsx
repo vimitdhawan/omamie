@@ -52,13 +52,17 @@ beforeEach(() => {
 
 /** Fills everything the basics section needs, including picking a neighbourhood. */
 async function completeBasics(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByRole("radio", { name: "Condo" }));
+  // Property type defaults to Condo and minimum lease defaults to 12 months already, so
+  // neither needs a click here.
   await user.type(await screen.findByLabelText(/monthly rent/i), "45000");
 
   await user.type(screen.getByLabelText(/neighbourhood/i), "Thonglor");
   // Selecting a suggestion is what supplies the coordinates a listing needs; typing the
   // name alone leaves the listing without a pin.
   await user.click(await screen.findByRole("button", { name: /Thonglor/ }));
+
+  await user.type(screen.getByLabelText(/available from/i), "2026-10-01");
+  await user.type(screen.getByLabelText(/security deposit/i), "2");
 }
 
 function openSection(
@@ -70,6 +74,8 @@ function openSection(
 
 const openBasics = (user: ReturnType<typeof userEvent.setup>) =>
   openSection(user, "Property Basics & Rental Terms");
+const openSpecs = (user: ReturnType<typeof userEvent.setup>) =>
+  openSection(user, "Bedrooms, Bathrooms & Specs");
 const openHeadline = (user: ReturnType<typeof userEvent.setup>) =>
   openSection(user, "Headline & Description");
 
@@ -89,8 +95,9 @@ describe("PropertyForm", () => {
       ).toBeInTheDocument();
     }
     // Specs is not in the list: bedrooms and bathrooms default to 1, so it always
-    // has a summary line to show.
-    expect(screen.getAllByText("Nothing filled in yet.").length).toBe(4);
+    // has a summary line to show. Basics is not in the list either: property type
+    // defaults to Condo, so it always has a summary line too.
+    expect(screen.getAllByText("Nothing filled in yet.").length).toBe(3);
   });
 
   it("reports readiness in the publish panel", () => {
@@ -153,19 +160,175 @@ describe("PropertyForm", () => {
     await screen.findByLabelText(/listing headline/i);
 
     // A pristine section states what it needs, but does not accuse the owner of anything
-    // before they have typed a character.
-    expect(screen.getByRole("button", { name: /^save$/i })).toBeDisabled();
-    expect(
-      await screen.findByText(/1 field still needed/i)
-    ).toBeInTheDocument();
+    // before they have typed a character or pressed Save.
+    expect(screen.getByRole("button", { name: /^save$/i })).toBeEnabled();
     expect(document.querySelectorAll('[data-slot="field-error"]')).toHaveLength(
       0
     );
-    // Cancel is the only way out of an incomplete section.
     expect(screen.getByRole("button", { name: "Cancel" })).toBeEnabled();
   });
 
-  it("reveals a field's error once the owner has edited it", async () => {
+  it("clears the location error once a suggestion is picked", async () => {
+    // Regression guard. Coordinates are set with `shouldValidate: false`, so nothing
+    // triggered the resolver to clear a hand-set "select a suggestion" error -- it stuck
+    // around even after the owner picked one.
+    const user = userEvent.setup();
+    render(<PropertyForm />);
+
+    await openBasics(user);
+    await user.type(screen.getByLabelText(/neighbourhood/i), "Thonglor");
+    await user.click(screen.getByRole("button", { name: /^save$/i }));
+
+    expect(
+      await screen.findByText(/select a neighbourhood from the suggestions/i)
+    ).toBeInTheDocument();
+
+    await user.click(await screen.findByRole("button", { name: /Thonglor/ }));
+
+    await waitFor(() =>
+      expect(
+        screen.queryByText(/select a neighbourhood from the suggestions/i)
+      ).not.toBeInTheDocument()
+    );
+  });
+
+  it("holds back the location error while the owner is still typing in it", async () => {
+    const user = userEvent.setup();
+    render(<PropertyForm />);
+
+    await openBasics(user);
+    const neighbourhood = screen.getByLabelText(/neighbourhood/i);
+    await user.click(screen.getByRole("button", { name: /^save$/i }));
+    await screen.findByText(/location is required/i);
+
+    // Focusing the field is what should silence the error, before anything is even typed.
+    await user.click(neighbourhood);
+    expect(screen.queryByText(/location is required/i)).not.toBeInTheDocument();
+
+    await user.type(neighbourhood, "Thong");
+    expect(
+      screen.queryByText(/select a neighbourhood from the suggestions/i)
+    ).not.toBeInTheDocument();
+
+    // Leaving the field without picking a suggestion is what brings the error back.
+    await user.tab();
+    expect(
+      await screen.findByText(/select a neighbourhood from the suggestions/i)
+    ).toBeInTheDocument();
+  });
+
+  it("rejects a negative bedroom count instead of silently clamping it", async () => {
+    // Regression guard. A silent clamp used to leave the (uncontrolled) input showing
+    // "-23" while the stored value was quietly 1, with no error to explain the mismatch.
+    const user = userEvent.setup();
+    render(<PropertyForm />);
+
+    await openSpecs(user);
+    const bedrooms = await screen.findByRole("spinbutton", {
+      name: /^bedrooms/i,
+    });
+    await user.clear(bedrooms);
+    await user.type(bedrooms, "-23");
+    await user.tab();
+
+    expect(
+      await screen.findByText(/at least 1 bedroom is required/i)
+    ).toBeInTheDocument();
+    expect(bedrooms).toHaveValue(-23);
+  });
+
+  it("shows a required error for bedrooms/bathrooms once cleared, not just once negative", async () => {
+    // Regression guard. An emptied count used to silently fall back to 1 -- a valid value --
+    // so the field looked blank yet never showed a "required" error at all.
+    const user = userEvent.setup();
+    render(<PropertyForm />);
+
+    await openSpecs(user);
+    const bedrooms = await screen.findByRole("spinbutton", {
+      name: /^bedrooms/i,
+    });
+    const bathrooms = screen.getByRole("spinbutton", { name: /^bathrooms/i });
+
+    await user.clear(bedrooms);
+    await user.clear(bathrooms);
+    await user.tab();
+
+    expect(
+      await screen.findByText(/at least 1 bedroom is required/i)
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/at least 1 bathroom is required/i)
+    ).toBeInTheDocument();
+  });
+
+  it("defaults furnishing to Fully Furnished on a new listing", async () => {
+    const user = userEvent.setup();
+    render(<PropertyForm />);
+
+    await openSpecs(user);
+    await screen.findByRole("spinbutton", { name: /^bedrooms/i });
+
+    expect(
+      screen.getByRole("radio", { name: "Fully Furnished" })
+    ).toHaveAttribute("aria-checked", "true");
+  });
+
+  it("rejects a building shorter than the unit's own floor, but allows leaving it empty", async () => {
+    const user = userEvent.setup();
+    render(<PropertyForm />);
+
+    await openSpecs(user);
+    const floor = await screen.findByRole("spinbutton", {
+      name: /^floor\b/i,
+    });
+    await user.type(floor, "18");
+    const totalFloors = screen.getByRole("spinbutton", {
+      name: /floors in building/i,
+    });
+    await user.type(totalFloors, "10");
+    await user.click(screen.getByRole("button", { name: /^save$/i }));
+
+    expect(
+      await screen.findByText(/must be at least the floor number/i)
+    ).toBeInTheDocument();
+
+    await user.clear(totalFloors);
+    await waitFor(() =>
+      expect(
+        screen.queryByText(/must be at least the floor number/i)
+      ).not.toBeInTheDocument()
+    );
+  });
+
+  it("does not reveal a required field's error just from tabbing past it", async () => {
+    // Regression guard. RHF's own `touchedFields` flips on blur regardless of whether the
+    // value changed, so simply tabbing through the section on the way to a field the owner
+    // actually meant to fill used to paint every empty field red along the way.
+    const user = userEvent.setup();
+    render(<PropertyForm />);
+
+    await openSpecs(user);
+    const floor = await screen.findByRole("spinbutton", {
+      name: /^floor\b/i,
+    });
+    // Tab past "Usable floor area" (still empty) on the way to "Floor", never typing in it.
+    await user.click(floor);
+
+    expect(
+      screen.queryByText(/floor area is required/i)
+    ).not.toBeInTheDocument();
+
+    await user.type(floor, "18");
+    await user.tab();
+
+    // Blurring "Floor" after actually filling it must not paint the still-untouched,
+    // still-empty area field red either.
+    expect(
+      screen.queryByText(/floor area is required/i)
+    ).not.toBeInTheDocument();
+  });
+
+  it("holds an error back while the owner is still typing, and reveals it once they leave the field", async () => {
     const user = userEvent.setup();
     render(<PropertyForm />);
 
@@ -174,9 +337,16 @@ describe("PropertyForm", () => {
 
     await user.type(title, "ab");
     expect(
+      screen.queryByText(/at least 5 characters/i)
+    ).not.toBeInTheDocument();
+
+    await user.tab();
+    expect(
       await screen.findByText(/at least 5 characters/i)
     ).toBeInTheDocument();
 
+    // Once shown, it still clears live as they fix it -- no need to leave the field again.
+    await user.click(title);
     await user.type(title, "cdef");
     await waitFor(() =>
       expect(
@@ -298,6 +468,25 @@ describe("PropertyForm", () => {
       )
     );
     expect(mocks.savePropertyAction).not.toHaveBeenCalled();
+  });
+
+  it("links a single acceptance checkbox to the Property Listing Terms & Conditions", () => {
+    // Accuracy of the listing is covered by those terms, so there is only one checkbox
+    // here, not a separate "the details are accurate" one.
+    render(<PropertyForm />);
+
+    expect(
+      screen.getByRole("checkbox", { name: /property listing terms/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/the details are accurate/i)
+    ).not.toBeInTheDocument();
+
+    const link = screen.getByRole("link", {
+      name: /property listing terms/i,
+    });
+    expect(link).toHaveAttribute("href", "/terms/property-listing");
+    expect(link).toHaveAttribute("target", "_blank");
   });
 
   it("submits an existing listing's id so the save is an update", async () => {

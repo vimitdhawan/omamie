@@ -77,43 +77,35 @@ export function PublishPanel({
 
       <div className="border-hairline-soft mt-4 flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <div className="flex flex-wrap gap-x-4 gap-y-1">
-            <Controller
-              control={control}
-              name="acceptTerms"
-              render={({ field }) => (
-                <Label className="flex items-center gap-2 text-sm font-normal">
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={(checked) =>
-                      field.onChange(checked === true)
-                    }
-                  />
-                  I accept the terms
-                </Label>
-              )}
-            />
-            <Controller
-              control={control}
-              name="confirmAccuracy"
-              render={({ field }) => (
-                <Label className="flex items-center gap-2 text-sm font-normal">
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={(checked) =>
-                      field.onChange(checked === true)
-                    }
-                  />
-                  The details are accurate
-                </Label>
-              )}
-            />
-          </div>
-          <FieldError
-            errors={[errors.acceptTerms, errors.confirmAccuracy].filter(
-              Boolean
+          <Controller
+            control={control}
+            name="acceptTerms"
+            render={({ field }) => (
+              <Label className="flex items-center gap-2 text-sm font-normal">
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(checked) =>
+                    field.onChange(checked === true)
+                  }
+                />
+                <span>
+                  I accept the{" "}
+                  <a
+                    href="/terms/property-listing"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:underline"
+                    // A checkbox label toggles the checkbox on click; without stopping
+                    // propagation here, opening the terms in a new tab would also flip it.
+                    onClick={(event) => event.stopPropagation()}
+                  >
+                    Property Listing Terms &amp; Conditions
+                  </a>
+                </span>
+              </Label>
             )}
           />
+          <FieldError errors={[errors.acceptTerms].filter(Boolean)} />
         </div>
 
         <div className="flex shrink-0 gap-2">

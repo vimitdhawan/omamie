@@ -21,6 +21,7 @@ export type LocationAutocompleteProps = {
   id?: string;
   value: string;
   onChange: (value: string, locationDetails?: Location) => void;
+  onFocus?: () => void;
   onBlur?: () => void;
   placeholder?: string;
   disabled?: boolean;
@@ -30,6 +31,7 @@ export function LocationAutocomplete({
   id,
   value,
   onChange,
+  onFocus,
   onBlur,
   placeholder = "e.g., Khlong Toei",
   disabled = false,
@@ -144,7 +146,10 @@ export function LocationAutocomplete({
           type="text"
           value={inputValue}
           onChange={(e) => handleInputChange(e.target.value)}
-          onFocus={() => suggestions.length > 0 && setOpen(true)}
+          onFocus={() => {
+            if (suggestions.length > 0) setOpen(true);
+            onFocus?.();
+          }}
           onBlur={() => {
             setTimeout(() => setOpen(false), 150);
             onBlur?.();

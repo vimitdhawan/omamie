@@ -42,6 +42,7 @@ import {
   type PropertyFormValues,
   type PropertySection,
 } from "../../schema";
+import { FurnishedStatus, PropertyType } from "../../types";
 import type { Property } from "../../types";
 import { SectionCard, EmptyHint, SectionChips } from "./section-card";
 import type { SectionStatus } from "./section-card";
@@ -69,7 +70,9 @@ const SECTION_ICONS: Record<PropertySection, React.ReactNode> = {
 
 function toFormValues(property?: Property): PropertyFormValues {
   return {
-    propertyType: property?.propertyType ?? undefined,
+    // Condo is the most common listing type in Bangkok, so a new listing starts there
+    // instead of forcing every owner to make the same first click.
+    propertyType: property?.propertyType ?? PropertyType.CONDO,
     title: property?.title ?? "",
     location: property?.location ?? "",
     latitude: property?.locationDetails?.latitude,
@@ -81,7 +84,9 @@ function toFormValues(property?: Property): PropertyFormValues {
       property?.condo?.name ?? property?.locationDetails?.addressLine2 ?? "",
     monthlyRent: property?.monthlyRent ?? undefined,
     securityDepositMonths: property?.securityDepositMonths ?? null,
-    minimumLeaseMonths: property?.minimumLeaseMonths ?? null,
+    // 12 months is what most tenants search for, so a new listing starts there instead of
+    // an empty, now-required field.
+    minimumLeaseMonths: property?.minimumLeaseMonths ?? 12,
     availableFrom: property?.availableFrom ?? null,
     areaSqm: property?.areaSqm ?? null,
     floorNumber: property?.floorNumber ?? null,
@@ -89,10 +94,11 @@ function toFormValues(property?: Property): PropertyFormValues {
     bedrooms: property?.bedrooms ?? 1,
     bathrooms: property?.bathrooms ?? 1,
     description: property?.description ?? "",
-    furnishedStatus: property?.furnishedStatus ?? undefined,
+    // Most Bangkok rentals are fully furnished, so a new listing starts there instead of
+    // an empty, required chip group.
+    furnishedStatus: property?.furnishedStatus ?? FurnishedStatus.FURNISHED,
     amenities: property?.amenities ?? [],
     acceptTerms: false,
-    confirmAccuracy: false,
     imageCount: property?.images.length ?? 0,
   };
 }
@@ -139,7 +145,10 @@ export function PropertyForm({ property }: PropertyFormProps) {
 
   const form = useForm<PropertyFormValues>({
     resolver: zodResolver(propertyFormClientSchema),
-    mode: "onChange",
+    // An error should appear once the owner leaves a field, not on every keystroke while
+    // they are still typing into it. `reValidateMode` keeps its default of "onChange", so
+    // once an error does show, it still clears live as they fix it.
+    mode: "onBlur",
     defaultValues: toFormValues(property),
   });
 
@@ -253,7 +262,6 @@ export function PropertyForm({ property }: PropertyFormProps) {
 
     if (intent === "publish") {
       formData.set("acceptTerms", data.acceptTerms ? "on" : "");
-      formData.set("confirmAccuracy", data.confirmAccuracy ? "on" : "");
     }
 
     // The manifest carries order and identity; files ride alongside and are addressed by
@@ -350,8 +358,8 @@ export function PropertyForm({ property }: PropertyFormProps) {
       specs: {
         filled: Boolean(values.furnishedStatus),
         line: [
-          `${values.bedrooms} bed`,
-          `${values.bathrooms} bath`,
+          values.bedrooms != null ? `${values.bedrooms} bed` : null,
+          values.bathrooms != null ? `${values.bathrooms} bath` : null,
           values.areaSqm ? `${values.areaSqm} m²` : null,
           values.floorNumber ? `Floor ${values.floorNumber}` : null,
         ]

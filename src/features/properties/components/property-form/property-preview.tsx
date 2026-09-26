@@ -30,8 +30,12 @@ export function PropertyPreview({ values, images }: PropertyPreviewProps) {
   const safeIndex = index >= images.length ? 0 : index;
   const current = images[safeIndex];
   const meta = [
-    `${values.bedrooms} ${values.bedrooms === 1 ? "bedroom" : "bedrooms"}`,
-    `${values.bathrooms} ${values.bathrooms === 1 ? "bath" : "baths"}`,
+    values.bedrooms != null
+      ? `${values.bedrooms} ${values.bedrooms === 1 ? "bedroom" : "bedrooms"}`
+      : null,
+    values.bathrooms != null
+      ? `${values.bathrooms} ${values.bathrooms === 1 ? "bath" : "baths"}`
+      : null,
     values.areaSqm ? `${values.areaSqm} m²` : null,
   ].filter(Boolean) as string[];
 
