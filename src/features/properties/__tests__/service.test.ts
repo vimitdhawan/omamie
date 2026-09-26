@@ -154,7 +154,6 @@ describe("savePropertyListing", () => {
         furnishedStatus: "furnished",
         areaSqm: "85",
         acceptTerms: "on",
-        confirmAccuracy: "on",
         images: JSON.stringify([
           {
             id: "3f1b9c2e-6a4d-4b8e-9f27-1c5ad0e7b912",
@@ -194,7 +193,6 @@ describe("savePropertyListing", () => {
         furnishedStatus: "furnished",
         areaSqm: "85",
         acceptTerms: "on",
-        confirmAccuracy: "on",
         images: JSON.stringify([{ id: null, fileIndex: 0, sortOrder: 0 }]),
       },
       [createMockFile("a.jpg", "image/jpeg", 100)],

@@ -39,9 +39,12 @@ async function openBasics(page: Page) {
 
 /** Fills every field that blocks the basics section from being saved. */
 async function completeBasics(page: Page) {
-  await page.getByRole("radio", { name: "Condo" }).click();
+  // Property type and minimum lease default to Condo / 12 months already, so neither
+  // needs a click here.
   await page.getByLabel(/neighbourhood/i).fill("Sukhumvit 26, Bangkok");
   await page.getByLabel(/monthly rent/i).fill("45000");
+  await page.getByLabel(/available from/i).fill("2026-11-01");
+  await page.getByLabel(/security deposit/i).fill("2");
 }
 
 const SECTIONS = [
@@ -121,15 +124,14 @@ test.describe("Single-form listing editor", () => {
     const save = page.getByRole("button", { name: /^save$/i });
 
     await page.getByLabel(/listing headline/i).fill("x".repeat(101));
+    await save.click();
 
-    // An invalid section cannot be carried into a save at all: the button is disabled
-    // rather than clickable-but-inert.
+    // Save is always clickable; an invalid section reveals its error and stays open
+    // instead of closing.
     await expect(page.getByText(/less than 100 characters/i)).toBeVisible();
-    await expect(save).toBeDisabled();
     await expect(page.getByLabel(/listing headline/i)).toBeVisible();
 
     await page.getByLabel(/listing headline/i).fill("Bright condo in Thonglor");
-    await expect(save).toBeEnabled();
     await save.click();
     await expect(page.getByLabel(/listing headline/i)).toBeHidden();
   });
@@ -166,7 +168,9 @@ test.describe("Single-form listing editor", () => {
 
     await openSection(page, "Bedrooms, Bathrooms & Specs");
     await page.getByLabel(/usable floor area/i).fill("85");
-    // Furnishing is required to publish, so the specs section will not save without it.
+    await page.getByLabel(/^floor\b/i).fill("18");
+    await page.getByLabel(/floors in building/i).fill("34");
+    // Every field in this section is required, so it will not save without all of them.
     await page.getByRole("radio", { name: "Fully Furnished" }).click();
     await page.getByRole("button", { name: /^save$/i }).click();
     await expect(page.getByLabel(/usable floor area/i)).toBeHidden();
@@ -303,17 +307,21 @@ test.describe("Single-form listing editor", () => {
     await expect(page).toHaveURL(/\/properties\/create/);
   });
 
-  test("blocks Save until a section has what it needs", async ({ page }) => {
+  test("reveals errors instead of closing when Save is clicked on an incomplete section", async ({
+    page,
+  }) => {
     await openSection(page, "Headline & Description");
 
     const save = page.getByRole("button", { name: /^save$/i });
-    await expect(save).toBeDisabled();
-    await expect(page.getByText(/still needed/i)).toBeVisible();
-    // Cancel is the only way out of an incomplete section.
+    await expect(save).toBeEnabled();
+    await save.click();
+    await expect(page.getByLabel(/listing headline/i)).toBeVisible();
+    // Cancel is the only other way out of an incomplete section.
     await expect(page.getByRole("button", { name: "Cancel" })).toBeEnabled();
 
     await page.getByLabel(/listing headline/i).fill("A perfectly good title");
-    await expect(save).toBeEnabled();
+    await save.click();
+    await expect(page.getByLabel(/listing headline/i)).toBeHidden();
   });
 
   test("marks the optional amenities section complete once reviewed", async ({

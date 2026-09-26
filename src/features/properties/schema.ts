@@ -141,6 +141,24 @@ function nullableIsoDate() {
 }
 
 /**
+ * Today .. +3 months, compared as "YYYY-MM-DD" strings (never a JS `Date`) so no timezone
+ * shift can move a boundary date across the line.
+ */
+function availabilityWindow() {
+  const today = new Date();
+  const toIso = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+      d.getDate()
+    ).padStart(2, "0")}`;
+  return {
+    min: toIso(today),
+    max: toIso(
+      new Date(today.getFullYear(), today.getMonth() + 3, today.getDate())
+    ),
+  };
+}
+
+/**
  * Draft intent: the shape is checked, completeness is not. Saving partial work must never be
  * blocked by a field the owner has not filled in yet.
  */
@@ -241,11 +259,10 @@ export const propertyPublishSchema = propertyDraftSchema.extend({
     (entries) => entries.length > 0,
     "At least one photo is required"
   ),
+  // Accuracy of the listing details is covered by the Property Listing Terms & Conditions
+  // themselves, so there is no separate "the details are accurate" checkbox to validate.
   acceptTerms: z.literal("on", {
-    message: "You must accept the terms and conditions",
-  }),
-  confirmAccuracy: z.literal("on", {
-    message: "You must confirm the information is accurate",
+    message: "You must accept the Property Listing Terms & Conditions",
   }),
 });
 
@@ -270,6 +287,8 @@ export const CLEARABLE_FIELDS = [
   "floorNumber",
   "totalFloors",
   "minimumLeaseMonths",
+  "bedrooms",
+  "bathrooms",
   "description",
 ] as const;
 
@@ -372,22 +391,12 @@ function nullableFormNumber(
 }
 
 /**
- * Registration options for every optional numeric input. Empty clears the field to null,
- * which is what tells `save_property` to empty the column -- omitting the key would instead
- * preserve whatever was saved before.
+ * Registration options for every optional numeric input, including bedrooms and bathrooms.
+ * Empty clears the field to null, which is what tells `save_property` to empty the column --
+ * omitting the key would instead preserve whatever was saved before. A genuinely invalid
+ * count (negative, zero, non-numeric) is left as typed, so the min(1) rule below can reject
+ * it with a real error instead of the value quietly becoming valid behind the owner's back.
  */
-/**
- * Bedrooms and bathrooms always have at least one. Clearing the input yields "" (NaN under
- * valueAsNumber), which zod reports as "expected number, received NaN" — a confusing error
- * for a field that simply cannot be empty, so it falls back to the minimum instead.
- */
-export const countFieldOptions = {
-  setValueAs: (value: unknown) => {
-    const parsed = Number(value);
-    return value === "" || value === null || Number.isNaN(parsed) ? 1 : parsed;
-  },
-} as const;
-
 export const numericFieldOptions = {
   setValueAs: (value: unknown) => {
     if (value === "" || value === null || value === undefined) return null;
@@ -396,7 +405,29 @@ export const numericFieldOptions = {
   },
 } as const;
 
-export const propertyFormClientSchema = z.object({
+/**
+ * "Floors in building" is optional, but a number below the unit's own floor makes no sense
+ * (a 12th-floor unit in a 5-storey building), so both schemas below check it once picked up
+ * from `.extend`.
+ */
+function checkTotalFloorsAtLeastFloorNumber(
+  data: { floorNumber?: number | null; totalFloors?: number | null },
+  ctx: z.RefinementCtx
+) {
+  if (
+    data.floorNumber != null &&
+    data.totalFloors != null &&
+    data.totalFloors < data.floorNumber
+  ) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["totalFloors"],
+      message: "Floors in building must be at least the floor number",
+    });
+  }
+}
+
+const propertyFormShape = z.object({
   propertyType: propertyTypeSchema.optional(),
   title: z
     .string()
@@ -415,12 +446,20 @@ export const propertyFormClientSchema = z.object({
     .int("Monthly rent must be a whole number")
     .positive("Monthly rent must be positive")
     .optional(),
+  // Nullable here so a cleared field is a valid draft, same as floorNumber/areaSqm; the
+  // publish override below is what actually requires a count, with the same message.
   bedrooms: z
     .number()
-    .int()
+    .int("Enter a whole number")
     .min(1, "At least 1 bedroom is required")
-    .max(20, "Maximum 20 bedrooms allowed"),
-  bathrooms: z.number().int().min(1).max(20, "Maximum 20 bathrooms allowed"),
+    .max(20, "Maximum 20 bedrooms allowed")
+    .nullish(),
+  bathrooms: z
+    .number()
+    .int("Enter a whole number")
+    .min(1, "At least 1 bathroom is required")
+    .max(20, "Maximum 20 bathrooms allowed")
+    .nullish(),
   description: z.string().max(1000, "Description is too long").nullish(),
   furnishedStatus: furnishedStatusSchema.optional(),
   securityDepositMonths: nullableFormInt(
@@ -428,7 +467,14 @@ export const propertyFormClientSchema = z.object({
     24,
     "Deposit cannot exceed 24 months"
   ),
-  availableFrom: nullableIsoDate(),
+  availableFrom: nullableIsoDate().refine(
+    (value) => {
+      if (!value) return true;
+      const { min, max } = availabilityWindow();
+      return value >= min && value <= max;
+    },
+    { message: "Available from must be within the next 3 months" }
+  ),
   areaSqm: nullableFormNumber(
     0.01,
     10000,
@@ -444,45 +490,75 @@ export const propertyFormClientSchema = z.object({
   ),
   amenities: z.array(amenitySchema),
   acceptTerms: z.boolean(),
-  confirmAccuracy: z.boolean(),
   imageCount: z.number().int().min(0).max(MAX_IMAGES),
 });
 
-export const propertyFormPublishClientSchema = propertyFormClientSchema.extend({
-  propertyType: propertyTypeSchema,
-  title: z
-    .string()
-    .min(5, "Property title must be at least 5 characters")
-    .max(100, "Property title must be less than 100 characters"),
-  location: z.string().min(3, "Location is required"),
-  latitude: z.number({
-    message: "Select a neighbourhood from the suggestions",
-  }),
-  longitude: z.number({
-    message: "Select a neighbourhood from the suggestions",
-  }),
-  monthlyRent: z
-    .number({ message: "Monthly rent is required" })
-    .int("Monthly rent must be a whole number")
-    .positive("Monthly rent must be positive"),
-  bedrooms: z
-    .number()
-    .int()
-    .min(1, "At least 1 bedroom is required")
-    .max(20, "Maximum 20 bedrooms allowed"),
-  furnishedStatus: furnishedStatusSchema,
-  areaSqm: z
-    .number({ message: "Floor area is required" })
-    .positive("Size must be greater than zero")
-    .max(10000, "Size looks too large"),
-  imageCount: z.number().int().min(1, "At least one photo is required"),
-  acceptTerms: z.literal(true, {
-    message: "You must accept the terms and conditions",
-  }),
-  confirmAccuracy: z.literal(true, {
-    message: "You must confirm the information is accurate",
-  }),
-});
+export const propertyFormClientSchema = propertyFormShape.superRefine(
+  checkTotalFloorsAtLeastFloorNumber
+);
+
+export const propertyFormPublishClientSchema = propertyFormShape
+  .extend({
+    propertyType: propertyTypeSchema,
+    title: z
+      .string()
+      .min(5, "Property title must be at least 5 characters")
+      .max(100, "Property title must be less than 100 characters"),
+    location: z.string().min(3, "Location is required"),
+    latitude: z.number({
+      message: "Select a neighbourhood from the suggestions",
+    }),
+    longitude: z.number({
+      message: "Select a neighbourhood from the suggestions",
+    }),
+    monthlyRent: z
+      .number({ message: "Monthly rent is required" })
+      .int("Monthly rent must be a whole number")
+      .positive("Monthly rent must be positive"),
+    availableFrom: z.iso
+      .date("Available from is required")
+      .refine((value) => value >= availabilityWindow().min, {
+        message: "Available from cannot be in the past",
+      })
+      .refine((value) => value <= availabilityWindow().max, {
+        message: "Available from cannot be more than 3 months ahead",
+      }),
+    securityDepositMonths: z
+      .number({ message: "Security deposit is required" })
+      .int("Enter a whole number")
+      .min(0)
+      .max(24, "Deposit cannot exceed 24 months"),
+    minimumLeaseMonths: z
+      .number({ message: "Minimum lease period is required" })
+      .int("Enter a whole number")
+      .min(1)
+      .max(60, "Minimum lease cannot exceed 60 months"),
+    bedrooms: z
+      .number({ message: "At least 1 bedroom is required" })
+      .int()
+      .min(1, "At least 1 bedroom is required")
+      .max(20, "Maximum 20 bedrooms allowed"),
+    bathrooms: z
+      .number({ message: "At least 1 bathroom is required" })
+      .int()
+      .min(1, "At least 1 bathroom is required")
+      .max(20, "Maximum 20 bathrooms allowed"),
+    furnishedStatus: furnishedStatusSchema,
+    areaSqm: z
+      .number({ message: "Floor area is required" })
+      .positive("Size must be greater than zero")
+      .max(10000, "Size looks too large"),
+    floorNumber: z
+      .number({ message: "Floor is required" })
+      .int("Enter a whole number")
+      .min(-5, "Floor looks too low")
+      .max(200, "Floor looks too high"),
+    imageCount: z.number().int().min(1, "At least one photo is required"),
+    acceptTerms: z.literal(true, {
+      message: "You must accept the Property Listing Terms & Conditions",
+    }),
+  })
+  .superRefine(checkTotalFloorsAtLeastFloorNumber);
 
 export type PropertyFormValues = z.infer<typeof propertyFormClientSchema>;
 
@@ -589,15 +665,29 @@ export function validateSection(
     section
   ] as readonly (keyof PropertyFormValues)[];
   const result = propertyFormPublishClientSchema.safeParse(values);
-  if (result.success) return {};
 
   const issues: Partial<Record<keyof PropertyFormValues, string>> = {};
-  for (const issue of result.error.issues) {
-    const field = issue.path[0] as keyof PropertyFormValues | undefined;
-    // acceptTerms / confirmAccuracy belong to the publish panel, not to any section.
-    if (!field || !owned.includes(field)) continue;
-    if (options.blockingOnly && NON_BLOCKING_FIELDS.includes(field)) continue;
-    issues[field] ??= issue.message;
+  if (!result.success) {
+    for (const issue of result.error.issues) {
+      const field = issue.path[0] as keyof PropertyFormValues | undefined;
+      // acceptTerms belongs to the publish panel, not to any section.
+      if (!field || !owned.includes(field)) continue;
+      if (options.blockingOnly && NON_BLOCKING_FIELDS.includes(field)) continue;
+      issues[field] ??= issue.message;
+    }
   }
+
+  // Checked outside the schema: zod skips a whole-object superRefine once any other field
+  // has already failed, but this message needs to show even while the rest of the section
+  // is still empty, not only once everything else is valid.
+  if (
+    owned.includes("totalFloors") &&
+    values.floorNumber != null &&
+    values.totalFloors != null &&
+    values.totalFloors < values.floorNumber
+  ) {
+    issues.totalFloors = "Floors in building must be at least the floor number";
+  }
+
   return issues;
 }

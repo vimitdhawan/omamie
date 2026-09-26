@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Controller, useFormState, type UseFormReturn } from "react-hook-form";
 import {
   Building2,
@@ -40,10 +40,34 @@ export function BasicsSection({
   // validation errors would never appear.
   const { errors } = useFormState({ control });
 
+  // While the owner is still typing in the box, "Location is required" or "Select a
+  // neighbourhood..." reads as a false accusation -- they haven't finished yet. Hold the
+  // message back until they leave the field.
+  const [locationFocused, setLocationFocused] = useState(false);
+
+  // Bounds for "Available from": today through 3 months out, kept as the same
+  // "YYYY-MM-DD" strings the field stores end to end, so no timezone shift can move the
+  // boundary. Computed once per mount rather than per keystroke.
+  const { minAvailableFrom, maxAvailableFrom } = useMemo(() => {
+    const today = new Date();
+    const toIso = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+        d.getDate()
+      ).padStart(2, "0")}`;
+    return {
+      minAvailableFrom: toIso(today),
+      maxAvailableFrom: toIso(
+        new Date(today.getFullYear(), today.getMonth() + 3, today.getDate())
+      ),
+    };
+  }, []);
+
   return (
     <div className="space-y-5">
       <div className="space-y-2">
-        <Label>Property type</Label>
+        <Label>
+          Property type <span className="text-destructive">*</span>
+        </Label>
         <Controller
           control={control}
           name="propertyType"
@@ -79,7 +103,9 @@ export function BasicsSection({
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="location">Neighbourhood / district</Label>
+        <Label htmlFor="location">
+          Neighbourhood / district <span className="text-destructive">*</span>
+        </Label>
         <Controller
           control={control}
           name="location"
@@ -87,6 +113,11 @@ export function BasicsSection({
             <LocationAutocomplete
               id="location"
               value={field.value ?? ""}
+              onFocus={() => setLocationFocused(true)}
+              onBlur={() => {
+                setLocationFocused(false);
+                field.onBlur();
+              }}
               onChange={(value, details) => {
                 field.onChange(value);
                 // Coordinates only exist once a suggestion is picked; clearing them when the
@@ -117,13 +148,27 @@ export function BasicsSection({
             />
           )}
         />
-        <FieldError errors={errors.location ? [errors.location] : undefined} />
-        <FieldError errors={errors.latitude ? [errors.latitude] : undefined} />
+        {/* One message, not two: an empty box needs "Location is required"; typed text
+            that hasn't been picked from the dropdown needs "Select a neighbourhood..." --
+            never both at once for what is, to the owner, a single field. */}
+        <FieldError
+          errors={
+            locationFocused
+              ? undefined
+              : errors.location
+                ? [errors.location]
+                : errors.latitude
+                  ? [errors.latitude]
+                  : undefined
+          }
+        />
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="monthlyRent">Monthly rent (THB)</Label>
+          <Label htmlFor="monthlyRent">
+            Monthly rent (THB) <span className="text-destructive">*</span>
+          </Label>
           <IconInput
             id="monthlyRent"
             icon={<Coins className="size-4" />}
@@ -143,7 +188,8 @@ export function BasicsSection({
 
         <div className="space-y-1.5">
           <Label htmlFor="securityDepositMonths">
-            Security deposit (months)
+            Security deposit (months){" "}
+            <span className="text-destructive">*</span>
           </Label>
           <IconInput
             id="securityDepositMonths"
@@ -166,11 +212,15 @@ export function BasicsSection({
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="availableFrom">Available from</Label>
+        <Label htmlFor="availableFrom">
+          Available from <span className="text-destructive">*</span>
+        </Label>
         <IconInput
           id="availableFrom"
           icon={<CalendarDays className="size-4" />}
           type="date"
+          min={minAvailableFrom}
+          max={maxAvailableFrom}
           {...register("availableFrom", {
             // "" must become null, not undefined: null is what clears a saved date.
             setValueAs: (value) => (value === "" ? null : value),
@@ -182,7 +232,9 @@ export function BasicsSection({
       </div>
 
       <div className="space-y-2">
-        <Label>Minimum lease period</Label>
+        <Label>
+          Minimum lease period <span className="text-destructive">*</span>
+        </Label>
         <Controller
           control={control}
           name="minimumLeaseMonths"

@@ -8,7 +8,6 @@ import { ChipRadio } from "./field-parts";
 import { IconInput } from "./icon-input";
 import {
   FURNISHED_STATUS,
-  countFieldOptions,
   numericFieldOptions,
   type PropertyFormValues,
 } from "../../schema";
@@ -33,7 +32,9 @@ export function SpecsSection({
     <div className="space-y-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="bedrooms">Bedrooms</Label>
+          <Label htmlFor="bedrooms">
+            Bedrooms <span className="text-destructive">*</span>
+          </Label>
           <IconInput
             id="bedrooms"
             icon={<BedDouble className="size-4" />}
@@ -41,7 +42,7 @@ export function SpecsSection({
             inputMode="numeric"
             min={1}
             max={20}
-            {...register("bedrooms", countFieldOptions)}
+            {...register("bedrooms", numericFieldOptions)}
           />
           <FieldError
             errors={errors.bedrooms ? [errors.bedrooms] : undefined}
@@ -49,7 +50,9 @@ export function SpecsSection({
         </div>
 
         <div className="space-y-1.5">
-          <Label htmlFor="bathrooms">Bathrooms</Label>
+          <Label htmlFor="bathrooms">
+            Bathrooms <span className="text-destructive">*</span>
+          </Label>
           <IconInput
             id="bathrooms"
             icon={<Bath className="size-4" />}
@@ -57,7 +60,7 @@ export function SpecsSection({
             inputMode="numeric"
             min={1}
             max={20}
-            {...register("bathrooms", countFieldOptions)}
+            {...register("bathrooms", numericFieldOptions)}
           />
           <FieldError
             errors={errors.bathrooms ? [errors.bathrooms] : undefined}
@@ -66,7 +69,9 @@ export function SpecsSection({
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="areaSqm">Usable floor area (m²)</Label>
+        <Label htmlFor="areaSqm">
+          Usable floor area (m²) <span className="text-destructive">*</span>
+        </Label>
         <IconInput
           id="areaSqm"
           icon={<Ruler className="size-4" />}
@@ -82,7 +87,9 @@ export function SpecsSection({
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label htmlFor="floorNumber">Floor</Label>
+          <Label htmlFor="floorNumber">
+            Floor <span className="text-destructive">*</span>
+          </Label>
           <IconInput
             id="floorNumber"
             icon={<Building className="size-4" />}
@@ -114,7 +121,9 @@ export function SpecsSection({
       </div>
 
       <div className="space-y-2">
-        <Label>Furnishing</Label>
+        <Label>
+          Furnishing <span className="text-destructive">*</span>
+        </Label>
         <Controller
           control={control}
           name="furnishedStatus"

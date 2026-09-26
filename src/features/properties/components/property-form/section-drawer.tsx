@@ -48,12 +48,13 @@ interface SectionDrawerProps {
 }
 
 /**
- * A drawer that will not close over invalid input.
+ * A drawer with exactly one way to keep edits: pressing Save.
  *
- * Closing by any route other than Cancel runs the section's fields through the form
- * resolver first; if anything fails the drawer stays open with the errors showing, so a
- * broken section can never be carried into a save. Cancel restores the values captured when
- * the drawer opened.
+ * Save runs the section's fields through the form resolver; if anything fails, the drawer
+ * stays open with the errors revealed, so a broken section can never be carried into a save.
+ * Every other way of leaving — Cancel, the overlay, Escape, a swipe — discards edits and
+ * restores the values captured when the drawer opened, so a stray outside click never turns
+ * the whole section red.
  */
 export function SectionDrawer({
   section,
@@ -79,18 +80,16 @@ export function SectionDrawer({
   // re-enables the moment the last required field is filled.
   useWatch({ control: form.control, name: fields as never });
   // formState is a proxy: without subscribing here, getFieldState would report stale
-  // dirty/touched flags and no error would ever be revealed.
-  const { dirtyFields, touchedFields, errors } = useFormState({
-    control: form.control,
-  });
+  // touched/error state and neither a reveal nor a clear would ever reach the screen.
+  const { touchedFields, errors } = useFormState({ control: form.control });
   const missing = validateSection(section, form.getValues());
+
   // Only the subset the owner can actually fill in here gates Save — see
   // NON_BLOCKING_FIELDS.
   const blocking = validateSection(section, form.getValues(), {
     blockingOnly: true,
   });
-  const missingFields = Object.keys(blocking) as (keyof PropertyFormValues)[];
-  const canSave = missingFields.length === 0;
+  const canSave = Object.keys(blocking).length === 0;
 
   // Errors appear as the owner works, not the instant a section opens — a pristine drawer
   // full of red is just noise. `revealAll` flips when they try to leave an incomplete
@@ -123,17 +122,21 @@ export function SectionDrawer({
     for (const field of fields) {
       const message = missing[field];
       // Coordinates are never typed, so they follow whether the location field has been
-      // edited rather than their own (always-pristine) state.
+      // left rather than their own (always-pristine) state.
       const source = NON_BLOCKING_SOURCE[field] ?? field;
-      // Dirty alone is not enough: clearing a field back to its default makes it clean
-      // again, so "typed a rent then deleted it" would silently show nothing.
-      const shown =
-        revealAll ||
-        Boolean(dirtyFields[source]) ||
-        Boolean(touchedFields[source]);
+      // Touched, not dirty: an error should appear once the owner leaves the field, not
+      // while they are still typing into it.
+      const shown = revealAll || Boolean(touchedFields[source]);
 
-      if (message && shown && errors[field]?.message !== message) {
-        form.setError(field, { message });
+      if (message && shown) {
+        if (errors[field]?.message !== message) {
+          form.setError(field, { message });
+        }
+      } else if (errors[field]) {
+        // The field just became valid (e.g. a suggestion was picked, which sets
+        // latitude/longitude with `shouldValidate: false`), so nothing else would ever
+        // clear an error this effect set by hand.
+        form.clearErrors(field);
       }
     }
   });
@@ -165,13 +168,14 @@ export function SectionDrawer({
   return (
     <Drawer
       open={open}
-      // Dismissing by overlay, Escape or swipe goes through the same gate as Done.
       onOpenChange={(next) => {
         if (next) {
           onOpenChange(true);
           return;
         }
-        void commit();
+        // Dismissing by overlay, Escape or swipe discards edits, same as Cancel — only the
+        // Save button commits.
+        cancel();
       }}
       swipeDirection={isMobile ? "down" : "right"}
       showSwipeHandle={isMobile}
@@ -196,24 +200,17 @@ export function SectionDrawer({
           {children}
         </div>
 
-        <DrawerFooter className="flex-row items-center justify-between gap-2 border-t pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-          <div className="flex min-w-0 items-center gap-2">
-            <Button type="button" variant="ghost" onClick={cancel}>
-              Cancel
-            </Button>
-            {!canSave && (
-              <p className="text-muted-foreground truncate text-xs">
-                {missingFields.length} field
-                {missingFields.length === 1 ? "" : "s"} still needed
-              </p>
-            )}
-          </div>
+        <DrawerFooter className="flex-row items-center justify-end gap-2 border-t pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <Button type="button" variant="ghost" onClick={cancel}>
+            Cancel
+          </Button>
           {/* Saving a draft lives once, outside the drawers, so there is a single place
-              that writes to the server. This button only closes the section. */}
+              that writes to the server. This button only closes the section. Always
+              enabled: clicking it on an incomplete section reveals the errors instead of
+              silently doing nothing. */}
           <Button
             type="button"
             onClick={() => void commit()}
-            disabled={!canSave}
             className="gap-1.5"
           >
             <Check className="size-4" />
